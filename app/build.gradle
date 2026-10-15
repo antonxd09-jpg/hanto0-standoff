@@ -1,6 +1,11 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
 plugins {
     id 'com.android.application'
-    id 'kotlin-android'
 }
 android {
     compileSdk 33
