@@ -18,15 +18,16 @@ class MainActivity : Activity() {
             setBackgroundColor(android.graphics.Color.parseColor("#0D0D0D"))
         }
         fun tv(t: String, sz: Float, col: String) = TextView(this).apply {
-            text=t; textSize=sz; setTextColor(android.graphics.Color.parseColor(col))
-            gravity=android.view.Gravity.CENTER
+            text = t; textSize = sz
+            setTextColor(android.graphics.Color.parseColor(col))
+            gravity = android.view.Gravity.CENTER
         }
         root.addView(tv("hanto0", 28f, "#2299FF"))
         root.addView(tv("Standoff 2 ESP | v2.0", 11f, "#555555"))
-        root.addView(tv("Silent Aim  •  ESP Box  •  Line  •  Skeleton  •  HP", 11f, "#888888"))
+        root.addView(tv("Silent Aim • ESP Box • Line • Skeleton • HP", 11f, "#888888"))
 
         val btn = Button(this).apply {
-            text = "▶  СТАРТ"
+            text = "СТАРТ"
             setTextColor(android.graphics.Color.WHITE)
             setBackgroundColor(android.graphics.Color.parseColor("#1A4A8A"))
         }

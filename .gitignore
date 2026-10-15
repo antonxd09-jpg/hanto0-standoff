@@ -1,2 +1,7 @@
-src/*.o
-esp_demo
+.gradle/
+build/
+local.properties
+*.iml
+.idea/
+.DS_Store
+app/build/
