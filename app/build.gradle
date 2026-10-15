@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
 }
 android {
+    namespace 'com.hanto0.esp'
     compileSdkVersion 33
     defaultConfig {
         applicationId "com.hanto0.esp"
@@ -9,5 +10,10 @@ android {
         targetSdkVersion 33
         versionCode 1
         versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
     }
 }
