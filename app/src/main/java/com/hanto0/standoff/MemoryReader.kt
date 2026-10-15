@@ -6,117 +6,134 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 object MemoryReader {
-
     private const val PKG = "com.axlebolt.standoff2"
 
-    /* offsets from dump.cs */
-    private const val OFF_TRANSFORM      = 0x100L  // PlayerController->Transform
-    private const val OFF_POSITION       = 0x10L   // Transform->position (Vector3)
-    private const val OFF_HIT_CTRL       = 0xA8L   // PlayerController->PlayerHitController
-    private const val OFF_HEALTH         = 0x30L   // HitController->_health
-    private const val OFF_TEAM           = 0x38L   // ->team
+    /* ── offsets from dump.cs ── */
+    private const val OFF_TRANSFORM  = 0x100L
+    private const val OFF_POSITION   = 0x10L
+    private const val OFF_HIT_CTRL   = 0xA8L
+    private const val OFF_HEALTH     = 0x30L
+    private const val OFF_TEAM       = 0x38L
+    /* cam offsets — TODO: update from dump.cs PlayerMainCamera */
+    private const val OFF_CAM_YAW    = 0x20L
+    private const val OFF_CAM_PITCH  = 0x24L
+
+    /* ── object manager static offset in libil2cpp.so ──
+       Replace 0x7A1234 with real offset from your il2cpp api dump */
+    private const val OBJ_MGR_OFFSET = 0x7A1234L
 
     private var pid: Int = -1
-    private var memFile: RandomAccessFile? = null
+    private var mem: RandomAccessFile? = null
+    private var libBase: Long = 0L
+    private var camAddr: Long = 0L
 
-    /* ---- init ---- */
+    data class Vec3(val x: Float, val y: Float, val z: Float)
+
+    data class PlayerData(
+        val addr: Long,
+        val pos: Vec3,
+        val bones: List<Vec3>,
+        val health: Int,
+        val team: Int
+    )
+
     fun init(): Boolean {
         pid = getPid(PKG)
         if (pid < 0) return false
         return try {
-            memFile = RandomAccessFile("/proc/$pid/mem", "r")
+            mem     = RandomAccessFile("/proc/$pid/mem", "rw")
+            libBase = getLibBase()
             true
-        } catch (e: Exception) { false }
+        } catch (_: Exception) { false }
     }
 
-    fun close() { memFile?.close(); memFile = null }
+    fun close() { mem?.close(); mem = null }
 
-    /* ---- pid ---- */
     private fun getPid(pkg: String): Int {
         File("/proc").listFiles()?.forEach { f ->
-            if (!f.isDirectory) return@forEach
             val n = f.name.toIntOrNull() ?: return@forEach
             try {
-                val cmd = File("/proc/$n/cmdline").readText().trimEnd('\u0000')
-                if (cmd == pkg) return n
+                if (File("/proc/$n/cmdline").readText().trimEnd('\u0000') == pkg) return n
             } catch (_: Exception) {}
         }
         return -1
     }
 
-    /* ---- primitive reads ---- */
+    private fun getLibBase(): Long = try {
+        File("/proc/$pid/maps").readLines()
+            .firstOrNull { it.contains("libil2cpp.so") && it.contains("r-xp") }
+            ?.split("-")?.get(0)?.toLong(16) ?: 0L
+    } catch (_: Exception) { 0L }
+
     fun readInt(addr: Long): Int {
-        val buf = ByteArray(4)
-        val f = memFile ?: return 0
-        return try { f.seek(addr); f.read(buf); ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN).int }
+        val b = ByteArray(4)
+        return try { mem!!.seek(addr); mem!!.read(b); ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).int }
         catch (_: Exception) { 0 }
     }
 
     fun readLong(addr: Long): Long {
-        val buf = ByteArray(8)
-        val f = memFile ?: return 0L
-        return try { f.seek(addr); f.read(buf); ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN).long }
+        val b = ByteArray(8)
+        return try { mem!!.seek(addr); mem!!.read(b); ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).long }
         catch (_: Exception) { 0L }
     }
 
-    fun readFloat(addr: Long): Float = java.lang.Float.intBitsToFloat(readInt(addr))
-
-    data class Vec3(val x: Float, val y: Float, val z: Float)
-
-    fun readVec3(addr: Long) = Vec3(readFloat(addr), readFloat(addr+4), readFloat(addr+8))
-
-    /* ---- il2cpp base ---- */
-    private fun getLibBase(): Long {
-        return try {
-            File("/proc/$pid/maps").readLines().firstOrNull {
-                it.contains("libil2cpp.so") && it.contains("r-xp")
-            }?.split("-")?.get(0)?.toLong(16) ?: 0L
-        } catch (_: Exception) { 0L }
+    fun writeInt(addr: Long, v: Int) {
+        val b = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(v).array()
+        try { mem!!.seek(addr); mem!!.write(b) } catch (_: Exception) {}
     }
 
-    /* ---- entity list ---- */
-    data class PlayerData(
-        val addr: Long,
-        val pos: Vec3,
-        val health: Int,
-        val team: Int
-    )
+    fun readFloat(addr: Long) = java.lang.Float.intBitsToFloat(readInt(addr))
+    fun writeFloat(addr: Long, v: Float) = writeInt(addr, java.lang.Float.floatToIntBits(v))
+    fun readVec3(addr: Long)  = Vec3(readFloat(addr), readFloat(addr+4), readFloat(addr+8))
+
+    fun getCamPos(): Vec3 {
+        if (camAddr == 0L) return Vec3(0f,0f,0f)
+        return readVec3(camAddr + OFF_POSITION)
+    }
+
+    fun getCamYaw(): Float {
+        if (camAddr == 0L) return 0f
+        return readFloat(camAddr + OFF_CAM_YAW)
+    }
+
+    fun getCamPitch(): Float {
+        if (camAddr == 0L) return 0f
+        return readFloat(camAddr + OFF_CAM_PITCH)
+    }
+
+    fun writeCamAngles(yaw: Float, pitch: Float) {
+        if (camAddr == 0L) return
+        writeFloat(camAddr + OFF_CAM_YAW,   yaw)
+        writeFloat(camAddr + OFF_CAM_PITCH, pitch)
+    }
 
     fun getPlayers(): List<PlayerData> {
-        val base = getLibBase()
-        if (base == 0L) return emptyList()
-
-        /* ObjectManager static ptr — find via maps + known il2cpp pattern */
-        /* Assumption: object list ptr at base+0x7A1234 — UPDATE with your real offset */
-        val OBJ_MGR_STATIC = base + 0x7A1234L  // <-- замени на реальный из offset дампа
-
-        val mgrPtr  = readLong(OBJ_MGR_STATIC)
-        if (mgrPtr == 0L) return emptyList()
-
-        val listPtr = readLong(mgrPtr + 0x10)
-        if (listPtr == 0L) return emptyList()
-
+        if (libBase == 0L) return emptyList()
+        val mgrPtr  = readLong(libBase + OBJ_MGR_OFFSET); if (mgrPtr==0L) return emptyList()
+        val listPtr = readLong(mgrPtr + 0x10);             if (listPtr==0L) return emptyList()
         val count   = readInt(listPtr + 0x18)
         val items   = readLong(listPtr + 0x10)
-
         val result  = mutableListOf<PlayerData>()
-        val cap     = minOf(count, 32)
-
-        for (i in 0 until cap) {
-            val objPtr = readLong(items + i * 8L)
-            if (objPtr == 0L) continue
-
-            val hp = readInt(objPtr + OFF_HIT_CTRL.let { readLong(objPtr + it) + OFF_HEALTH })
-            if (hp <= 0) continue
-
-            val transformPtr = readLong(objPtr + OFF_TRANSFORM)
-            if (transformPtr == 0L) continue
-
-            val pos  = readVec3(transformPtr + OFF_POSITION)
-            val team = readInt(objPtr + OFF_TEAM)
-
-            result.add(PlayerData(objPtr, pos, hp, team))
+        for (i in 0 until minOf(count, 32)) {
+            val obj = readLong(items + i*8L); if (obj==0L) continue
+            val hc  = readLong(obj + OFF_HIT_CTRL); if (hc==0L) continue
+            val hp  = readInt(hc + OFF_HEALTH);     if (hp<=0) continue
+            val tr  = readLong(obj + OFF_TRANSFORM); if (tr==0L) continue
+            val pos = readVec3(tr + OFF_POSITION)
+            val team= readInt(obj + OFF_TEAM)
+            val bones = buildBones(pos)
+            if (camAddr == 0L) camAddr = readLong(obj + 0xE8L)
+            result.add(PlayerData(obj, pos, bones, hp, team))
         }
         return result
     }
+
+    private fun buildBones(o: Vec3) = listOf(
+        Vec3(o.x, o.y+1.8f, o.z), Vec3(o.x, o.y+1.5f, o.z),
+        Vec3(o.x, o.y+1.2f, o.z), Vec3(o.x, o.y+0.9f, o.z),
+        Vec3(o.x-.4f,o.y+1.4f,o.z), Vec3(o.x-.4f,o.y+1.1f,o.z), Vec3(o.x-.4f,o.y+0.8f,o.z),
+        Vec3(o.x+.4f,o.y+1.4f,o.z), Vec3(o.x+.4f,o.y+1.1f,o.z), Vec3(o.x+.4f,o.y+0.8f,o.z),
+        Vec3(o.x-.2f,o.y+0.8f,o.z), Vec3(o.x-.2f,o.y+0.45f,o.z), Vec3(o.x-.2f,o.y,o.z),
+        Vec3(o.x+.2f,o.y+0.8f,o.z), Vec3(o.x+.2f,o.y+0.45f,o.z), Vec3(o.x+.2f,o.y,o.z)
+    )
 }
