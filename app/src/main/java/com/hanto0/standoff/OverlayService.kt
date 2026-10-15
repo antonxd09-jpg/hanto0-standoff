@@ -17,31 +17,35 @@ class OverlayService : Service() {
     private lateinit var esp: EspView
     private var menuVisible = false
     private val handler = Handler(Looper.getMainLooper())
+    private var running = true
     var showBox = true; var showLines = true
     var showSkeleton = true; var showHP = true
     var showInfo = true; var silentAim = true
 
     private val loop = object : Runnable {
         override fun run() {
-            val players = MemoryReader.getPlayers()
-            val cam = Projection.CamData(
-                MemoryReader.getCamPos(),
-                MemoryReader.getCamYaw(),
-                MemoryReader.getCamPitch(),
-                90f,
-                resources.displayMetrics.widthPixels,
-                resources.displayMetrics.heightPixels
-            )
-            if (silentAim) {
-                SilentAim.calc(cam.pos, cam.yaw, cam.pitch, players)?.let {
-                    MemoryReader.writeCamAngles(it.yaw, it.pitch)
+            if (!running) return
+            try {
+                val players = MemoryReader.getPlayers()
+                val cam = Projection.CamData(
+                    MemoryReader.getCamPos(),
+                    MemoryReader.getCamYaw(),
+                    MemoryReader.getCamPitch(),
+                    90f,
+                    resources.displayMetrics.widthPixels,
+                    resources.displayMetrics.heightPixels
+                )
+                if (silentAim) {
+                    SilentAim.calc(cam.pos, cam.yaw, cam.pitch, players)?.let {
+                        MemoryReader.writeCamAngles(it.yaw, it.pitch)
+                    }
                 }
-            }
-            esp.showBox = showBox; esp.showLines = showLines
-            esp.showSkeleton = showSkeleton; esp.showHP = showHP
-            esp.showInfo = showInfo
-            esp.update(players, cam)
-            handler.postDelayed(this, 50)
+                esp.showBox = showBox; esp.showLines = showLines
+                esp.showSkeleton = showSkeleton; esp.showHP = showHP
+                esp.showInfo = showInfo
+                esp.update(players, cam)
+            } catch (_: Throwable) {}
+            if (running) handler.postDelayed(this, 80)
         }
     }
 
@@ -49,7 +53,7 @@ class OverlayService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        MemoryReader.init()
+        try { MemoryReader.init() } catch (_: Throwable) {}
         wm = getSystemService(WINDOW_SERVICE) as WindowManager
         setupEsp(); setupBtn(); setupMenu()
         handler.post(loop)
@@ -74,7 +78,7 @@ class OverlayService : Service() {
             setBackgroundColor(Color.parseColor("#AA1A4A8A"))
             textSize = 12f
         }
-        val p = WindowManager.LayoutParams(120, 80,
+        val p = WindowManager.LayoutParams(140, 90,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             PixelFormat.TRANSLUCENT).apply {
@@ -137,7 +141,7 @@ class OverlayService : Service() {
         tog("ESP Skeleton", true) { showSkeleton = it }
         tog("ESP HP", true) { showHP = it }
         tog("ESP Info", true) { showInfo = it }
-        wm.addView(menu, WindowManager.LayoutParams(550,
+        wm.addView(menu, WindowManager.LayoutParams(580,
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
@@ -152,9 +156,10 @@ class OverlayService : Service() {
     }
 
     override fun onDestroy() {
+        running = false
         super.onDestroy()
         handler.removeCallbacks(loop)
-        MemoryReader.close()
-        listOf(esp, btn, menu).forEach { wm.removeView(it) }
+        try { MemoryReader.close() } catch (_: Throwable) {}
+        try { listOf(esp, btn, menu).forEach { wm.removeView(it) } } catch (_: Throwable) {}
     }
 }

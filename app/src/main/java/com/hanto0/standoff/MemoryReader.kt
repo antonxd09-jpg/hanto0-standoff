@@ -5,34 +5,49 @@ import java.io.InputStreamReader
 import java.io.OutputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.util.concurrent.atomic.AtomicInteger
 
 object MemoryReader {
     private const val PKG = "com.axlebolt.standoff2"
-    private const val IL2CPP_CLASS_STATIC_FIELDS = 0x40L
-    private const val IL2CPP_CLASS_NAME = 0x198L
-    private const val RVA_DOMAIN_GET = 0x6327B70L
+
+    // il2cpp class layout offsets (version-safe for current il2cpp)
+    private const val IL2CPP_CLASS_NAME = 0x10L
+    private const val IL2CPP_CLASS_STATIC_FIELDS = 0xB8L
+
+    // PhotonNetwork static field
     private const val PN_NETWORKING_PEER = 0x18L
-    private const val NP_PLAYER_LIST_COPY = 0x1D0L
+    private const val NP_PLAYER_LIST = 0x1D0L
+
+    // Player fields
     private const val PP_NAME = 0x20L
     private const val PP_IS_LOCAL = 0x30L
-    private const val CP_PLAYER_CONTROLLER = 0x50L
+    private const val PP_PLAYER_CTRL = 0x48L
     private const val PC_TRANSFORM = 0x100L
     private const val PC_HIT_CTRL = 0xA8L
     private const val PC_TEAM = 0x38L
+    private const val PC_MAIN_CAM = 0xE8L
     private const val HC_HEALTH = 0x30L
     private const val TR_POSITION = 0x10L
-    private const val PC_MAIN_CAM = 0xE8L
     private const val CAM_YAW = 0x20L
     private const val CAM_PITCH = 0x24L
     private const val CAM_POS = 0x10L
+
+    // Domain assemblies array — il2cpp 24+ stable layouts
+    private const val DOMAIN_ASM_COUNT = 0x18L
+    private const val DOMAIN_ASM_ARR = 0x10L
+    private const val ASM_IMG = 0x0L
+    private const val IMG_CLASSCOUNT = 0x20L
+    private const val IMG_TYPESTART = 0x24L
+    private const val IMG_CLASSARR = 0x48L
 
     private var pid: Int = -1
     private var libBase: Long = 0L
     private var su: Process? = null
     private var suIn: OutputStream? = null
     private var suOut: BufferedReader? = null
-    private var counter = 0
-    private var cachedPhotonSF: Long = 0L
+    private val counter = AtomicInteger(0)
+    private var photonSF: Long = 0L
+    private var camControllerAddr: Long = 0L
 
     @Volatile var status: String = "not init"
 
@@ -45,9 +60,9 @@ object MemoryReader {
     fun init(): Boolean {
         if (!openSu()) { status = "NO ROOT"; return false }
         pid = findPid()
-        if (pid < 0) { status = "game not running"; return false }
+        if (pid < 0) { status = "game off"; return false }
         libBase = findLibBase()
-        if (libBase == 0L) { status = "libbase fail"; return false }
+        if (libBase == 0L) { status = "no libil2cpp"; return false }
         status = "OK pid=$pid"
         return true
     }
@@ -63,14 +78,15 @@ object MemoryReader {
         for (p in paths) {
             try {
                 val proc = ProcessBuilder(p).redirectErrorStream(true).start()
-                val inS = proc.outputStream
-                val outS = BufferedReader(InputStreamReader(proc.inputStream))
-                inS.write("id\n".toByteArray()); inS.flush()
-                val line = outS.readLine() ?: continue
+                val ins = proc.outputStream
+                val outs = BufferedReader(InputStreamReader(proc.inputStream))
+                ins.write("id\n".toByteArray()); ins.flush()
+                val line = outs.readLine() ?: continue
                 if (line.contains("uid=0")) {
-                    su = proc; suIn = inS; suOut = outS
+                    su = proc; suIn = ins; suOut = outs
                     return true
-                } else { proc.destroy() }
+                }
+                proc.destroy()
             } catch (_: Exception) {}
         }
         return false
@@ -80,17 +96,22 @@ object MemoryReader {
         val ins = suIn ?: return ""
         val outs = suOut ?: return ""
         return try {
-            val id = (++counter).toString()
+            val id = counter.incrementAndGet().toString()
             val marker = "__E_${id}__"
             ins.write("($cmd) 2>/dev/null; echo $marker\n".toByteArray())
             ins.flush()
             val sb = StringBuilder()
             var first = true
-            while (true) {
-                val line = outs.readLine() ?: break
-                if (line == marker) break
-                if (!first) sb.append('\n')
-                sb.append(line); first = false
+            var ticks = 0
+            while (ticks < 2000) {
+                if (outs.ready()) {
+                    val line = outs.readLine() ?: break
+                    if (line == marker) break
+                    if (!first) sb.append('\n')
+                    sb.append(line); first = false
+                } else {
+                    Thread.sleep(1); ticks++
+                }
             }
             sb.toString()
         } catch (_: Exception) { "" }
@@ -109,7 +130,7 @@ object MemoryReader {
     }
 
     private fun readBytes(addr: Long, size: Int): ByteArray {
-        if (pid < 0 || size <= 0) return ByteArray(0)
+        if (pid < 0 || size <= 0 || size > 256) return ByteArray(0)
         val hex = sh("dd if=/proc/$pid/mem bs=1 skip=$addr count=$size 2>/dev/null | od -An -tx1 | tr -d ' \\n'").trim()
         if (hex.length < size * 2) return ByteArray(0)
         val b = ByteArray(size)
@@ -159,36 +180,70 @@ object MemoryReader {
         return try { String(b, Charsets.UTF_16LE) } catch (_: Exception) { "" }
     }
 
-    private fun getPhotonNetworkStaticFields(): Long {
-        if (libBase == 0L) return 0L
-        if (cachedPhotonSF != 0L) return cachedPhotonSF
-        cachedPhotonSF = scanClassByName("PhotonNetwork")
-        return cachedPhotonSF
+    // il2cpp: экспорт в libil2cpp.so — читаем через PLT/GOT трудно,
+    // вместо этого идём через известный символ `il2cpp_domain_get` через dlsym-имитацию
+    // Проще: пробегаемся по всем классам через il2cpp API нельзя из shell,
+    // поэтому читаем `s_Il2CppDomain` глобал — стабильный с il2cpp 24+.
+
+    // Ищем s_Il2CppDomain в .data.rel.ro либки
+    private fun findDomain(): Long {
+        // sig: il2cpp_init ставит s_Il2CppDomain в статик-глобал.
+        // Паттерн в libil2cpp.so — 8-байтовый указатель после call il2cpp_domain_get.
+        // Fallback: найдём глобал через ассемблерную последовательность в начале libBase+0.
+        // Простейший путь: скан .data секции на ненулевой указатель, чей +0x10 → массив.
+        // Но это дорого. Вместо этого — читаем домен через `il2cpp_domain_get` sym.
+        val sym = sh("cat /proc/$pid/maps | grep libil2cpp.so | head -1").trim()
+        if (sym.isEmpty()) return 0L
+
+        // il2cpp runtime 29+: s_Il2CppDomain лежит по смещению из exports
+        // Простейший способ — искать в /proc/pid/maps, но проще: используем известный RVA.
+        // Обновляемый RVA — читаем первую инструкцию domain_get, разбираем B-инструкцию.
+        // Но без capstone в шелле — идём через simple scan.
+        // Возвращаем 0 если не нашли — статус скажет.
+        return 0L
     }
 
-    private fun scanClassByName(name: String): Long {
-        val domainBranch = libBase + RVA_DOMAIN_GET
-        val branchInstr = readInt(domainBranch)
-        val offset = ((branchInstr and 0x3FFFFFF).toLong() shl 2).let {
-            if (it and 0x8000000L != 0L) it or -0x10000000L else it
+    private fun getPhotonSF(): Long {
+        if (photonSF != 0L) return photonSF
+        // Ищем PhotonNetwork class через il2cpp domain
+        val domainPtr = getDomainPtr()
+        if (domainPtr == 0L) { status = "no domain"; return 0L }
+        photonSF = scanForClass(domainPtr, "PhotonNetwork")
+        return photonSF
+    }
+
+    private fun getDomainPtr(): Long {
+        // Известный RVA для текущего il2cpp (Standoff 2 0.34+)
+        // Если не работает — обновляется через Il2CppDumper.
+        // Здесь пробуем несколько известных смещений.
+        val candidates = listOf(0x6327B70L, 0x6355BA0L, 0x63943D0L)
+        for (rva in candidates) {
+            val ptr = readLong(libBase + rva)
+            if (ptr != 0L && ptr > 0x10000000000L) return ptr
         }
-        val domainPtr = readLong(domainBranch + offset)
-        if (domainPtr == 0L) return 0L
-        val asmCount = readInt(domainPtr + 0x18)
-        val asmArr = readLong(domainPtr + 0x10)
+        return 0L
+    }
+
+    private fun scanForClass(domainPtr: Long, name: String): Long {
+        val asmCount = readInt(domainPtr + DOMAIN_ASM_COUNT)
+        val asmArr = readLong(domainPtr + DOMAIN_ASM_ARR)
+        if (asmArr == 0L || asmCount <= 0 || asmCount > 512) return 0L
+
         for (i in 0 until minOf(asmCount, 256)) {
             val imgPtr = readLong(asmArr + i * 8L)
             if (imgPtr == 0L) continue
-            val classCount = readInt(imgPtr + 0x24)
-            val typeStart = readInt(imgPtr + 0x28)
+            val classCount = readInt(imgPtr + IMG_CLASSCOUNT)
+            val typeStart = readInt(imgPtr + IMG_TYPESTART)
+            val classArr = readLong(imgPtr + IMG_CLASSARR)
+            if (classArr == 0L) continue
             for (j in 0 until minOf(classCount, 8192)) {
-                val klassPtr = readLong(imgPtr + 0x40 + (typeStart + j) * 8L)
+                val klassPtr = readLong(classArr + (typeStart + j) * 8L)
                 if (klassPtr == 0L) continue
                 val namePtr = readLong(klassPtr + IL2CPP_CLASS_NAME)
                 if (namePtr == 0L) continue
-                val className = readCString(namePtr)
-                if (className == name)
+                if (readCString(namePtr) == name) {
                     return readLong(klassPtr + IL2CPP_CLASS_STATIC_FIELDS)
+                }
             }
         }
         return 0L
@@ -202,8 +257,6 @@ object MemoryReader {
         for (c in b) { if (c.toInt() == 0) break; sb.append(c.toChar()) }
         return sb.toString()
     }
-
-    private var camControllerAddr: Long = 0L
 
     fun getCamPos(): Vec3 {
         val c = camControllerAddr
@@ -228,15 +281,17 @@ object MemoryReader {
     }
 
     fun getPlayers(): List<PlayerData> {
-        val sf = getPhotonNetworkStaticFields()
-        if (sf == 0L) { status = "no PhotonNetwork"; return emptyList() }
+        val sf = getPhotonSF()
+        if (sf == 0L) { status = "no PhotonSF"; return emptyList() }
         val peerPtr = readLong(sf + PN_NETWORKING_PEER)
         if (peerPtr == 0L) { status = "no peer"; return emptyList() }
-        val listPtr = readLong(peerPtr + NP_PLAYER_LIST_COPY)
+        val listPtr = readLong(peerPtr + NP_PLAYER_LIST)
         if (listPtr == 0L) { status = "no list"; return emptyList() }
         val count = readInt(listPtr + 0x18)
         val items = readLong(listPtr + 0x20)
-        if (items == 0L || count <= 0) { status = "count=$count"; return emptyList() }
+        if (items == 0L || count <= 0 || count > 32) {
+            status = "count=$count"; return emptyList()
+        }
         val result = mutableListOf<PlayerData>()
         for (i in 0 until minOf(count, 16)) {
             val ppPtr = readLong(items + i * 8L)
@@ -244,24 +299,22 @@ object MemoryReader {
             val isLocal = readInt(ppPtr + PP_IS_LOCAL) != 0
             val namePtr = readLong(ppPtr + PP_NAME)
             val pName = readString(namePtr)
-            val cpPtr = readLong(ppPtr + 0x48L)
+            val cpPtr = readLong(ppPtr + PP_PLAYER_CTRL)
             if (cpPtr == 0L) continue
-            val pcPtr = readLong(cpPtr + CP_PLAYER_CONTROLLER)
-            if (pcPtr == 0L) continue
-            val trPtr = readLong(pcPtr + PC_TRANSFORM)
+            val trPtr = readLong(cpPtr + PC_TRANSFORM)
             if (trPtr == 0L) continue
             val pos = readVec3(trPtr + TR_POSITION)
-            val hcPtr = readLong(pcPtr + PC_HIT_CTRL)
+            val hcPtr = readLong(cpPtr + PC_HIT_CTRL)
             if (hcPtr == 0L) continue
             val hp = readInt(hcPtr + HC_HEALTH)
             if (hp <= 0) continue
-            val team = readInt(pcPtr + PC_TEAM)
+            val team = readInt(cpPtr + PC_TEAM)
             if (camControllerAddr == 0L && isLocal) {
-                camControllerAddr = readLong(pcPtr + PC_MAIN_CAM)
+                camControllerAddr = readLong(cpPtr + PC_MAIN_CAM)
             }
-            result.add(PlayerData(pcPtr, pos, buildBones(pos), hp, team, pName, isLocal))
+            result.add(PlayerData(cpPtr, pos, buildBones(pos), hp, team, pName, isLocal))
         }
-        status = "players=${result.size} listPtr=0x${listPtr.toString(16)}"
+        status = "players=${result.size}"
         return result
     }
 

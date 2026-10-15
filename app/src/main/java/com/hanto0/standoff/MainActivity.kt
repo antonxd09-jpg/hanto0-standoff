@@ -23,8 +23,8 @@ class MainActivity : Activity() {
             gravity = android.view.Gravity.CENTER
         }
         root.addView(tv("hanto0", 28f, "#2299FF"))
-        root.addView(tv("Standoff 2 ESP | v2.0", 11f, "#555555"))
-        root.addView(tv("Silent Aim • ESP Box • Line • Skeleton • HP", 11f, "#888888"))
+        root.addView(tv("Standoff 2 ESP | v2.1", 11f, "#555555"))
+        root.addView(tv("Требуется ROOT + запущенная игра", 11f, "#AA5555"))
 
         val btn = Button(this).apply {
             text = "СТАРТ"
