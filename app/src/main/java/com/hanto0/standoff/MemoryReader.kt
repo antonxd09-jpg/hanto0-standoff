@@ -1,7 +1,8 @@
 package com.hanto0.standoff
 
-import java.io.File
-import java.io.RandomAccessFile
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.io.OutputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -26,8 +27,14 @@ object MemoryReader {
     private const val CAM_POS = 0x10L
 
     private var pid: Int = -1
-    private var mem: RandomAccessFile? = null
     private var libBase: Long = 0L
+    private var su: Process? = null
+    private var suIn: OutputStream? = null
+    private var suOut: BufferedReader? = null
+    private var counter = 0
+    private var cachedPhotonSF: Long = 0L
+
+    @Volatile var status: String = "not init"
 
     data class Vec3(val x: Float, val y: Float, val z: Float)
     data class PlayerData(
@@ -36,56 +43,107 @@ object MemoryReader {
     )
 
     fun init(): Boolean {
-        pid = getPid(PKG)
-        if (pid < 0) return false
-        return try {
-            mem = RandomAccessFile("/proc/$pid/mem", "rw")
-            libBase = getLibBase()
-            true
-        } catch (_: Exception) { false }
+        if (!openSu()) { status = "NO ROOT"; return false }
+        pid = findPid()
+        if (pid < 0) { status = "game not running"; return false }
+        libBase = findLibBase()
+        if (libBase == 0L) { status = "libbase fail"; return false }
+        status = "OK pid=$pid"
+        return true
     }
 
-    fun close() { mem?.close(); mem = null }
+    fun close() {
+        try { suIn?.write("exit\n".toByteArray()); suIn?.flush() } catch (_: Exception) {}
+        try { su?.destroy() } catch (_: Exception) {}
+        su = null; suIn = null; suOut = null
+    }
 
-    private fun getPid(pkg: String): Int {
-        File("/proc").listFiles()?.forEach { f ->
-            val n = f.name.toIntOrNull() ?: return@forEach
+    private fun openSu(): Boolean {
+        val paths = listOf("su", "/system/bin/su", "/system/xbin/su", "/sbin/su")
+        for (p in paths) {
             try {
-                if (File("/proc/$n/cmdline").readText()
-                        .trimEnd('\u0000') == pkg) return n
+                val proc = ProcessBuilder(p).redirectErrorStream(true).start()
+                val inS = proc.outputStream
+                val outS = BufferedReader(InputStreamReader(proc.inputStream))
+                inS.write("id\n".toByteArray()); inS.flush()
+                val line = outS.readLine() ?: continue
+                if (line.contains("uid=0")) {
+                    su = proc; suIn = inS; suOut = outS
+                    return true
+                } else { proc.destroy() }
             } catch (_: Exception) {}
         }
-        return -1
+        return false
     }
 
-    private fun getLibBase(): Long = try {
-        File("/proc/$pid/maps").readLines()
-            .firstOrNull { it.contains("libil2cpp.so") && it.contains("r-xp") }
-            ?.split("-")?.get(0)?.toLong(16) ?: 0L
-    } catch (_: Exception) { 0L }
+    private fun sh(cmd: String): String {
+        val ins = suIn ?: return ""
+        val outs = suOut ?: return ""
+        return try {
+            val id = (++counter).toString()
+            val marker = "__E_${id}__"
+            ins.write("($cmd) 2>/dev/null; echo $marker\n".toByteArray())
+            ins.flush()
+            val sb = StringBuilder()
+            var first = true
+            while (true) {
+                val line = outs.readLine() ?: break
+                if (line == marker) break
+                if (!first) sb.append('\n')
+                sb.append(line); first = false
+            }
+            sb.toString()
+        } catch (_: Exception) { "" }
+    }
+
+    private fun findPid(): Int {
+        val script = "for d in /proc/[0-9]*; do n=\${d#/proc/}; c=\$(cat \$d/cmdline 2>/dev/null | tr -d '\\000'); if [ \"\$c\" = \"$PKG\" ]; then echo \$n; break; fi; done"
+        val out = sh(script).trim()
+        return out.lines().firstOrNull()?.toIntOrNull() ?: -1
+    }
+
+    private fun findLibBase(): Long {
+        val out = sh("grep libil2cpp.so /proc/$pid/maps 2>/dev/null | head -1").trim()
+        if (out.isEmpty()) return 0L
+        return out.substringBefore("-").trim().toLongOrNull(16) ?: 0L
+    }
+
+    private fun readBytes(addr: Long, size: Int): ByteArray {
+        if (pid < 0 || size <= 0) return ByteArray(0)
+        val hex = sh("dd if=/proc/$pid/mem bs=1 skip=$addr count=$size 2>/dev/null | od -An -tx1 | tr -d ' \\n'").trim()
+        if (hex.length < size * 2) return ByteArray(0)
+        val b = ByteArray(size)
+        for (i in 0 until size) {
+            b[i] = ((hex[i * 2].digitToIntOrNull(16) ?: 0) shl 4 or
+                    (hex[i * 2 + 1].digitToIntOrNull(16) ?: 0)).toByte()
+        }
+        return b
+    }
+
+    private fun writeBytes(addr: Long, data: ByteArray) {
+        if (pid < 0 || data.isEmpty()) return
+        val sb = StringBuilder()
+        for (b in data) sb.append("\\x%02x".format(b.toInt() and 0xFF))
+        sh("echo -ne '$sb' | dd of=/proc/$pid/mem bs=1 seek=$addr conv=notrunc 2>/dev/null")
+    }
 
     fun readInt(a: Long): Int {
-        val b = ByteArray(4)
-        return try {
-            mem!!.seek(a); mem!!.read(b)
-            ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).int
-        } catch (_: Exception) { 0 }
+        val b = readBytes(a, 4)
+        if (b.size < 4) return 0
+        return ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).int
     }
 
     fun readLong(a: Long): Long {
-        val b = ByteArray(8)
-        return try {
-            mem!!.seek(a); mem!!.read(b)
-            ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).long
-        } catch (_: Exception) { 0L }
+        val b = readBytes(a, 8)
+        if (b.size < 8) return 0L
+        return ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).long
     }
 
     fun readFloat(a: Long) = java.lang.Float.intBitsToFloat(readInt(a))
 
     fun writeInt(a: Long, v: Int) {
-        val b = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN)
-            .putInt(v).array()
-        try { mem!!.seek(a); mem!!.write(b) } catch (_: Exception) {}
+        val b = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(v).array()
+        writeBytes(a, b)
     }
 
     fun writeFloat(a: Long, v: Float) = writeInt(a, java.lang.Float.floatToIntBits(v))
@@ -94,18 +152,18 @@ object MemoryReader {
 
     fun readString(a: Long): String {
         if (a == 0L) return ""
-        return try {
-            val len = readInt(a + 0x10)
-            if (len <= 0 || len > 64) return ""
-            val bytes = ByteArray(len * 2)
-            mem!!.seek(a + 0x14); mem!!.read(bytes)
-            String(bytes, Charsets.UTF_16LE)
-        } catch (_: Exception) { "" }
+        val len = readInt(a + 0x10)
+        if (len <= 0 || len > 48) return ""
+        val b = readBytes(a + 0x14, len * 2)
+        if (b.isEmpty()) return ""
+        return try { String(b, Charsets.UTF_16LE) } catch (_: Exception) { "" }
     }
 
     private fun getPhotonNetworkStaticFields(): Long {
         if (libBase == 0L) return 0L
-        return scanClassByName("PhotonNetwork")
+        if (cachedPhotonSF != 0L) return cachedPhotonSF
+        cachedPhotonSF = scanClassByName("PhotonNetwork")
+        return cachedPhotonSF
     }
 
     private fun scanClassByName(name: String): Long {
@@ -138,36 +196,28 @@ object MemoryReader {
 
     private fun readCString(addr: Long): String {
         if (addr == 0L) return ""
-        return try {
-            val buf = StringBuilder()
-            var i = 0
-            while (i < 64) {
-                val c = readInt(addr + i) and 0xFF
-                if (c == 0) break
-                buf.append(c.toChar()); i++
-            }
-            buf.toString()
-        } catch (_: Exception) { "" }
+        val b = readBytes(addr, 48)
+        if (b.isEmpty()) return ""
+        val sb = StringBuilder()
+        for (c in b) { if (c.toInt() == 0) break; sb.append(c.toChar()) }
+        return sb.toString()
     }
 
     private var camControllerAddr: Long = 0L
 
     fun getCamPos(): Vec3 {
         val c = camControllerAddr
-        if (c == 0L) return Vec3(0f, 0f, 0f)
-        return readVec3(c + CAM_POS)
+        return if (c == 0L) Vec3(0f, 0f, 0f) else readVec3(c + CAM_POS)
     }
 
     fun getCamYaw(): Float {
         val c = camControllerAddr
-        if (c == 0L) return 0f
-        return readFloat(c + CAM_YAW)
+        return if (c == 0L) 0f else readFloat(c + CAM_YAW)
     }
 
     fun getCamPitch(): Float {
         val c = camControllerAddr
-        if (c == 0L) return 0f
-        return readFloat(c + CAM_PITCH)
+        return if (c == 0L) 0f else readFloat(c + CAM_PITCH)
     }
 
     fun writeCamAngles(yaw: Float, pitch: Float) {
@@ -179,19 +229,21 @@ object MemoryReader {
 
     fun getPlayers(): List<PlayerData> {
         val sf = getPhotonNetworkStaticFields()
-        if (sf == 0L) return emptyList()
+        if (sf == 0L) { status = "no PhotonNetwork"; return emptyList() }
         val peerPtr = readLong(sf + PN_NETWORKING_PEER)
-        if (peerPtr == 0L) return emptyList()
+        if (peerPtr == 0L) { status = "no peer"; return emptyList() }
         val listPtr = readLong(peerPtr + NP_PLAYER_LIST_COPY)
-        if (listPtr == 0L) return emptyList()
+        if (listPtr == 0L) { status = "no list"; return emptyList() }
         val count = readInt(listPtr + 0x18)
         val items = readLong(listPtr + 0x20)
+        if (items == 0L || count <= 0) { status = "count=$count"; return emptyList() }
         val result = mutableListOf<PlayerData>()
         for (i in 0 until minOf(count, 16)) {
             val ppPtr = readLong(items + i * 8L)
             if (ppPtr == 0L) continue
             val isLocal = readInt(ppPtr + PP_IS_LOCAL) != 0
-            val pName = readString(readLong(ppPtr + PP_NAME))
+            val namePtr = readLong(ppPtr + PP_NAME)
+            val pName = readString(namePtr)
             val cpPtr = readLong(ppPtr + 0x48L)
             if (cpPtr == 0L) continue
             val pcPtr = readLong(cpPtr + CP_PLAYER_CONTROLLER)
@@ -207,9 +259,9 @@ object MemoryReader {
             if (camControllerAddr == 0L && isLocal) {
                 camControllerAddr = readLong(pcPtr + PC_MAIN_CAM)
             }
-            result.add(PlayerData(pcPtr, pos, buildBones(pos),
-                hp, team, pName, isLocal))
+            result.add(PlayerData(pcPtr, pos, buildBones(pos), hp, team, pName, isLocal))
         }
+        status = "players=${result.size} listPtr=0x${listPtr.toString(16)}"
         return result
     }
 
