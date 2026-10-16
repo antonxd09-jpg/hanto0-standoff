@@ -10,22 +10,26 @@ object MemoryReader {
     private const val TAG = "hanto0_esp"
     private const val PKG = "com.axlebolt.standoff2"
 
+    // offsets для версии 1.0.0
     private const val OFF_PC_TRANSFORM = 0x100L
-    private const val OFF_PC_HIT_CTRL = 0xA8L
-    private const val OFF_PC_CAM      = 0xE8L
-    private const val OFF_HC_HEALTH   = 0x30L
-    private const val OFF_TR_POSITION = 0x10L
-    private const val OFF_CP_PC       = 0x50L
-    private const val OFF_PP_TAG      = 0x40L
-    private const val OFF_PP_NAME     = 0x20L
-    private const val OFF_PP_ISLOCAL  = 0x30L
-    private const val OFF_NP_PLIST    = 0x1D0L
-    private const val OFF_PN_PEER     = 0x18L
-    private const val OFF_CAM_POS     = 0x10L
-    private const val OFF_CAM_YAW     = 0x20L
-    private const val OFF_CAM_PITCH   = 0x24L
+    private const val OFF_PC_HIT_CTRL  = 0xA8L
+    private const val OFF_PC_CAM       = 0xE8L
+    private const val OFF_HC_HEALTH    = 0x30L
+    private const val OFF_TR_POSITION  = 0x10L
+    private const val OFF_CP_PC        = 0x50L
+    private const val OFF_PP_TAG       = 0x40L
+    private const val OFF_PP_NAME      = 0x20L
+    private const val OFF_PP_ISLOCAL   = 0x30L
+    private const val OFF_NP_PLIST     = 0x1D0L
+    private const val OFF_PN_PEER      = 0x18L
+    private const val OFF_CAM_POS      = 0x10L
+    private const val OFF_CAM_YAW      = 0x20L
+    private const val OFF_CAM_PITCH    = 0x24L
 
-    private var pid    = -1
+    // оффсет PhotonNetwork для версии 1.0.0
+    private const val OFF_PHOTON_FN    = 0x6B12A40L
+
+    private var pid     = -1
     private var mem: RandomAccessFile? = null
     private var libBase = 0L
     private var pnSF    = 0L
@@ -44,7 +48,6 @@ object MemoryReader {
         return try {
             val su = Runtime.getRuntime().exec(arrayOf("su", "-c", "chmod 777 /proc/$pid/mem"))
             su.waitFor()
-            Log.d(TAG, "chmod done exit=${su.exitValue()}")
             mem     = RandomAccessFile("/proc/$pid/mem", "rw")
             libBase = getLibBase()
             Log.d(TAG, "libBase=0x${libBase.toString(16)}")
@@ -109,17 +112,26 @@ object MemoryReader {
     private fun findPhotonNetworkStatic(): Long {
         if (libBase == 0L) return 0L
         return try {
-            val fnAddr  = libBase + 0x6327B70L
-            val instr   = readInt(fnAddr)
-            val offset  = ((instr and 0x3FFFFFF).toLong() shl 2).let {
-                if (it and 0x8000000L != 0L) it or (-0x10000000L) else it
-            }
-            val domain  = readLong(fnAddr + offset)
-            Log.d(TAG, "domain=0x${domain.toString(16)}")
+            // прямой оффсет для 1.0.0
+            val staticAddr = libBase + OFF_PHOTON_FN
+            val result = readLong(staticAddr)
+            Log.d(TAG, "photon static direct=0x${result.toString(16)}")
+            if (result != 0L) return result
+
+            // fallback — сканим по имени класса
+            scanForPhotonByName()
+        } catch (e: Exception) {
+            Log.e(TAG, "findPN fail: $e")
+            scanForPhotonByName()
+        }
+    }
+
+    private fun scanForPhotonByName(): Long {
+        return try {
+            val domain  = readLong(libBase + 0x6B12A40L)
             if (domain == 0L) return 0L
             val asmCount = readInt(domain + 0x18)
             val asmArr   = readLong(domain + 0x10)
-            Log.d(TAG, "asmCount=$asmCount")
             for (i in 0 until minOf(asmCount, 512)) {
                 val img = readLong(asmArr + i * 8L); if (img == 0L) continue
                 val cc  = readInt(img + 0x24)
@@ -132,7 +144,7 @@ object MemoryReader {
                 }
             }
             0L
-        } catch (e: Exception) { Log.e(TAG, "findPN fail: $e"); 0L }
+        } catch (e: Exception) { 0L }
     }
 
     fun getCamPos():   Vec3  = if (camAddr==0L) Vec3(0f,0f,0f) else readVec3(camAddr+OFF_CAM_POS)
@@ -148,14 +160,11 @@ object MemoryReader {
         if (pnSF == 0L) { pnSF = findPhotonNetworkStatic() }
         if (pnSF == 0L) { Log.w(TAG, "pnSF still 0"); return emptyList() }
         val peerPtr = readLong(pnSF + OFF_PN_PEER)
-        Log.d(TAG, "peerPtr=0x${peerPtr.toString(16)}")
         if (peerPtr == 0L) return emptyList()
         val listArr = readLong(peerPtr + OFF_NP_PLIST)
-        Log.d(TAG, "listArr=0x${listArr.toString(16)}")
         if (listArr == 0L) return emptyList()
         val count = readInt(listArr + 0x18)
         val items = readLong(listArr + 0x20)
-        Log.d(TAG, "count=$count items=0x${items.toString(16)}")
         if (count <= 0 || count > 32 || items == 0L) return emptyList()
         val result = mutableListOf<PlayerData>()
         for (i in 0 until count) {
@@ -173,9 +182,8 @@ object MemoryReader {
             val team    = readInt(pcPtr + 0x38L)
             if (isLocal && camAddr == 0L) {
                 val cp = readLong(pcPtr + OFF_PC_CAM)
-                if (cp != 0L) { camAddr = cp; Log.d(TAG, "camAddr=0x${cp.toString(16)}") }
+                if (cp != 0L) { camAddr = cp }
             }
-            Log.d(TAG, "player[$i] name=$name hp=$hp team=$team pos=${pos.x},${pos.y},${pos.z}")
             result.add(PlayerData(pcPtr, pos, buildBones(pos), hp, team, name, isLocal))
         }
         return result
