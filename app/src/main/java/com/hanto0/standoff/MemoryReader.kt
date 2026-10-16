@@ -43,6 +43,10 @@ object MemoryReader {
 
     fun init(): Boolean {
         pid = getPid()
+        System.loadLibrary("androidx.graphics.path")
+        System.loadLibrary("datastore_shared_counter")
+        System.loadLibrary("internal")
+
         Log.d(TAG, "pid=$pid")
         if (pid < 0) return false
         return try {
@@ -55,9 +59,13 @@ object MemoryReader {
             Log.d(TAG, "pnSF=0x${pnSF.toString(16)}")
             true
         } catch (e: Exception) { Log.e(TAG, "init fail: $e"); false }
+
+
     }
 
-    fun close() { try { mem?.close() } catch (_: Exception) {}; mem = null }
+    
+fun close() { try { mem?.close() } catch (_: Exception) {}; mem = null }
+
 
     private fun getPid(): Int {
         File("/proc").listFiles()?.forEach { f ->
