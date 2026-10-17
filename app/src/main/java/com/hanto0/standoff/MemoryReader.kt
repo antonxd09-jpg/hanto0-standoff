@@ -43,9 +43,6 @@ object MemoryReader {
 
     fun init(): Boolean {
         pid = getPid()
-        System.loadLibrary("androidx.graphics.path")
-        System.loadLibrary("datastore_shared_counter")
-        System.loadLibrary("internal")
 
         Log.d(TAG, "pid=$pid")
         if (pid < 0) return false
