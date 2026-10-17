@@ -83,13 +83,13 @@ object MemoryReader {
         try {
             val lines = File("/proc/$pid/maps").readLines()
             for (line in lines) {
-                if (line.contains("libil2cpp.so") && line.contains("r-xp")) {
+                if (line.contains("libunity.so") && line.contains("r-xp")) {
                     return line.split("-")[0].toLong(16)
                 }
             }
             // fallback: first executable mapping of libil2cpp
             for (line in lines) {
-                if (line.contains("libil2cpp.so")) {
+                if (line.contains("libunity.so")) {
                     return line.split("-")[0].toLong(16)
                 }
             }
