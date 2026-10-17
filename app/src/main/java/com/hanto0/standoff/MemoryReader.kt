@@ -66,6 +66,18 @@ object MemoryReader {
     fun close() { try { mem?.close() } catch (_: Exception) {}; mem = null }
 
     private fun getPid(): Int {
+        // find process that actually has libunity.so loaded (= main game process)
+        return try {
+            val proc = Runtime.getRuntime().exec(arrayOf("su", "-c",
+                "grep -rl libunity.so /proc/[0-9]*/maps 2>/dev/null | head -1"))
+            val out = proc.inputStream.bufferedReader().readLine()?.trim() ?: return -1
+            proc.waitFor()
+            val pid = out.split("/").getOrNull(2)?.toIntOrNull() ?: return -1
+            Log.d(TAG, "found pid=$pid via libunity.so")
+            pid
+        } catch (e: Exception) { Log.e(TAG, "getPid fail: $e"); -1 }
+    }
+    private fun getPidOLD(): Int {
         return try {
             // try pidof first (returns main process only)
             var proc = Runtime.getRuntime().exec(arrayOf("su", "-c", "pidof com.axlebolt.standoff2"))
