@@ -43,24 +43,24 @@ object MemoryReader {
     )
 
     fun init(): Boolean {
-        // retry up to 5 times — pid can die between find and open
-        for (attempt in 1..5) {
-            pid = getPid()
-            Log.d(TAG, "attempt=$attempt pid=$pid")
-            if (pid < 0) { Thread.sleep(500); continue }
+        for (attempt in 1..10) {
             try {
-                val su = Runtime.getRuntime().exec(arrayOf(SU, "-c", "chmod 777 /proc/$pid/mem"))
-                su.waitFor()
-                val f = java.io.File("/proc/$pid/mem")
-                if (!f.exists()) { Log.w(TAG, "mem gone, retry"); Thread.sleep(300); continue }
-                mem     = RandomAccessFile("/proc/$pid/mem", "rw")
+                val cmd = "P=\$(grep -rl libunity.so /proc/[0-9]*/maps 2>/dev/null | head -1 | cut -d/ -f3); [ -n \"\$P\" ] && chmod 777 /proc/\$P/mem 2>/dev/null && echo \$P"
+                val proc = Runtime.getRuntime().exec(arrayOf(SU, "-c", cmd))
+                val out = proc.inputStream.bufferedReader().readLine()?.trim() ?: ""
+                proc.waitFor()
+                pid = out.toIntOrNull() ?: -1
+                Log.d(TAG, "attempt=$attempt pid=$pid")
+                if (pid < 0) { Thread.sleep(600); continue }
+                if (!java.io.File("/proc/$pid/mem").exists()) { Thread.sleep(300); continue }
+                mem = RandomAccessFile("/proc/$pid/mem", "rw")
                 libBase = getLibBase()
                 Log.d(TAG, "libBase=0x${libBase.toString(16)}")
                 if (libBase == 0L) { Thread.sleep(300); continue }
                 pnSF = findPhotonNetworkStatic()
                 Log.d(TAG, "pnSF=0x${pnSF.toString(16)}")
                 return true
-            } catch (e: Exception) { Log.e(TAG, "init fail attempt=$attempt: $e"); Thread.sleep(300) }
+            } catch (e: Exception) { Log.e(TAG, "init fail attempt=$attempt: $e"); Thread.sleep(400) }
         }
         return false
     }
