@@ -8,6 +8,8 @@ import java.nio.ByteOrder
 
 object MemoryReader {
     private const val TAG = "hanto0_esp"
+    private val SU = listOf("/system/bin/su", "/system/xbin/su", "/sbin/su", "su")
+        .firstOrNull { try { Runtime.getRuntime().exec(arrayOf(it, "-c", "id")).waitFor(); true } catch(_:Exception){ false } } ?: "su"
     private const val PKG = "com.axlebolt.standoff2"
 
     private const val OFF_PN_PEER      = 0x18L
@@ -47,7 +49,7 @@ object MemoryReader {
             Log.d(TAG, "attempt=$attempt pid=$pid")
             if (pid < 0) { Thread.sleep(500); continue }
             try {
-                val su = Runtime.getRuntime().exec(arrayOf("su", "-c", "chmod 777 /proc/$pid/mem"))
+                val su = Runtime.getRuntime().exec(arrayOf(SU, "-c", "chmod 777 /proc/$pid/mem"))
                 su.waitFor()
                 val f = java.io.File("/proc/$pid/mem")
                 if (!f.exists()) { Log.w(TAG, "mem gone, retry"); Thread.sleep(300); continue }
@@ -68,7 +70,7 @@ object MemoryReader {
     private fun getPid(): Int {
         // find process that actually has libunity.so loaded (= main game process)
         return try {
-            val proc = Runtime.getRuntime().exec(arrayOf("su", "-c",
+            val proc = Runtime.getRuntime().exec(arrayOf(SU, "-c",
                 "grep -rl libunity.so /proc/[0-9]*/maps 2>/dev/null | head -1"))
             val out = proc.inputStream.bufferedReader().readLine()?.trim() ?: return -1
             proc.waitFor()
@@ -80,7 +82,7 @@ object MemoryReader {
     private fun getPidOLD(): Int {
         return try {
             // try pidof first (returns main process only)
-            var proc = Runtime.getRuntime().exec(arrayOf("su", "-c", "pidof com.axlebolt.standoff2"))
+            var proc = Runtime.getRuntime().exec(arrayOf(SU, "-c", "pidof com.axlebolt.standoff2"))
             var out = proc.inputStream.bufferedReader().readLine()?.trim() ?: ""
             proc.waitFor()
             var pid = out.split(" ")[0].toIntOrNull() ?: -1
@@ -89,7 +91,7 @@ object MemoryReader {
                 return pid
             }
             // fallback: grep cmdline
-            proc = Runtime.getRuntime().exec(arrayOf("su", "-c",
+            proc = Runtime.getRuntime().exec(arrayOf(SU, "-c",
                 "for p in /proc/[0-9]*/cmdline; do if grep -q axlebolt \$p 2>/dev/null; then echo \$p; break; fi; done"))
             out = proc.inputStream.bufferedReader().readLine()?.trim() ?: return -1
             pid = out.split("/").getOrNull(2)?.toIntOrNull() ?: return -1
@@ -120,7 +122,7 @@ object MemoryReader {
     private fun getUnityRanges(): List<MapRange> {
         val ranges = mutableListOf<MapRange>()
         try {
-            val proc = Runtime.getRuntime().exec(arrayOf("su", "-c", "cat /proc/$pid/maps"))
+            val proc = Runtime.getRuntime().exec(arrayOf(SU, "-c", "cat /proc/$pid/maps"))
             proc.inputStream.bufferedReader().forEachLine { line ->
                 if (line.contains("libunity.so") && (line.contains("r--p") || line.contains("r-xp"))) {
                     val parts = line.trim().split("\\s+".toRegex())
