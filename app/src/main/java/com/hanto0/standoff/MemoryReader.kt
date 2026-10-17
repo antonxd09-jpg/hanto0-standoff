@@ -60,15 +60,14 @@ object MemoryReader {
     fun close() { try { mem?.close() } catch (_: Exception) {}; mem = null }
 
     private fun getPid(): Int {
-        File("/proc").listFiles()?.forEach { f ->
-            val n = f.name.toIntOrNull() ?: return@forEach
-            try {
-                val cmd = Runtime.getRuntime().exec(arrayOf("su","-c","cat /proc/$n/cmdline")).inputStream.readBytes()
-                    .takeWhile { it != 0.toByte() }.toByteArray().toString(Charsets.UTF_8)
-                if (cmd == PKG) return n
-            } catch (_: Exception) {}
-        }
-        return -1
+        return try {
+            val proc = Runtime.getRuntime().exec(arrayOf("su", "-c",
+                "grep -rl axlebolt /proc/[0-9]*/cmdline 2>/dev/null | head -1"))
+            val out = proc.inputStream.bufferedReader().readLine() ?: return -1
+            val pid = out.trim().split("/")[2].toIntOrNull() ?: return -1
+            Log.d(TAG, "found pid=$pid")
+            pid
+        } catch (e: Exception) { Log.e(TAG, "getPid fail: $e"); -1 }
     }
 
     private fun getLibBase(): Long {
