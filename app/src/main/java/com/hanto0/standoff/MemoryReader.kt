@@ -63,7 +63,7 @@ object MemoryReader {
         File("/proc").listFiles()?.forEach { f ->
             val n = f.name.toIntOrNull() ?: return@forEach
             try {
-                val cmd = File("/proc/$n/cmdline").readBytes()
+                val cmd = Runtime.getRuntime().exec(arrayOf("su","-c","cat /proc/$n/cmdline")).inputStream.readBytes()
                     .takeWhile { it != 0.toByte() }.toByteArray().toString(Charsets.UTF_8)
                 if (cmd == PKG) return n
             } catch (_: Exception) {}
