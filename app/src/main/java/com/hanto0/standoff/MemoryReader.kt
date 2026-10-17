@@ -89,13 +89,15 @@ object MemoryReader {
     private fun getUnityRanges(): List<MapRange> {
         val ranges = mutableListOf<MapRange>()
         try {
-            File("/proc/$pid/maps").readLines().forEach { line ->
+            val proc = Runtime.getRuntime().exec(arrayOf("su", "-c", "cat /proc/$pid/maps"))
+            proc.inputStream.bufferedReader().forEachLine { line ->
                 if (line.contains("libunity.so") && (line.contains("r--p") || line.contains("r-xp"))) {
-                    val parts = line.trim().split("\\s+".toRegex())
+                    val parts = line.trim().split("\s+".toRegex())
                     val range = parts[0].split("-")
                     ranges.add(MapRange(range[0].toLong(16), range[1].toLong(16)))
                 }
             }
+            proc.waitFor()
         } catch (e: Exception) { Log.e(TAG, "getUnityRanges fail: $e") }
         return ranges
     }
