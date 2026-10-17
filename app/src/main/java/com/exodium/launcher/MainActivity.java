@@ -66,7 +66,9 @@ public class MainActivity extends Activity {
 
     private String runSu(String cmd) {
         try {
-            Process p = Runtime.getRuntime().exec(new String[]{"su", "-c", cmd});
+            ProcessBuilder pb = new ProcessBuilder("su", "-c", cmd);
+            pb.redirectErrorStream(true);
+            Process p = pb.start();
             BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
             StringBuilder sb = new StringBuilder();
             String line;
@@ -124,10 +126,12 @@ public class MainActivity extends Activity {
             runSu("chmod 700 " + runtime + "/manualmap_injector " + runtime + "/start.sh " + runtime + "/stop.sh " + runtime + "/rest.sh");
             runSu("chmod 600 " + runtime + "/libmain.so " + runtime + "/cache");
 
-            appendLog("Запуск start.sh... (ожидание инжекта)");
+            appendLog("Запуск start.sh (ожидание инжекта)...");
             
             String cmd = "cd " + runtime + " && setsid sh start.sh";
-            currentProcess = Runtime.getRuntime().exec(new String[]{"su", "-c", cmd});
+            ProcessBuilder pb = new ProcessBuilder("su", "-c", cmd);
+            pb.redirectErrorStream(true); // Теперь мы видим все ошибки
+            currentProcess = pb.start();
             
             BufferedReader r = new BufferedReader(new InputStreamReader(currentProcess.getInputStream()));
             String line;
