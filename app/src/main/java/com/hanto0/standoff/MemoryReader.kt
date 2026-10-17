@@ -10,16 +10,12 @@ object MemoryReader {
     private const val TAG = "hanto0_esp"
     private const val PKG = "com.axlebolt.standoff2"
 
-    // RVA из il2cpp api 1.0.0.txt
-    private const val RVA_DOMAIN_GET_BRANCH = 0x634279CL  // branch target of il2cpp_domain_get
-
-    // PhotonNetwork instance field offsets (из dump.cs)
-    private const val OFF_PN_PEER      = 0x18L   // NetworkingPeer networkingPeer
-    private const val OFF_NP_PLIST     = 0x1D0L  // mPlayerListCopy
-    private const val OFF_PP_TAG       = 0x40L   // TagObject
-    private const val OFF_PP_NAME      = 0x20L   // name
-    private const val OFF_PP_ISLOCAL   = 0x30L   // isLocal
-    private const val OFF_CP_PC        = 0x50L   // PlayerController
+    private const val OFF_PN_PEER      = 0x18L
+    private const val OFF_NP_PLIST     = 0x1D0L
+    private const val OFF_PP_TAG       = 0x40L
+    private const val OFF_PP_NAME      = 0x20L
+    private const val OFF_PP_ISLOCAL   = 0x30L
+    private const val OFF_CP_PC        = 0x50L
     private const val OFF_PC_TRANSFORM = 0x100L
     private const val OFF_PC_HIT_CTRL  = 0xA8L
     private const val OFF_PC_CAM       = 0xE8L
@@ -28,13 +24,9 @@ object MemoryReader {
     private const val OFF_CAM_POS      = 0x10L
     private const val OFF_CAM_YAW      = 0x20L
     private const val OFF_CAM_PITCH    = 0x24L
+    private const val IL2CPP_CLASS_NAME = 0x198L
 
-    // Il2CppClass offsets (из il2cpp api)
-    private const val IL2CPP_CLASS_NAME         = 0x198L
-    private const val IL2CPP_CLASS_STATIC_FIELDS= 0x40L  // wait - actually need to verify
-    // Actually from il2cpp api: static_fields is at different offset
-    // Using 0xB8 for il2cpp 27.x which Unity 2021 uses
-    private const val IL2CPP_CLASS_STATIC_FIELDS_ACTUAL = 0xB8L
+    data class MapRange(val start: Long, val end: Long)
 
     private var pid     = -1
     private var mem: RandomAccessFile? = null
@@ -84,151 +76,87 @@ object MemoryReader {
             val lines = File("/proc/$pid/maps").readLines()
             for (line in lines) {
                 if (line.contains("libunity.so") && line.contains("r-xp")) {
-                    return line.split("-")[0].toLong(16)
-                }
-            }
-            // fallback: first executable mapping of libil2cpp
-            for (line in lines) {
-                if (line.contains("libunity.so")) {
-                    return line.split("-")[0].toLong(16)
+                    val parts = line.trim().split("\\s+".toRegex())
+                    val vaddr   = parts[0].split("-")[0].toLong(16)
+                    val fileOff = parts[2].toLong(16)
+                    return vaddr - fileOff
                 }
             }
         } catch (e: Exception) { Log.e(TAG, "getLibBase fail: $e") }
         return 0L
     }
 
-    // Decode ARM64 ADRP instruction: returns page address
-    private fun decodeAdrp(insn: Int, pc: Long): Long {
-        val immlo = (insn shr 29) and 0x3
-        val immhi = (insn shr 5) and 0x7FFFF
-        val imm = ((immhi.toLong() shl 2) or immlo.toLong()) shl 12
-        val pcPage = pc and -0x1000L
-        return pcPage + imm
-    }
-
-    // Decode ARM64 LDR (unsigned offset) 64-bit: returns byte offset
-    private fun decodeLdrUoff64(insn: Int): Long {
-        val imm12 = (insn shr 10) and 0xFFF
-        return imm12.toLong() * 8L  // scale=8 for 64-bit LDR
-    }
-
-    // Find the global Il2CppDomain* by decoding ADRP+LDR at il2cpp_domain_get branch target
-    private fun findDomainPtr(): Long {
-        return try {
-            val pc = libBase + RVA_DOMAIN_GET_BRANCH
-            // scan up to 8 instructions for ADRP+LDR pair
-            for (i in 0 until 8) {
-                val addr = pc + i * 4L
-                val insn0 = readInt(addr)
-                // check ADRP: bits[28:24] == 10000, bit[31] == 1
-                if ((insn0 and 0x9F000000.toInt()) == 0x90000000.toInt()) {
-                    val insn1 = readInt(addr + 4)
-                    // check LDR 64-bit unsigned offset: top 10 bits = 1111100001
-                    if ((insn1 and 0xFFC00000.toInt()) == 0xF9400000.toInt()) {
-                        val page = decodeAdrp(insn0, addr)
-                        val off  = decodeLdrUoff64(insn1)
-                        val domPtrAddr = page + off
-                        Log.d(TAG, "domPtrAddr=0x${domPtrAddr.toString(16)}")
-                        val dom = readLong(domPtrAddr)
-                        Log.d(TAG, "domain=0x${dom.toString(16)}")
-                        if (dom != 0L) return dom
-                    }
+    // Get all readable libunity.so segments for scanning
+    private fun getUnityRanges(): List<MapRange> {
+        val ranges = mutableListOf<MapRange>()
+        try {
+            File("/proc/$pid/maps").readLines().forEach { line ->
+                if (line.contains("libunity.so") && (line.contains("r--p") || line.contains("r-xp"))) {
+                    val parts = line.trim().split("\\s+".toRegex())
+                    val range = parts[0].split("-")
+                    ranges.add(MapRange(range[0].toLong(16), range[1].toLong(16)))
                 }
             }
-            Log.w(TAG, "ADRP+LDR not found at domain_get")
-            0L
-        } catch (e: Exception) { Log.e(TAG, "findDomainPtr fail: $e"); 0L }
+        } catch (e: Exception) { Log.e(TAG, "getUnityRanges fail: $e") }
+        return ranges
     }
 
     private fun findPhotonNetworkStatic(): Long {
-        val domain = findDomainPtr()
-        if (domain == 0L) {
-            Log.e(TAG, "domain is 0")
-            return 0L
-        }
-        return try {
-            // Il2CppDomain->domain_assemblies: GSList* at offset 0x10 (pointer) + count at 0x18
-            // Try walking assembly list
-            val asmCount = readInt(domain + 0x18)
-            val asmArr   = readLong(domain + 0x10)
-            Log.d(TAG, "asmCount=$asmCount asmArr=0x${asmArr.toString(16)}")
-            if (asmArr == 0L || asmCount <= 0 || asmCount > 1024) return fallbackWalkGSList(domain)
+        val target = "PhotonNetwork".toByteArray(Charsets.UTF_8)
+        val ranges  = getUnityRanges()
+        Log.d(TAG, "scanning ${ranges.size} ranges for PhotonNetwork string")
 
-            for (i in 0 until minOf(asmCount, 512)) {
-                val asmPtr = readLong(asmArr + i * 8L)
-                if (asmPtr == 0L) continue
-                // Il2CppAssembly->image at offset 0x0 or 0x8
-                val img = readLong(asmPtr)
-                if (img == 0L) continue
-                val namePtr = readLong(img)
-                if (namePtr == 0L) continue
-                val imgName = readCStr(namePtr)
-                if (!imgName.contains("CSharp") && !imgName.contains("Assembly")) continue
-
-                val typeCount = readInt(img + 0x18)
-                val typeStart = readInt(img + 0x1C)
-                Log.d(TAG, "img=$imgName typeCount=$typeCount typeStart=$typeStart")
-                if (typeCount <= 0 || typeCount > 50000) continue
-
-                // Il2CppImage->metadataHandle / typeStart points into g_Il2CppTypeDefinitions
-                // Try: klass table at img+0x40 with (typeStart+j)*8 index
-                for (j in 0 until minOf(typeCount, 32768)) {
-                    val klass = readLong(img + 0x40L + (typeStart + j) * 8L)
-                    if (klass == 0L) continue
-                    val np = readLong(klass + IL2CPP_CLASS_NAME)
-                    if (np == 0L) continue
-                    val name = readCStr(np)
-                    if (name == "PhotonNetwork") {
-                        Log.d(TAG, "found PhotonNetwork klass=0x${klass.toString(16)}")
-                        // Try both possible static_fields offsets
-                        var sf = readLong(klass + IL2CPP_CLASS_STATIC_FIELDS_ACTUAL)
-                        if (sf == 0L) sf = readLong(klass + IL2CPP_CLASS_STATIC_FIELDS)
-                        Log.d(TAG, "static_fields=0x${sf.toString(16)}")
-                        return sf
-                    }
+        // Step 1: find all addresses of the "PhotonNetwork" string
+        val nameAddrs = mutableListOf<Long>()
+        for (r in ranges) {
+            val size = (r.end - r.start).coerceAtMost(64 * 1024 * 1024L).toInt()
+            val buf  = readBytes(r.start, size)
+            var i    = 0
+            while (i <= buf.size - target.size) {
+                var match = true
+                for (j in target.indices) {
+                    if (buf[i + j] != target[j]) { match = false; break }
                 }
+                if (match && (i + target.size >= buf.size || buf[i + target.size] == 0.toByte())) {
+                    nameAddrs.add(r.start + i)
+                }
+                i++
             }
-            Log.w(TAG, "PhotonNetwork not found in assembly walk")
-            0L
-        } catch (e: Exception) { Log.e(TAG, "findPN fail: $e"); 0L }
-    }
+        }
+        Log.d(TAG, "found ${nameAddrs.size} 'PhotonNetwork' strings")
 
-    // Fallback: walk GSList linked list for domain assemblies
-    private fun fallbackWalkGSList(domain: Long): Long {
-        return try {
-            var node = readLong(domain + 0x10)
-            var limit = 0
-            while (node != 0L && limit < 512) {
-                val asmPtr = readLong(node)
-                val next   = readLong(node + 0x8)
-                if (asmPtr != 0L) {
-                    val img = readLong(asmPtr)
-                    if (img != 0L) {
-                        val namePtr = readLong(img)
-                        if (namePtr != 0L) {
-                            val n = readCStr(namePtr)
-                            if (n.contains("CSharp") || n.contains("Assembly")) {
-                                val tc = readInt(img + 0x18)
-                                val ts = readInt(img + 0x1C)
-                                for (j in 0 until minOf(tc, 32768)) {
-                                    val klass = readLong(img + 0x40L + (ts + j) * 8L)
-                                    if (klass == 0L) continue
-                                    val np = readLong(klass + IL2CPP_CLASS_NAME); if (np == 0L) continue
-                                    if (readCStr(np) == "PhotonNetwork") {
-                                        var sf = readLong(klass + IL2CPP_CLASS_STATIC_FIELDS_ACTUAL)
-                                        if (sf == 0L) sf = readLong(klass + IL2CPP_CLASS_STATIC_FIELDS)
+        // Step 2: for each name address, scan for Il2CppClass* that has it at offset +0x198
+        for (nameAddr in nameAddrs) {
+            for (r in ranges) {
+                val size = (r.end - r.start).coerceAtMost(64 * 1024 * 1024L).toInt()
+                val buf  = ByteBuffer.wrap(readBytes(r.start, size)).order(ByteOrder.LITTLE_ENDIAN)
+                var i    = 0
+                while (i <= size - 8) {
+                    val ptr = buf.getLong(i).toLong()
+                    if (ptr == nameAddr) {
+                        // potential Il2CppClass at r.start + i - 0x198
+                        val klassAddr = r.start + i - IL2CPP_CLASS_NAME
+                        if (klassAddr > 0) {
+                            // try both known static_fields offsets
+                            for (sfOff in listOf(0xB8L, 0x40L, 0xC0L, 0xD0L)) {
+                                val sf = readLong(klassAddr + sfOff)
+                                if (sf != 0L && sf > 0x700000000000L) {
+                                    // verify: peerPtr at sf+0x18 should be non-zero valid ptr
+                                    val peer = readLong(sf + OFF_PN_PEER)
+                                    if (peer != 0L && peer > 0x700000000000L) {
+                                        Log.d(TAG, "PhotonNetwork found! klass=0x${klassAddr.toString(16)} sfOff=0x${sfOff.toString(16)} sf=0x${sf.toString(16)} peer=0x${peer.toString(16)}")
                                         return sf
                                     }
                                 }
                             }
                         }
                     }
+                    i += 8
                 }
-                node = next
-                limit++
             }
-            0L
-        } catch (e: Exception) { 0L }
+        }
+        Log.w(TAG, "PhotonNetwork static fields not found via string scan")
+        return 0L
     }
 
     fun readBytes(addr: Long, len: Int): ByteArray {
@@ -249,7 +177,7 @@ object MemoryReader {
     fun readString16(a: Long): String {
         if (a == 0L) return ""
         return try {
-            val len = readInt(a + 0x10).coerceIn(0, 32)
+            val len = readInt(a + 0x10).coerceIn(0, 64)
             if (len == 0) return ""
             String(readBytes(a + 0x14, len * 2), Charsets.UTF_16LE)
         } catch (_: Exception) { "" }
@@ -285,7 +213,7 @@ object MemoryReader {
             if (listArr == 0L) { Log.w(TAG, "listArr=0"); return emptyList() }
             val count = readInt(listArr + 0x18)
             val items = readLong(listArr + 0x20)
-            Log.d(TAG, "playerCount=$count items=0x${items.toString(16)}")
+            Log.d(TAG, "playerCount=$count")
             if (count <= 0 || count > 32 || items == 0L) return emptyList()
             val result = mutableListOf<PlayerData>()
             for (i in 0 until count) {
