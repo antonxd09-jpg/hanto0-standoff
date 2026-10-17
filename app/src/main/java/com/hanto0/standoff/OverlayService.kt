@@ -20,27 +20,31 @@ class OverlayService : Service() {
     private val handler = Handler(Looper.getMainLooper())
 
     var showBox=true; var showLines=true; var showSkeleton=true
-    var showHP=true;  var showInfo=true;  var silentAim=true
+    var showHP=true; var showInfo=true; var silentAim=true
 
     private val loop = object : Runnable {
         override fun run() {
-            val players = MemoryReader.getPlayers()
-            val cam = Projection.CamData(
-                MemoryReader.getCamPos(),
-                MemoryReader.getCamYaw(),
-                MemoryReader.getCamPitch(),
-                90f,
-                resources.displayMetrics.widthPixels,
-                resources.displayMetrics.heightPixels
-            )
-            if (silentAim) {
-                SilentAim.calc(cam.pos, cam.yaw, cam.pitch, players)?.let {
-                    MemoryReader.writeCamAngles(it.yaw, it.pitch)
+            try {
+                val players = MemoryReader.getPlayers()
+                val cam = Projection.CamData(
+                    MemoryReader.getCamPos(),
+                    MemoryReader.getCamYaw(),
+                    MemoryReader.getCamPitch(),
+                    90f,
+                    resources.displayMetrics.widthPixels,
+                    resources.displayMetrics.heightPixels
+                )
+                if (silentAim) {
+                    SilentAim.calc(cam.pos, cam.yaw, cam.pitch, players)?.let {
+                        MemoryReader.writeCamAngles(it.yaw, it.pitch)
+                    }
                 }
+                esp.showBox=showBox; esp.showLines=showLines
+                esp.showSkeleton=showSkeleton; esp.showHP=showHP; esp.showInfo=showInfo
+                esp.update(players, cam)
+            } catch (e: Exception) {
+                Log.e("hanto0_esp", "loop error: $e")
             }
-            esp.showBox=showBox; esp.showLines=showLines
-            esp.showSkeleton=showSkeleton; esp.showHP=showHP; esp.showInfo=showInfo
-            esp.update(players, cam)
             handler.postDelayed(this, 50)
         }
     }
@@ -50,10 +54,12 @@ class OverlayService : Service() {
     override fun onCreate() {
         super.onCreate()
         Log.d("hanto0_esp", "OverlayService onCreate")
-        ZeninLoader.load()
-        ZeninLoader.startEntry()
-        val ok = MemoryReader.init()
-        Log.d("hanto0_esp", "MemoryReader.init=$ok")
+        try {
+            val ok = MemoryReader.init()
+            Log.d("hanto0_esp", "MemoryReader.init=$ok")
+        } catch (e: Exception) {
+            Log.e("hanto0_esp", "MemoryReader init error: $e")
+        }
         wm = getSystemService(WINDOW_SERVICE) as WindowManager
         setupEsp(); setupBtn(); setupMenu()
         handler.post(loop)
@@ -110,8 +116,7 @@ class OverlayService : Service() {
         menu.addView(TextView(this).apply{
             text="── hanto0 menu ──"
             setTextColor(Color.parseColor("#2299FF"))
-            textSize=15f
-            gravity=android.view.Gravity.CENTER
+            textSize=15f; gravity=android.view.Gravity.CENTER
         })
         tog("Silent Aim",  true){silentAim=it; SilentAim.enabled=it}
         tog("ESP Box",     true){showBox=it}
