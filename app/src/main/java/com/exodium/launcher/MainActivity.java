@@ -80,7 +80,9 @@ public class MainActivity extends Activity {
         try (InputStream is = getAssets().open(name); FileOutputStream fos = new FileOutputStream(outFile)) {
             byte[] buf = new byte[8192]; int len;
             while ((len = is.read(buf)) > 0) fos.write(buf, 0, len);
-        } catch (Exception e) { appendLog("Ошибка распаковки " + name + ": " + e.getMessage()); }
+        } catch (Exception e) { 
+            appendLog("ОШИБКА АССЕТА " + name + ": " + e.getMessage()); 
+        }
     }
 
     private void startProcess() {
@@ -133,7 +135,7 @@ public class MainActivity extends Activity {
                 appendLog(line);
             }
             currentProcess.waitFor();
-            appendLog("Скрипт завершил работу. Игра должна быть запущена, чит внедрен.");
+            appendLog("Скрипт завершил работу.");
 
         } catch (Exception e) {
             appendLog("Ошибка: " + e.getMessage());
