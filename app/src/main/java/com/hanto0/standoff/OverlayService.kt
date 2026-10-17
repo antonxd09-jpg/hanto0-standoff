@@ -12,15 +12,16 @@ import android.view.*
 import android.widget.*
 
 class OverlayService : Service() {
+    companion object {
+        var showBox=true; var showLines=true; var showSkeleton=true
+        var showHP=true; var showInfo=true; var silentAim=true
+    }
     private lateinit var wm: WindowManager
     private lateinit var btn: Button
     private lateinit var menu: LinearLayout
     private lateinit var esp: EspView
     private var menuVisible = false
     private val handler = Handler(Looper.getMainLooper())
-
-    var showBox=true; var showLines=true; var showSkeleton=true
-    var showHP=true; var showInfo=true; var silentAim=true
 
     private val loop = object : Runnable {
         override fun run() {
