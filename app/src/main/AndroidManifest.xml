@@ -3,8 +3,7 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <application
         android:label="Exodium Launcher"
-        android:theme="@android:style/Theme.DeviceDefault.Dark"
-        android:extractNativeLibs="true">
+        android:theme="@android:style/Theme.Material.NoActionBar">
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
