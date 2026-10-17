@@ -41,32 +41,51 @@ object MemoryReader {
     )
 
     fun init(): Boolean {
-        pid = getPid()
-        Log.d(TAG, "pid=$pid")
-        if (pid < 0) return false
-        return try {
-            val su = Runtime.getRuntime().exec(arrayOf("su", "-c", "chmod 777 /proc/$pid/mem"))
-            su.waitFor()
-            mem     = RandomAccessFile("/proc/$pid/mem", "rw")
-            libBase = getLibBase()
-            Log.d(TAG, "libBase=0x${libBase.toString(16)}")
-            if (libBase == 0L) return false
-            pnSF = findPhotonNetworkStatic()
-            Log.d(TAG, "pnSF=0x${pnSF.toString(16)}")
-            true
-        } catch (e: Exception) { Log.e(TAG, "init fail: $e"); false }
+        // retry up to 5 times — pid can die between find and open
+        for (attempt in 1..5) {
+            pid = getPid()
+            Log.d(TAG, "attempt=$attempt pid=$pid")
+            if (pid < 0) { Thread.sleep(500); continue }
+            try {
+                val su = Runtime.getRuntime().exec(arrayOf("su", "-c", "chmod 777 /proc/$pid/mem"))
+                su.waitFor()
+                val f = java.io.File("/proc/$pid/mem")
+                if (!f.exists()) { Log.w(TAG, "mem gone, retry"); Thread.sleep(300); continue }
+                mem     = RandomAccessFile("/proc/$pid/mem", "rw")
+                libBase = getLibBase()
+                Log.d(TAG, "libBase=0x${libBase.toString(16)}")
+                if (libBase == 0L) { Thread.sleep(300); continue }
+                pnSF = findPhotonNetworkStatic()
+                Log.d(TAG, "pnSF=0x${pnSF.toString(16)}")
+                return true
+            } catch (e: Exception) { Log.e(TAG, "init fail attempt=$attempt: $e"); Thread.sleep(300) }
+        }
+        return false
     }
 
     fun close() { try { mem?.close() } catch (_: Exception) {}; mem = null }
 
     private fun getPid(): Int {
         return try {
-            val proc = Runtime.getRuntime().exec(arrayOf("su", "-c",
-                "grep -rl axlebolt /proc/[0-9]*/cmdline 2>/dev/null | head -1"))
-            val out = proc.inputStream.bufferedReader().readLine() ?: return -1
-            val pid = out.trim().split("/")[2].toIntOrNull() ?: return -1
-            Log.d(TAG, "found pid=$pid")
-            pid
+            // try pidof first (returns main process only)
+            var proc = Runtime.getRuntime().exec(arrayOf("su", "-c", "pidof com.axlebolt.standoff2"))
+            var out = proc.inputStream.bufferedReader().readLine()?.trim() ?: ""
+            proc.waitFor()
+            var pid = out.split(" ")[0].toIntOrNull() ?: -1
+            if (pid > 0 && java.io.File("/proc/$pid").exists()) {
+                Log.d(TAG, "found pid=$pid via pidof")
+                return pid
+            }
+            // fallback: grep cmdline
+            proc = Runtime.getRuntime().exec(arrayOf("su", "-c",
+                "for p in /proc/[0-9]*/cmdline; do if grep -q axlebolt \$p 2>/dev/null; then echo \$p; break; fi; done"))
+            out = proc.inputStream.bufferedReader().readLine()?.trim() ?: return -1
+            pid = out.split("/").getOrNull(2)?.toIntOrNull() ?: return -1
+            if (java.io.File("/proc/$pid").exists()) {
+                Log.d(TAG, "found pid=$pid via grep")
+                return pid
+            }
+            -1
         } catch (e: Exception) { Log.e(TAG, "getPid fail: $e"); -1 }
     }
 
