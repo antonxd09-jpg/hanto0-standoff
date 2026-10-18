@@ -1,84 +1,66 @@
 #!/system/bin/sh
 set -eu
 fail() { printf '%s\n' "$*" >&2; exit 1; }
-[ "$(id -u)" = 0 ] || fail 'Запусти этот скрипт через root.'
+[ "$(id -u)" = 0 ] || fail 'root required'
+
 SOURCE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 RUNTIME=/data/local/tmp/hantoo-local
 PACKAGE=com.axlebolt.standoff2
 
 PIDS=$(pidof "$PACKAGE" 2>/dev/null || true)
 if [ -z "$PIDS" ]; then
-  printf '[HantoO] Запускаю игру...\n'
-  monkey -p "$PACKAGE" -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1 || am start -n "$PACKAGE/.UnityPlayerActivity" >/dev/null 2>&1 || fail 'Не удалось запустить игру'
+  printf '[HantoO] start game\n'
+  am start -n "$PACKAGE/.UnityPlayerActivity" >/dev/null 2>&1 || monkey -p "$PACKAGE" -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1 || fail 'cannot start game'
   i=0
-  while [ $i -lt 30 ]; do
+  while [ $i -lt 25 ]; do
     PIDS=$(pidof "$PACKAGE" 2>/dev/null || true)
     [ -n "$PIDS" ] && break
     i=$((i+1)); sleep 1
   done
-  [ -n "$PIDS" ] || fail 'Игра не запустилась'
-  printf '[HantoO] Игра запущена, жду 50 секунд загрузки...\n'
-  sleep 50
+  [ -n "$PIDS" ] || fail 'game not running'
+  printf '[HantoO] wait menu 8s\n'
+  sleep 8
 fi
 
 set -- $PIDS
-[ "$#" = 1 ] || fail 'Найдено несколько процессов игры. Перезапусти игру.'
+[ "$#" = 1 ] || fail 'multiple game processes'
 GAME_PID=$1
 GAME_START=$(awk '{print $22}' "/proc/$GAME_PID/stat")
 GAME_UID=$(awk '/^Uid:/{print $2}' "/proc/$GAME_PID/status")
 ANDROID_USER=$((GAME_UID / 100000))
-
-GAME_FILES="/data/data/$PACKAGE/files"
-if [ ! -d "$GAME_FILES" ]; then
-    GAME_FILES="/data/user/$ANDROID_USER/$PACKAGE/files"
-fi
-
-# ЕСЛИ ПАПКИ НЕТ - СОЗДАЕМ ЕЁ
-if [ ! -d "$GAME_FILES" ]; then
-    printf '[HantoO] Папка files отсутствует, создаю: %s\n' "$GAME_FILES"
-    mkdir -p "$GAME_FILES"
-    chown "$GAME_UID:$GAME_UID" "$GAME_FILES"
-    chmod 771 "$GAME_FILES"
-fi
-
-PACKAGE_DIR=$(dirname "$GAME_FILES")
-GAME_LABEL=$(ls -Zd "$PACKAGE_DIR" | awk '{print $1}')
-[ -n "$GAME_LABEL" ] || fail 'Не прочитан SELinux-контекст.'
-chcon "$GAME_LABEL" "$GAME_FILES" 2>/dev/null || true
+GAME_FILES=/data/user/$ANDROID_USER/$PACKAGE/files
+[ -d "$GAME_FILES" ] || fail "no game files: $GAME_FILES"
+GAME_LABEL=$(ls -Zd "$GAME_FILES" | awk '{print $1}')
 
 cd "$SOURCE"
 mkdir -p "$RUNTIME"
 chmod 700 "$RUNTIME"
 
-for CANDIDATE in $(pidof rest.sh 2>/dev/null || true); do
-    EXE=$(readlink "/proc/$CANDIDATE/exe" 2>/dev/null || true)
-    [ "$EXE" != "$RUNTIME/rest.sh" ] || fail 'Меню уже запущено. Сначала выполни stop.sh.'
+for C in $(pidof rest.sh 2>/dev/null || true); do
+  E=$(readlink "/proc/$C/exe" 2>/dev/null || true)
+  [ "$E" != "$RUNTIME/rest.sh" ] || fail 'menu already running, stop first'
 done
 
-for NAME in manualmap_injector libmain.so rest.sh; do
-    if [ ! "$SOURCE/$NAME" -ef "$RUNTIME/$NAME" ]; then
-        cp "$SOURCE/$NAME" "$RUNTIME/$NAME"
-    fi
-done
+cp -f "$SOURCE/manualmap_injector" "$RUNTIME/manualmap_injector"
+cp -f "$SOURCE/libmain.so" "$RUNTIME/libmain.so"
+cp -f "$SOURCE/rest.sh" "$RUNTIME/rest.sh"
 chmod 700 "$RUNTIME/manualmap_injector" "$RUNTIME/rest.sh"
 chmod 600 "$RUNTIME/libmain.so"
 
 mkdir -p "$GAME_FILES/exodium"
 chown "$GAME_UID:$GAME_UID" "$GAME_FILES/exodium"
-chmod 700 "$GAME_FILES/exodium"
 chcon "$GAME_LABEL" "$GAME_FILES/exodium" 2>/dev/null || true
-
-cp "$SOURCE/cache" "$GAME_FILES/exodium/cache"
+cp -f "$SOURCE/cache" "$GAME_FILES/exodium/cache"
 chown "$GAME_UID:$GAME_UID" "$GAME_FILES/exodium/cache"
 chmod 600 "$GAME_FILES/exodium/cache"
 chcon "$GAME_LABEL" "$GAME_FILES/exodium/cache" 2>/dev/null || true
 
 for NAME in sssss3 sssss4 sssss5 sssss sssss2 sssss7 sssss8 sssss9 sssss1 sssss10; do
-    FILE=$GAME_FILES/$NAME.txt
-    [ -e "$FILE" ] || touch "$FILE"
-    chown "$GAME_UID:$GAME_UID" "$FILE"
-    chmod 600 "$FILE"
-    chcon "$GAME_LABEL" "$FILE" 2>/dev/null || true
+  F=$GAME_FILES/$NAME.txt
+  [ -e "$F" ] || touch "$F"
+  chown "$GAME_UID:$GAME_UID" "$F"
+  chmod 600 "$F"
+  chcon "$GAME_LABEL" "$F" 2>/dev/null || true
 done
 
 printf 'Remaster' > /data/local/tmp/version.txt
@@ -86,37 +68,39 @@ chmod 644 /data/local/tmp/version.txt
 
 MARKER=$RUNTIME/loaded.$GAME_PID.$GAME_START
 if [ ! -f "$MARKER" ]; then
-    printf '[HantoO] Инжектирую чит в PID %s...\n' "$GAME_PID"
-    if "$RUNTIME/manualmap_injector" "$GAME_PID" "$RUNTIME/libmain.so" > "$RUNTIME/injector.log" 2>&1; then
-        printf 'loaded\n' > "$MARKER"
-    else
-        cat "$RUNTIME/injector.log"
-        fail 'Инжектор завершился с ошибкой.'
-    fi
+  printf '[HantoO] inject %s\n' "$GAME_PID"
+  if "$RUNTIME/manualmap_injector" "$GAME_PID" "$RUNTIME/libmain.so" > "$RUNTIME/injector.log" 2>&1; then
+    printf 'loaded\n' > "$MARKER"
+  else
+    cat "$RUNTIME/injector.log"
+    fail 'inject failed'
+  fi
 fi
-[ -d "/proc/$GAME_PID" ] || fail 'Игра завершилась после загрузки библиотеки.'
+[ -d "/proc/$GAME_PID" ] || fail 'game died'
 
 rm -f "$RUNTIME/rest.ready" "$RUNTIME/rest.exit"
+unset EXODIUM_KEY EXODIUM_AUTH_FILE
 nohup /system/bin/sh -c '
-    EXODIUM_READY_FILE="$1/rest.ready" "$1/rest.sh" > "$1/rest.log" 2>&1
-    RC=$?
-    printf "%s\n" "$RC" > "$1/rest.exit"
-' exodium-worker "$RUNTIME" > /dev/null 2>&1 < /dev/null &
-WORKER_PID=$!
-printf '%s\n' "$WORKER_PID" > "$RUNTIME/worker.pid"
+  EXODIUM_READY_FILE="$1/rest.ready" "$1/rest.sh" > "$1/rest.log" 2>&1
+  printf "%s\n" $? > "$1/rest.exit"
+' hantoo-worker "$RUNTIME" >/dev/null 2>&1 </dev/null &
+echo $! > "$RUNTIME/worker.pid"
 
-ATTEMPT=0
-while [ "$ATTEMPT" -lt 30 ]; do
-    if [ -s "$RUNTIME/rest.ready" ]; then
-        printf '[HantoO] Меню готово.\n'
-        exit 0
-    fi
-    if [ -f "$RUNTIME/rest.exit" ]; then
-        cat "$RUNTIME/rest.log"
-        fail "Меню завершилось с кодом $(cat "$RUNTIME/rest.exit")."
-    fi
-    ATTEMPT=$((ATTEMPT + 1))
-    sleep 1
+i=0
+while [ $i -lt 30 ]; do
+  if [ -s "$RUNTIME/rest.ready" ]; then
+    printf '[HantoO] menu ready\n'
+    exit 0
+  fi
+  if [ -f "$RUNTIME/rest.exit" ]; then
+    cat "$RUNTIME/rest.log"
+    fail "rest exit $(cat $RUNTIME/rest.exit)"
+  fi
+  for C in $(pidof rest.sh 2>/dev/null || true); do
+    E=$(readlink "/proc/$C/exe" 2>/dev/null || true)
+    [ "$E" = "$RUNTIME/rest.sh" ] && echo $C > "$RUNTIME/rest.pid"
+  done
+  i=$((i+1)); sleep 1
 done
-tail -n 30 "$RUNTIME/rest.log"
-fail 'Меню не подтвердило готовность за 30 секунд.'
+tail -n 40 "$RUNTIME/rest.log" 2>/dev/null || true
+fail 'menu timeout'
