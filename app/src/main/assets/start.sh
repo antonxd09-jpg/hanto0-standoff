@@ -9,15 +9,16 @@ PACKAGE=com.axlebolt.standoff2
 PIDS=$(pidof "$PACKAGE" 2>/dev/null || true)
 if [ -z "$PIDS" ]; then
   printf '[HantoO] Запускаю игру...\n'
-  am start -n "$PACKAGE/.UnityPlayerActivity" >/dev/null 2>&1 || monkey -p "$PACKAGE" -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1 || fail 'Не удалось запустить игру'
+  monkey -p "$PACKAGE" -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1 || am start -n "$PACKAGE/.UnityPlayerActivity" >/dev/null 2>&1 || fail 'Не удалось запустить игру'
   i=0
-  while [ $i -lt 25 ]; do
+  while [ $i -lt 30 ]; do
     PIDS=$(pidof "$PACKAGE" 2>/dev/null || true)
     [ -n "$PIDS" ] && break
     i=$((i+1)); sleep 1
   done
   [ -n "$PIDS" ] || fail 'Игра не запустилась'
-  sleep 5
+  printf '[HantoO] Игра запущена, жду 50 секунд загрузки...\n'
+  sleep 50
 fi
 
 set -- $PIDS
@@ -26,8 +27,13 @@ GAME_PID=$1
 GAME_START=$(awk '{print $22}' "/proc/$GAME_PID/stat")
 GAME_UID=$(awk '/^Uid:/{print $2}' "/proc/$GAME_PID/status")
 ANDROID_USER=$((GAME_UID / 100000))
-GAME_FILES=/data/user/$ANDROID_USER/$PACKAGE/files
+
+GAME_FILES="/data/data/$PACKAGE/files"
+if [ ! -d "$GAME_FILES" ]; then
+    GAME_FILES="/data/user/$ANDROID_USER/$PACKAGE/files"
+fi
 [ -d "$GAME_FILES" ] || fail "Не найдена папка игры: $GAME_FILES"
+
 GAME_LABEL=$(ls -Zd "$GAME_FILES" | awk '{print $1}')
 [ -n "$GAME_LABEL" ] || fail 'Не прочитан SELinux-контекст папки игры.'
 
