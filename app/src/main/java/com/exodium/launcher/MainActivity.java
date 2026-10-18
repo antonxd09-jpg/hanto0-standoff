@@ -26,50 +26,44 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        // Основной фон (глубокий темный цвет)
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setBackgroundColor(Color.parseColor("#0B0C10"));
         layout.setPadding(60, 120, 60, 60);
 
-        // Заголовок
         TextView title = new TextView(this);
         title.setText("HantoO\nLauncher");
-        title.setTextColor(Color.parseColor("#66FCF1")); // Неоновый бирюзовый
+        title.setTextColor(Color.parseColor("#66FCF1"));
         title.setTextSize(42);
         title.setTypeface(Typeface.create("sans-serif-condensed", Typeface.BOLD));
         title.setGravity(Gravity.CENTER);
         title.setPadding(0, 0, 0, 100);
         layout.addView(title);
 
-        // Параметры для кнопок (высота 180, отступ снизу 40)
         LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, 180);
         btnParams.setMargins(0, 0, 0, 50);
 
-        // Кнопка СТАРТ (Зелено-бирюзовый градиент)
         Button startBtn = new Button(this);
         startBtn.setText("ЗАПУСТИТЬ");
         startBtn.setTextColor(Color.parseColor("#000000"));
         startBtn.setTextSize(24);
         startBtn.setTypeface(Typeface.DEFAULT_BOLD);
-        startBtn.setBackground(createGradient("#00B4DB", "#0083B0")); // Морской градиент
+        startBtn.setBackground(createGradient("#00B4DB", "#0083B0"));
         startBtn.setOnClickListener(v -> executor.submit(this::startProcess));
         startBtn.setLayoutParams(btnParams);
         layout.addView(startBtn);
 
-        // Кнопка СТОП (Красно-оранжевый градиент)
         Button stopBtn = new Button(this);
         stopBtn.setText("ОСТАНОВИТЬ");
         stopBtn.setTextColor(Color.parseColor("#FFFFFF"));
         stopBtn.setTextSize(24);
         stopBtn.setTypeface(Typeface.DEFAULT_BOLD);
-        stopBtn.setBackground(createGradient("#FF416C", "#FF4B2B")); // Огненный градиент
+        stopBtn.setBackground(createGradient("#FF416C", "#FF4B2B"));
         stopBtn.setOnClickListener(v -> stopProcess());
         stopBtn.setLayoutParams(btnParams);
         layout.addView(stopBtn);
 
-        // Заголовок логов
         TextView logTitle = new TextView(this);
         logTitle.setText("SYSTEM LOGS");
         logTitle.setTextColor(Color.parseColor("#45A29E"));
@@ -79,7 +73,6 @@ public class MainActivity extends Activity {
         logTitle.setPadding(10, 0, 0, 20);
         layout.addView(logTitle);
 
-        // Окно логов
         logView = new TextView(this);
         logView.setTextColor(Color.parseColor("#00FFCC")); 
         logView.setTextSize(14);
@@ -87,11 +80,10 @@ public class MainActivity extends Activity {
         logView.setPadding(40, 40, 40, 40);
         logView.setTextIsSelectable(true);
 
-        // Красивая рамка для логов
         GradientDrawable logBg = new GradientDrawable();
         logBg.setColor(Color.parseColor("#1F2833"));
         logBg.setCornerRadius(30);
-        logBg.setStroke(4, Color.parseColor("#45A29E")); // Бирюзовая обводка
+        logBg.setStroke(4, Color.parseColor("#45A29E"));
         logView.setBackground(logBg);
 
         ScrollView scroll = new ScrollView(this);
@@ -103,16 +95,14 @@ public class MainActivity extends Activity {
         layout.addView(scroll);
         setContentView(layout);
 
-        // Проверка, что ты установил новый APK
         appendLog("[HantoO UI v2.0 Loaded]");
     }
 
-    // Создание красивого градиента со скругленными углами
     private GradientDrawable createGradient(String colorTop, String colorBottom) {
         GradientDrawable gd = new GradientDrawable(
-                GradientDrawable.Orientation.TL_BR, // От левого верхнего к правому нижнему
+                GradientDrawable.Orientation.TL_BR,
                 new int[] {Color.parseColor(colorTop), Color.parseColor(colorBottom)});
-        gd.setCornerRadius(40); // Сильное скругление
+        gd.setCornerRadius(40);
         return gd;
     }
 
