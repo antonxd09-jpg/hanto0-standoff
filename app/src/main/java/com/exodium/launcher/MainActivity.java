@@ -31,7 +31,6 @@ public class MainActivity extends Activity {
     private final int textColorPrimary = Color.parseColor("#FFFFFF");
     private final int textColorSecondary = Color.parseColor("#8E929A");
     private final int accentColor = Color.parseColor("#8C9EFF");
-    private final int accentColorDark = Color.parseColor("#232738");
     private final int colorGreen = Color.parseColor("#00E676");
     private final int colorRed = Color.parseColor("#FF1744");
 
@@ -45,39 +44,18 @@ public class MainActivity extends Activity {
             
             LinearLayout layout = new LinearLayout(this);
             layout.setOrientation(LinearLayout.VERTICAL);
-            layout.setPadding(dp(20), dp(30), dp(20), dp(30));
+            layout.setPadding(dp(20), dp(40), dp(20), dp(30));
 
+            // 1. Мини-заголовок (оставил только его для контекста)
             TextView topBar = new TextView(this);
             topBar.setText("HANTOO / STANDOFF 2");
             topBar.setTextColor(accentColor);
             topBar.setTextSize(12);
             topBar.setTypeface(Typeface.MONOSPACE);
+            topBar.setPadding(0, 0, 0, dp(20));
             layout.addView(topBar);
 
-            TextView title = new TextView(this);
-            title.setText("ESP & Aimbot");
-            title.setTextColor(textColorPrimary);
-            title.setTextSize(32);
-            title.setTypeface(Typeface.DEFAULT_BOLD);
-            title.setPadding(0, dp(5), 0, dp(2));
-            layout.addView(title);
-
-            TextView subtitle = new TextView(this);
-            subtitle.setText("Memory · Overlay · ROOT required");
-            subtitle.setTextColor(textColorSecondary);
-            subtitle.setTextSize(13);
-            subtitle.setPadding(0, 0, 0, dp(20));
-            layout.addView(subtitle);
-
-            LinearLayout tabs = new LinearLayout(this);
-            tabs.setOrientation(LinearLayout.HORIZONTAL);
-            tabs.setPadding(0, 0, 0, dp(20));
-            
-            tabs.addView(createTab("GENERAL", true));
-            tabs.addView(createTab("VISUALS", false));
-            tabs.addView(createTab("SETTINGS", false));
-            layout.addView(tabs);
-
+            // 2. Карточка Status
             LinearLayout statusCard = createCard();
             TextView statusTitle = new TextView(this);
             statusTitle.setText("Status");
@@ -102,7 +80,7 @@ public class MainActivity extends Activity {
             statusCard.addView(statusText);
             layout.addView(statusCard);
 
-            // Кнопка START (Зеленая)
+            // 3. Кнопка START (Зеленая)
             Button startBtn = new Button(this);
             startBtn.setText("START");
             startBtn.setTextColor(Color.WHITE);
@@ -112,7 +90,7 @@ public class MainActivity extends Activity {
             
             LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, dp(55));
-            btnParams.setMargins(0, dp(20), 0, dp(15));
+            btnParams.setMargins(0, dp(10), 0, dp(15));
             startBtn.setLayoutParams(btnParams);
             startBtn.setOnClickListener(v -> {
                 statusText.setText("○ Starting...");
@@ -121,7 +99,7 @@ public class MainActivity extends Activity {
             });
             layout.addView(startBtn);
 
-            // Кнопка STOP (Красная)
+            // 4. Кнопка STOP (Красная)
             Button stopBtn = new Button(this);
             stopBtn.setText("STOP");
             stopBtn.setTextColor(Color.WHITE);
@@ -136,6 +114,7 @@ public class MainActivity extends Activity {
             stopBtn.setOnClickListener(v -> stopProcess());
             layout.addView(stopBtn);
 
+            // 5. Карточка Info
             LinearLayout infoCard = createCard();
             TextView infoTitle = new TextView(this);
             infoTitle.setText("Info");
@@ -153,12 +132,13 @@ public class MainActivity extends Activity {
             infoCard.addView(infoDesc);
             layout.addView(infoCard);
 
+            // 6. Логи
             TextView logLabel = new TextView(this);
             logLabel.setText("SYSTEM LOGS");
             logLabel.setTextColor(textColorSecondary);
             logLabel.setTextSize(11);
             logLabel.setTypeface(Typeface.MONOSPACE);
-            logLabel.setPadding(0, dp(20), 0, dp(5));
+            logLabel.setPadding(0, dp(10), 0, dp(5));
             layout.addView(logLabel);
 
             logView = new TextView(this);
@@ -200,28 +180,6 @@ public class MainActivity extends Activity {
         params.setMargins(0, 0, 0, dp(10));
         card.setLayoutParams(params);
         return card;
-    }
-
-    private TextView createTab(String text, boolean isActive) {
-        TextView tab = new TextView(this);
-        tab.setText(text);
-        tab.setTextSize(12);
-        tab.setTypeface(Typeface.DEFAULT_BOLD);
-        tab.setGravity(Gravity.CENTER);
-        tab.setPadding(dp(15), dp(8), dp(15), dp(8));
-        
-        int bg = isActive ? accentColorDark : Color.TRANSPARENT;
-        int textColor = isActive ? accentColor : textColorSecondary;
-        
-        tab.setBackground(createRoundedBg(bg, dp(10)));
-        tab.setTextColor(textColor);
-        
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
-        params.setMargins(dp(4), 0, dp(4), 0);
-        tab.setLayoutParams(params);
-        
-        return tab;
     }
 
     private void appendLog(String msg) {
