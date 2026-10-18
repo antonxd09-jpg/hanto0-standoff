@@ -2,11 +2,16 @@ package com.exodium.launcher;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.view.Gravity;
+import android.view.WindowManager;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -20,10 +25,13 @@ public class MainActivity extends Activity {
     private final Handler uiHandler = new Handler(Looper.getMainLooper());
     private TextView logView;
     private Process currentProcess;
+    private WindowManager windowManager;
+    private WebView menuView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -130,7 +138,7 @@ public class MainActivity extends Activity {
             
             String cmd = "cd " + runtime + " && setsid sh start.sh";
             ProcessBuilder pb = new ProcessBuilder("su", "-c", cmd);
-            pb.redirectErrorStream(true); // Теперь мы видим все ошибки
+            pb.redirectErrorStream(true);
             currentProcess = pb.start();
             
             BufferedReader r = new BufferedReader(new InputStreamReader(currentProcess.getInputStream()));
@@ -139,16 +147,51 @@ public class MainActivity extends Activity {
                 appendLog(line);
             }
             currentProcess.waitFor();
-            appendLog("Скрипт завершил работу.");
+            appendLog("Скрипт завершил работу. Открываю меню...");
+
+            // Автоматический вызов меню после успешного старта
+            uiHandler.post(this::showOverlay);
 
         } catch (Exception e) {
             appendLog("Ошибка: " + e.getMessage());
         }
     }
 
+    private void showOverlay() {
+        if (menuView != null) return;
+        
+        menuView = new WebView(this);
+        menuView.getSettings().setJavaScriptEnabled(true);
+        menuView.setWebViewClient(new WebViewClient());
+        menuView.setBackgroundColor(0x80000000); // Полупрозрачный фон
+        // Порт по умолчанию 8080. Если не работает - замени на нужный.
+        menuView.loadUrl("http://127.0.0.1:8080"); 
+
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSLUCENT
+        );
+        params.gravity = Gravity.TOP | Gravity.START;
+        params.x = 0; params.y = 0;
+
+        try {
+            windowManager.addView(menuView, params);
+            appendLog("Меню открыто автоматически.");
+        } catch (Exception e) {
+            appendLog("Ошибка оверлея: " + e.getMessage());
+        }
+    }
+
     private void stopProcess() {
         executor.submit(() -> {
             appendLog("Остановка...");
+            if (menuView != null && windowManager != null) {
+                windowManager.removeView(menuView);
+                menuView = null;
+            }
             String runtime = "/data/local/tmp/hantoo-local";
             runSu("cd " + runtime + " && sh stop.sh");
             if (currentProcess != null) currentProcess.destroy();
