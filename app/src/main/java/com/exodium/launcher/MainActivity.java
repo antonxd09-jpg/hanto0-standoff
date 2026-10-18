@@ -28,42 +28,55 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
+        // Основной темный фон
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setBackgroundColor(Color.parseColor("#0B0C10")); // Темный фон
-        layout.setPadding(60, 120, 60, 60);
+        layout.setBackgroundColor(Color.parseColor("#121212"));
+        layout.setPadding(60, 100, 60, 60);
 
+        // Заголовок
         TextView title = new TextView(this);
         title.setText("HantoO");
-        title.setTextColor(Color.parseColor("#66FCF1")); // Неоновый
-        title.setTextSize(40);
-        title.setTypeface(null, Typeface.BOLD);
+        title.setTextColor(Color.parseColor("#00E5FF"));
+        title.setTextSize(42);
+        title.setTypeface(Typeface.DEFAULT_BOLD);
         title.setGravity(Gravity.CENTER);
-        title.setPadding(0, 0, 0, 100);
+        title.setPadding(0, 0, 0, 80);
         layout.addView(title);
 
+        // Параметры для кнопок
         LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, 180);
-        btnParams.setMargins(0, 0, 0, 50);
+        btnParams.setMargins(0, 0, 0, 40);
 
-        // Кнопка СТАРТ
+        // Кнопка СТАРТ (Зеленая)
         Button startBtn = new Button(this);
         startBtn.setText("ЗАПУСТИТЬ");
         startBtn.setTextColor(Color.WHITE);
-        startBtn.setTextSize(22);
-        startBtn.setTypeface(null, Typeface.BOLD);
-        startBtn.setBackground(createGradient("#00B4DB", "#0083B0"));
+        startBtn.setTextSize(20);
+        startBtn.setTypeface(Typeface.DEFAULT_BOLD);
+        
+        GradientDrawable startBg = new GradientDrawable();
+        startBg.setColor(Color.parseColor("#00C853"));
+        startBg.setCornerRadius(50);
+        startBtn.setBackground(startBg);
+        
         startBtn.setOnClickListener(v -> executor.submit(this::startProcess));
         startBtn.setLayoutParams(btnParams);
         layout.addView(startBtn);
 
-        // Кнопка СТОП
+        // Кнопка СТОП (Красная)
         Button stopBtn = new Button(this);
         stopBtn.setText("ОСТАНОВИТЬ");
         stopBtn.setTextColor(Color.WHITE);
-        stopBtn.setTextSize(22);
-        stopBtn.setTypeface(null, Typeface.BOLD);
-        stopBtn.setBackground(createGradient("#FF416C", "#FF4B2B"));
+        stopBtn.setTextSize(20);
+        stopBtn.setTypeface(Typeface.DEFAULT_BOLD);
+        
+        GradientDrawable stopBg = new GradientDrawable();
+        stopBg.setColor(Color.parseColor("#D50000"));
+        stopBg.setCornerRadius(50);
+        stopBtn.setBackground(stopBg);
+        
         stopBtn.setOnClickListener(v -> stopProcess());
         stopBtn.setLayoutParams(btnParams);
         layout.addView(stopBtn);
@@ -71,7 +84,8 @@ public class MainActivity extends Activity {
         // Окно логов
         logView = new TextView(this);
         logView.setTextColor(Color.parseColor("#00FFCC")); 
-        logView.setTextSize(13);
+        logView.setTextSize(12);
+        logView.setTypeface(Typeface.MONOSPACE);
         logView.setPadding(30, 30, 30, 30);
 
         GradientDrawable logBg = new GradientDrawable();
@@ -89,22 +103,13 @@ public class MainActivity extends Activity {
         layout.addView(scrollView);
         setContentView(layout);
 
-        appendLog("HantoO UI Loaded.");
-    }
-
-    private GradientDrawable createGradient(String colorTop, String colorBottom) {
-        GradientDrawable gd = new GradientDrawable(
-                GradientDrawable.Orientation.TL_BR,
-                new int[] {Color.parseColor(colorTop), Color.parseColor(colorBottom)});
-        gd.setCornerRadius(40);
-        return gd;
+        appendLog("HantoO UI готов к работе.");
     }
 
     private void appendLog(String msg) {
         uiHandler.post(() -> {
-            if (logView != null) {
+            if (logView != null && scrollView != null) {
                 logView.append("> " + msg + "\n");
-                // Безопасная прокрутка вниз
                 scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
             }
         });
