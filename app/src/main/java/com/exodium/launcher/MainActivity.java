@@ -3,7 +3,6 @@ package com.exodium.launcher;
 import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -28,89 +27,85 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        // Основной темный фон
+        // Простой темный фон
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setBackgroundColor(Color.parseColor("#121212"));
-        layout.setPadding(60, 100, 60, 60);
+        layout.setBackgroundColor(Color.parseColor("#1A1A1A"));
+        layout.setPadding(40, 80, 40, 40);
 
         // Заголовок
         TextView title = new TextView(this);
         title.setText("HantoO");
-        title.setTextColor(Color.parseColor("#00E5FF"));
-        title.setTextSize(42);
+        title.setTextColor(Color.WHITE);
+        title.setTextSize(36);
         title.setTypeface(Typeface.DEFAULT_BOLD);
         title.setGravity(Gravity.CENTER);
-        title.setPadding(0, 0, 0, 80);
+        title.setPadding(0, 0, 0, 60);
         layout.addView(title);
 
-        // Параметры для кнопок
-        LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, 180);
-        btnParams.setMargins(0, 0, 0, 40);
-
-        // Кнопка СТАРТ (Зеленая)
+        // Кнопка СТАРТ (Сплошной зеленый)
         Button startBtn = new Button(this);
-        startBtn.setText("ЗАПУСТИТЬ");
+        startBtn.setText("СТАРТ");
         startBtn.setTextColor(Color.WHITE);
         startBtn.setTextSize(20);
         startBtn.setTypeface(Typeface.DEFAULT_BOLD);
-        
-        GradientDrawable startBg = new GradientDrawable();
-        startBg.setColor(Color.parseColor("#00C853"));
-        startBg.setCornerRadius(50);
-        startBtn.setBackground(startBg);
-        
+        startBtn.setBackgroundColor(Color.parseColor("#2E7D32")); // Темно-зеленый
         startBtn.setOnClickListener(v -> executor.submit(this::startProcess));
-        startBtn.setLayoutParams(btnParams);
+        
+        LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 160);
+        params1.setMargins(0, 0, 0, 30);
+        startBtn.setLayoutParams(params1);
         layout.addView(startBtn);
 
-        // Кнопка СТОП (Красная)
+        // Кнопка СТОП (Сплошной красный)
         Button stopBtn = new Button(this);
-        stopBtn.setText("ОСТАНОВИТЬ");
+        stopBtn.setText("СТОП");
         stopBtn.setTextColor(Color.WHITE);
         stopBtn.setTextSize(20);
         stopBtn.setTypeface(Typeface.DEFAULT_BOLD);
-        
-        GradientDrawable stopBg = new GradientDrawable();
-        stopBg.setColor(Color.parseColor("#D50000"));
-        stopBg.setCornerRadius(50);
-        stopBtn.setBackground(stopBg);
-        
+        stopBtn.setBackgroundColor(Color.parseColor("#C62828")); // Темно-красный
         stopBtn.setOnClickListener(v -> stopProcess());
-        stopBtn.setLayoutParams(btnParams);
+        
+        LinearLayout.LayoutParams params2 = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 160);
+        params2.setMargins(0, 0, 0, 40);
+        stopBtn.setLayoutParams(params2);
         layout.addView(stopBtn);
 
-        // Окно логов
-        logView = new TextView(this);
-        logView.setTextColor(Color.parseColor("#00FFCC")); 
-        logView.setTextSize(12);
-        logView.setTypeface(Typeface.MONOSPACE);
-        logView.setPadding(30, 30, 30, 30);
+        // Заголовок логов
+        TextView logLabel = new TextView(this);
+        logLabel.setText("ЛОГИ:");
+        logLabel.setTextColor(Color.LTGRAY);
+        logLabel.setTextSize(14);
+        logLabel.setPadding(0, 0, 0, 10);
+        layout.addView(logLabel);
 
-        GradientDrawable logBg = new GradientDrawable();
-        logBg.setColor(Color.parseColor("#1F2833"));
-        logBg.setCornerRadius(20);
-        logBg.setStroke(3, Color.parseColor("#45A29E"));
-        logView.setBackground(logBg);
+        // Окно логов (Простое, без рамок)
+        logView = new TextView(this);
+        logView.setTextColor(Color.parseColor("#00FF00")); 
+        logView.setTextSize(13);
+        logView.setTypeface(Typeface.MONOSPACE);
+        logView.setPadding(20, 20, 20, 20);
+        logView.setBackgroundColor(Color.parseColor("#0D0D0D"));
 
         scrollView = new ScrollView(this);
         scrollView.addView(logView);
         LinearLayout.LayoutParams scrollParams = new LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f);
+                LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f);
         scrollView.setLayoutParams(scrollParams);
         
         layout.addView(scrollView);
         setContentView(layout);
 
-        appendLog("HantoO UI готов к работе.");
+        appendLog("HantoO готов к работе.");
     }
 
     private void appendLog(String msg) {
         uiHandler.post(() -> {
             if (logView != null && scrollView != null) {
                 logView.append("> " + msg + "\n");
-                scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
+                scrollView.fullScroll(View.FOCUS_DOWN);
             }
         });
     }
