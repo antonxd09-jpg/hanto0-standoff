@@ -7,7 +7,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -46,16 +45,7 @@ public class MainActivity extends Activity {
             layout.setOrientation(LinearLayout.VERTICAL);
             layout.setPadding(dp(20), dp(40), dp(20), dp(30));
 
-            // 1. Мини-заголовок (оставил только его для контекста)
-            TextView topBar = new TextView(this);
-            topBar.setText("HANTOO / STANDOFF 2");
-            topBar.setTextColor(accentColor);
-            topBar.setTextSize(12);
-            topBar.setTypeface(Typeface.MONOSPACE);
-            topBar.setPadding(0, 0, 0, dp(20));
-            layout.addView(topBar);
-
-            // 2. Карточка Status
+            // Карточка Status
             LinearLayout statusCard = createCard();
             TextView statusTitle = new TextView(this);
             statusTitle.setText("Status");
@@ -80,7 +70,7 @@ public class MainActivity extends Activity {
             statusCard.addView(statusText);
             layout.addView(statusCard);
 
-            // 3. Кнопка START (Зеленая)
+            // Кнопка START (Зеленая)
             Button startBtn = new Button(this);
             startBtn.setText("START");
             startBtn.setTextColor(Color.WHITE);
@@ -99,7 +89,7 @@ public class MainActivity extends Activity {
             });
             layout.addView(startBtn);
 
-            // 4. Кнопка STOP (Красная)
+            // Кнопка STOP (Красная)
             Button stopBtn = new Button(this);
             stopBtn.setText("STOP");
             stopBtn.setTextColor(Color.WHITE);
@@ -114,7 +104,7 @@ public class MainActivity extends Activity {
             stopBtn.setOnClickListener(v -> stopProcess());
             layout.addView(stopBtn);
 
-            // 5. Карточка Info
+            // Карточка Info
             LinearLayout infoCard = createCard();
             TextView infoTitle = new TextView(this);
             infoTitle.setText("Info");
@@ -132,7 +122,7 @@ public class MainActivity extends Activity {
             infoCard.addView(infoDesc);
             layout.addView(infoCard);
 
-            // 6. Логи
+            // Логи
             TextView logLabel = new TextView(this);
             logLabel.setText("SYSTEM LOGS");
             logLabel.setTextColor(textColorSecondary);
