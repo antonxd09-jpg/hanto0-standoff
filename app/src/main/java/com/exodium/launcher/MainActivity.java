@@ -1,19 +1,24 @@
 package com.exodium.launcher;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.io.*;
+import java.security.MessageDigest;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -24,7 +29,9 @@ public class MainActivity extends Activity {
     private ScrollView scrollView;
     private Process currentProcess;
     private TextView statusText;
-
+    private EditText keyInput;
+    
+    private final String SECRET = "HantoO_Super_Secret_Salt_2024";
     private final int bgColor = Color.parseColor("#0F1115");
     private final int cardColor = Color.parseColor("#1A1D24");
     private final int textColorPrimary = Color.parseColor("#FFFFFF");
@@ -45,7 +52,33 @@ public class MainActivity extends Activity {
             layout.setOrientation(LinearLayout.VERTICAL);
             layout.setPadding(dp(20), dp(40), dp(20), dp(30));
 
-            // Карточка Status
+            // КАРТОЧКА АКТИВАЦИИ
+            LinearLayout authCard = createCard();
+            TextView authTitle = new TextView(this);
+            authTitle.setText("License Key");
+            authTitle.setTextColor(textColorPrimary);
+            authTitle.setTextSize(16);
+            authTitle.setTypeface(Typeface.DEFAULT_BOLD);
+            
+            keyInput = new EditText(this);
+            keyInput.setHint("HANT-...");
+            keyInput.setTextColor(textColorPrimary);
+            keyInput.setHintTextColor(textColorSecondary);
+            keyInput.setTextSize(14);
+            keyInput.setTypeface(Typeface.MONOSPACE);
+            keyInput.setInputType(InputType.TYPE_CLASS_TEXT);
+            keyInput.setBackground(createRoundedBg(Color.parseColor("#0A0A0C"), dp(8)));
+            keyInput.setPadding(dp(10), dp(10), dp(10), dp(10));
+            
+            // Загружаем сохраненный ключ
+            SharedPreferences prefs = getSharedPreferences("HantoO", Context.MODE_PRIVATE);
+            keyInput.setText(prefs.getString("license_key", ""));
+
+            authCard.addView(authTitle);
+            authCard.addView(keyInput);
+            layout.addView(authCard);
+
+            // КАРТОЧКА СТАТУСА
             LinearLayout statusCard = createCard();
             TextView statusTitle = new TextView(this);
             statusTitle.setText("Status");
@@ -53,24 +86,17 @@ public class MainActivity extends Activity {
             statusTitle.setTextSize(16);
             statusTitle.setTypeface(Typeface.DEFAULT_BOLD);
             
-            TextView statusDesc = new TextView(this);
-            statusDesc.setText("Launch Standoff 2, enter a match, then start.");
-            statusDesc.setTextColor(textColorSecondary);
-            statusDesc.setTextSize(13);
-            statusDesc.setPadding(0, dp(5), 0, dp(10));
-
             statusText = new TextView(this);
-            statusText.setText("○ Stopped");
+            statusText.setText("○ Waiting for key");
             statusText.setTextColor(textColorSecondary);
             statusText.setTextSize(14);
             statusText.setTypeface(Typeface.MONOSPACE);
 
             statusCard.addView(statusTitle);
-            statusCard.addView(statusDesc);
             statusCard.addView(statusText);
             layout.addView(statusCard);
 
-            // Кнопка START (Зеленая)
+            // КНОПКА START (Зеленая)
             Button startBtn = new Button(this);
             startBtn.setText("START");
             startBtn.setTextColor(Color.WHITE);
@@ -83,13 +109,22 @@ public class MainActivity extends Activity {
             btnParams.setMargins(0, dp(10), 0, dp(15));
             startBtn.setLayoutParams(btnParams);
             startBtn.setOnClickListener(v -> {
-                statusText.setText("○ Starting...");
-                statusText.setTextColor(accentColor);
-                executor.submit(this::startProcess);
+                String key = keyInput.getText().toString().trim();
+                if (validateKey(key)) {
+                    // Сохраняем рабочий ключ
+                    prefs.edit().putString("license_key", key).apply();
+                    statusText.setText("○ Starting...");
+                    statusText.setTextColor(accentColor);
+                    executor.submit(this::startProcess);
+                } else {
+                    statusText.setText("○ Invalid or expired key!");
+                    statusText.setTextColor(colorRed);
+                    Toast.makeText(this, "Ключ неверный или истек срок!", Toast.LENGTH_SHORT).show();
+                }
             });
             layout.addView(startBtn);
 
-            // Кнопка STOP (Красная)
+            // КНОПКА STOP (Красная)
             Button stopBtn = new Button(this);
             stopBtn.setText("STOP");
             stopBtn.setTextColor(Color.WHITE);
@@ -104,25 +139,7 @@ public class MainActivity extends Activity {
             stopBtn.setOnClickListener(v -> stopProcess());
             layout.addView(stopBtn);
 
-            // Карточка Info
-            LinearLayout infoCard = createCard();
-            TextView infoTitle = new TextView(this);
-            infoTitle.setText("Info");
-            infoTitle.setTextColor(textColorPrimary);
-            infoTitle.setTextSize(16);
-            infoTitle.setTypeface(Typeface.DEFAULT_BOLD);
-            
-            TextView infoDesc = new TextView(this);
-            infoDesc.setText("ROOT + SYSTEM_ALERT_WINDOW required.");
-            infoDesc.setTextColor(textColorSecondary);
-            infoDesc.setTextSize(13);
-            infoDesc.setPadding(0, dp(5), 0, 0);
-
-            infoCard.addView(infoTitle);
-            infoCard.addView(infoDesc);
-            layout.addView(infoCard);
-
-            // Логи
+            // ЛОГИ
             TextView logLabel = new TextView(this);
             logLabel.setText("SYSTEM LOGS");
             logLabel.setTextColor(textColorSecondary);
@@ -149,6 +166,54 @@ public class MainActivity extends Activity {
         }
     }
 
+    // --- ЛОГИКА ПРОВЕРКИ КЛЮЧА ---
+    private boolean validateKey(String key) {
+        if (key == null || !key.startsWith("HANT-")) return false;
+        try {
+            String b64 = key.substring(5);
+            // Восстанавливаем padding для Base64
+            while (b64.length() % 4 != 0) b64 += "=";
+            
+            byte[] decoded = android.util.Base64.decode(b64, android.util.Base64.DEFAULT);
+            String payload = new String(decoded);
+            
+            String[] parts = payload.split("\\|");
+            if (parts.length != 2) return false;
+            
+            long expTime = Long.parseLong(parts[0]);
+            String hash = parts[1];
+            
+            // Проверяем подпись
+            String expectedHash = sha256(parts[0] + SECRET).substring(0, 8);
+            if (!hash.equals(expectedHash)) return false;
+            
+            // Проверяем срок (текущее время в секундах)
+            long currentTime = System.currentTimeMillis() / 1000;
+            if (currentTime > expTime) return false;
+            
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private String sha256(String base) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(base.getBytes("UTF-8"));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (Exception ex) {
+            return "";
+        }
+    }
+
+    // --- ДИЗАЙН ---
     private int dp(int dp) {
         return (int) (dp * getResources().getDisplayMetrics().density);
     }
