@@ -63,7 +63,7 @@ public class MainActivity extends Activity {
 
     private String runSu(String cmd) {
         try {
-            ProcessBuilder pb = new ProcessBuilder("su", "-c", cmd);
+            ProcessBuilder pb = new ProcessBuilder("su", "-mm", "-c", cmd);
             pb.redirectErrorStream(true);
             Process p = pb.start();
             BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -115,11 +115,10 @@ public class MainActivity extends Activity {
             runSu("chmod 700 " + runtime + "/manualmap_injector " + runtime + "/start.sh " + runtime + "/stop.sh " + runtime + "/rest.sh");
             runSu("chmod 600 " + runtime + "/libmain.so " + runtime + "/cache");
 
-            appendLog("Запуск start.sh (MT Manager style)...");
+            appendLog("Запуск start.sh (ожидание)...");
             
-            // Запускаем скрипт, как это делал бы MT Manager
             String cmd = "cd " + runtime + " && sh start.sh";
-            ProcessBuilder pb = new ProcessBuilder("su", "-c", cmd);
+            ProcessBuilder pb = new ProcessBuilder("su", "-mm", "-c", cmd);
             pb.redirectErrorStream(true);
             currentProcess = pb.start();
             
@@ -128,8 +127,12 @@ public class MainActivity extends Activity {
             while ((line = r.readLine()) != null) {
                 appendLog(line);
             }
-            currentProcess.waitFor();
-            appendLog("Скрипт завершил работу. Наслаждайся меню в игре!");
+            int exitCode = currentProcess.waitFor();
+            if (exitCode == 0) {
+                appendLog("Скрипт успешно завершен. Меню должно быть в игре!");
+            } else {
+                appendLog("Скрипт завершился с ошибкой (код " + exitCode + "). Смотри лог выше.");
+            }
 
         } catch (Exception e) {
             appendLog("Ошибка: " + e.getMessage());
