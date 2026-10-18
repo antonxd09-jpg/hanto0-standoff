@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -20,6 +21,7 @@ public class MainActivity extends Activity {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler uiHandler = new Handler(Looper.getMainLooper());
     private TextView logView;
+    private ScrollView scrollView;
     private Process currentProcess;
 
     @Override
@@ -28,14 +30,14 @@ public class MainActivity extends Activity {
         
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setBackgroundColor(Color.parseColor("#0B0C10"));
+        layout.setBackgroundColor(Color.parseColor("#0B0C10")); // Темный фон
         layout.setPadding(60, 120, 60, 60);
 
         TextView title = new TextView(this);
-        title.setText("HantoO\nLauncher");
-        title.setTextColor(Color.parseColor("#66FCF1"));
-        title.setTextSize(42);
-        title.setTypeface(Typeface.create("sans-serif-condensed", Typeface.BOLD));
+        title.setText("HantoO");
+        title.setTextColor(Color.parseColor("#66FCF1")); // Неоновый
+        title.setTextSize(40);
+        title.setTypeface(null, Typeface.BOLD);
         title.setGravity(Gravity.CENTER);
         title.setPadding(0, 0, 0, 100);
         layout.addView(title);
@@ -44,58 +46,50 @@ public class MainActivity extends Activity {
                 LinearLayout.LayoutParams.MATCH_PARENT, 180);
         btnParams.setMargins(0, 0, 0, 50);
 
+        // Кнопка СТАРТ
         Button startBtn = new Button(this);
         startBtn.setText("ЗАПУСТИТЬ");
-        startBtn.setTextColor(Color.parseColor("#000000"));
-        startBtn.setTextSize(24);
-        startBtn.setTypeface(Typeface.DEFAULT_BOLD);
+        startBtn.setTextColor(Color.WHITE);
+        startBtn.setTextSize(22);
+        startBtn.setTypeface(null, Typeface.BOLD);
         startBtn.setBackground(createGradient("#00B4DB", "#0083B0"));
         startBtn.setOnClickListener(v -> executor.submit(this::startProcess));
         startBtn.setLayoutParams(btnParams);
         layout.addView(startBtn);
 
+        // Кнопка СТОП
         Button stopBtn = new Button(this);
         stopBtn.setText("ОСТАНОВИТЬ");
-        stopBtn.setTextColor(Color.parseColor("#FFFFFF"));
-        stopBtn.setTextSize(24);
-        stopBtn.setTypeface(Typeface.DEFAULT_BOLD);
+        stopBtn.setTextColor(Color.WHITE);
+        stopBtn.setTextSize(22);
+        stopBtn.setTypeface(null, Typeface.BOLD);
         stopBtn.setBackground(createGradient("#FF416C", "#FF4B2B"));
         stopBtn.setOnClickListener(v -> stopProcess());
         stopBtn.setLayoutParams(btnParams);
         layout.addView(stopBtn);
 
-        TextView logTitle = new TextView(this);
-        logTitle.setText("SYSTEM LOGS");
-        logTitle.setTextColor(Color.parseColor("#45A29E"));
-        logTitle.setTextSize(14);
-        logTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        logTitle.setLetterSpacing(0.2f);
-        logTitle.setPadding(10, 0, 0, 20);
-        layout.addView(logTitle);
-
+        // Окно логов
         logView = new TextView(this);
         logView.setTextColor(Color.parseColor("#00FFCC")); 
-        logView.setTextSize(14);
-        logView.setTypeface(Typeface.MONOSPACE); 
-        logView.setPadding(40, 40, 40, 40);
-        logView.setTextIsSelectable(true);
+        logView.setTextSize(13);
+        logView.setPadding(30, 30, 30, 30);
 
         GradientDrawable logBg = new GradientDrawable();
         logBg.setColor(Color.parseColor("#1F2833"));
-        logBg.setCornerRadius(30);
-        logBg.setStroke(4, Color.parseColor("#45A29E"));
+        logBg.setCornerRadius(20);
+        logBg.setStroke(3, Color.parseColor("#45A29E"));
         logView.setBackground(logBg);
 
-        ScrollView scroll = new ScrollView(this);
-        scroll.addView(logView);
+        scrollView = new ScrollView(this);
+        scrollView.addView(logView);
         LinearLayout.LayoutParams scrollParams = new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f);
-        scroll.setLayoutParams(scrollParams);
+        scrollView.setLayoutParams(scrollParams);
         
-        layout.addView(scroll);
+        layout.addView(scrollView);
         setContentView(layout);
 
-        appendLog("[HantoO UI v2.0 Loaded]");
+        appendLog("HantoO UI Loaded.");
     }
 
     private GradientDrawable createGradient(String colorTop, String colorBottom) {
@@ -108,10 +102,11 @@ public class MainActivity extends Activity {
 
     private void appendLog(String msg) {
         uiHandler.post(() -> {
-            logView.append("> " + msg + "\n");
-            int scrollAmount = logView.getLayout().getLineTop(logView.getLineCount()) - logView.getHeight();
-            if (scrollAmount > 0) logView.scrollTo(0, scrollAmount);
-            else logView.scrollTo(0, 0);
+            if (logView != null) {
+                logView.append("> " + msg + "\n");
+                // Безопасная прокрутка вниз
+                scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
+            }
         });
     }
 
@@ -134,7 +129,7 @@ public class MainActivity extends Activity {
             byte[] buf = new byte[8192]; int len;
             while ((len = is.read(buf)) > 0) fos.write(buf, 0, len);
         } catch (Exception e) { 
-            appendLog("ОШИБКА АССЕТА " + name + ": " + e.getMessage()); 
+            appendLog("ОШИБКА " + name + ": " + e.getMessage()); 
         }
     }
 
