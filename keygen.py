@@ -1,21 +1,18 @@
-import base64, time, hashlib, sys
+import time, hashlib, sys
 
 SECRET = "HantoO_Super_Secret_Salt_2024"
 
-def generate_key(days):
+def generate_key(days, device_id="none"):
     exp_time = int(time.time()) + (days * 86400)
-    raw = str(exp_time)
-    # Делаем хэш от времени + секрет, чтобы нельзя было просто перебрать время
+    exp_hex = hex(exp_time)[2:] # Время в HEX
+    raw = f"{exp_hex}:{device_id}"
     h = hashlib.sha256((raw + SECRET).encode()).hexdigest()[:8]
-    payload = f"{raw}|{h}"
-    # Кодируем в base64 и убираем лишние символы
-    key = base64.b64encode(payload.encode()).decode().replace("=", "")
-    return f"HANT-{key}"
+    return f"HANT-{exp_hex}-{device_id}-{h}"
 
 if __name__ == "__main__":
     try:
         days = int(sys.argv[1]) if len(sys.argv) > 1 else 1
-        print(generate_key(days))
+        dev_id = sys.argv[2] if len(sys.argv) > 2 else "none"
+        print(generate_key(days, dev_id))
     except Exception as e:
-        print("Использование: python keygen.py <дни>")
-        print("Пример: python keygen.py 30")
+        print("Ошибка:", e)

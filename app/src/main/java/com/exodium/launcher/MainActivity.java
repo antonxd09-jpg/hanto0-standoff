@@ -116,15 +116,16 @@ public class MainActivity extends Activity {
             startBtn.setLayoutParams(btnParams);
             startBtn.setOnClickListener(v -> {
                 String key = keyInput.getText().toString().trim();
-                if (validateKey(key, deviceId)) {
+                String result = validateKey(key, deviceId);
+                if (result.equals("OK")) {
                     prefs.edit().putString("license_key", key).apply();
                     statusText.setText("○ Starting...");
                     statusText.setTextColor(accentColor);
                     executor.submit(this::startProcess);
                 } else {
-                    statusText.setText("○ Invalid or expired key!");
+                    statusText.setText("○ " + result);
                     statusText.setTextColor(colorRed);
-                    Toast.makeText(this, "Ключ неверный или истек!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, result, Toast.LENGTH_LONG).show();
                 }
             });
             layout.addView(startBtn);
@@ -169,37 +170,31 @@ public class MainActivity extends Activity {
         }
     }
 
-    private boolean validateKey(String key, String currentDeviceId) {
-        if (key == null || !key.startsWith("HANT-")) return false;
+    private String validateKey(String key, String currentDeviceId) {
+        if (key == null || !key.startsWith("HANT-")) return "Неверный формат";
         try {
-            String b64 = key.substring(5);
-            while (b64.length() % 4 != 0) b64 += "=";
+            String[] parts = key.split("-");
+            if (parts.length != 4) return "Ошибка структуры";
             
-            byte[] decoded = android.util.Base64.decode(b64, android.util.Base64.DEFAULT);
-            String payload = new String(decoded);
+            String expHex = parts[1];
+            String keyDeviceId = parts[2];
+            String hash = parts[3];
             
-            String[] parts = payload.split("\\|");
-            if (parts.length != 3) return false;
+            long expTime = Long.parseLong(expHex, 16);
+            String expectedHash = sha256(expHex + ":" + keyDeviceId + SECRET).substring(0, 8);
             
-            String expTimeStr = parts[0];
-            String keyDeviceId = parts[1];
-            String hash = parts[2];
-            
-            long expTime = Long.parseLong(expTimeStr);
-            
-            String expectedHash = sha256(expTimeStr + "|" + keyDeviceId + SECRET).substring(0, 8);
-            if (!hash.equals(expectedHash)) return false;
+            if (!hash.equals(expectedHash)) return "Ключ подделан";
             
             long currentTime = System.currentTimeMillis() / 1000;
-            if (currentTime > expTime) return false;
-
-            if (!keyDeviceId.isEmpty()) {
-                if (!keyDeviceId.equals(currentDeviceId)) return false;
+            if (currentTime > expTime) return "Срок истек";
+            
+            if (!keyDeviceId.equals("none") && !keyDeviceId.equals(currentDeviceId)) {
+                return "Чужое устройство";
             }
             
-            return true;
+            return "OK";
         } catch (Exception e) {
-            return false;
+            return "Ошибка парсинга";
         }
     }
 
@@ -292,7 +287,6 @@ public class MainActivity extends Activity {
             File restSh = new File(cacheDir, "rest.sh");
             File cacheBin = new File(cacheDir, "cache");
 
-            // Распаковываем ВСЁ из assets напрямую
             extractAsset("libmain.so", libMain);
             extractAsset("libinjector.so", libInjector);
             extractAsset("start.sh", startSh);
