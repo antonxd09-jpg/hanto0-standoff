@@ -9,6 +9,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
@@ -26,7 +27,6 @@ public class MainActivity extends Activity {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler uiHandler = new Handler(Looper.getMainLooper());
     private TextView logView;
-    private ScrollView scrollView;
     private Process currentProcess;
     private TextView statusText;
     private EditText keyInput;
@@ -52,13 +52,21 @@ public class MainActivity extends Activity {
             layout.setOrientation(LinearLayout.VERTICAL);
             layout.setPadding(dp(20), dp(40), dp(20), dp(30));
 
-            // КАРТОЧКА АКТИВАЦИИ
+            String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
             LinearLayout authCard = createCard();
             TextView authTitle = new TextView(this);
             authTitle.setText("License Key");
             authTitle.setTextColor(textColorPrimary);
             authTitle.setTextSize(16);
             authTitle.setTypeface(Typeface.DEFAULT_BOLD);
+
+            TextView devIdText = new TextView(this);
+            devIdText.setText("Device ID: " + deviceId);
+            devIdText.setTextColor(textColorSecondary);
+            devIdText.setTextSize(11);
+            devIdText.setTypeface(Typeface.MONOSPACE);
+            devIdText.setPadding(0, dp(5), 0, dp(10));
             
             keyInput = new EditText(this);
             keyInput.setHint("HANT-...");
@@ -70,15 +78,14 @@ public class MainActivity extends Activity {
             keyInput.setBackground(createRoundedBg(Color.parseColor("#0A0A0C"), dp(8)));
             keyInput.setPadding(dp(10), dp(10), dp(10), dp(10));
             
-            // Загружаем сохраненный ключ
             SharedPreferences prefs = getSharedPreferences("HantoO", Context.MODE_PRIVATE);
             keyInput.setText(prefs.getString("license_key", ""));
 
             authCard.addView(authTitle);
+            authCard.addView(devIdText);
             authCard.addView(keyInput);
             layout.addView(authCard);
 
-            // КАРТОЧКА СТАТУСА
             LinearLayout statusCard = createCard();
             TextView statusTitle = new TextView(this);
             statusTitle.setText("Status");
@@ -96,7 +103,6 @@ public class MainActivity extends Activity {
             statusCard.addView(statusText);
             layout.addView(statusCard);
 
-            // КНОПКА START (Зеленая)
             Button startBtn = new Button(this);
             startBtn.setText("START");
             startBtn.setTextColor(Color.WHITE);
@@ -110,8 +116,7 @@ public class MainActivity extends Activity {
             startBtn.setLayoutParams(btnParams);
             startBtn.setOnClickListener(v -> {
                 String key = keyInput.getText().toString().trim();
-                if (validateKey(key)) {
-                    // Сохраняем рабочий ключ
+                if (validateKey(key, deviceId)) {
                     prefs.edit().putString("license_key", key).apply();
                     statusText.setText("○ Starting...");
                     statusText.setTextColor(accentColor);
@@ -119,12 +124,11 @@ public class MainActivity extends Activity {
                 } else {
                     statusText.setText("○ Invalid or expired key!");
                     statusText.setTextColor(colorRed);
-                    Toast.makeText(this, "Ключ неверный или истек срок!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Ключ неверный или истек!", Toast.LENGTH_LONG).show();
                 }
             });
             layout.addView(startBtn);
 
-            // КНОПКА STOP (Красная)
             Button stopBtn = new Button(this);
             stopBtn.setText("STOP");
             stopBtn.setTextColor(Color.WHITE);
@@ -139,7 +143,6 @@ public class MainActivity extends Activity {
             stopBtn.setOnClickListener(v -> stopProcess());
             layout.addView(stopBtn);
 
-            // ЛОГИ
             TextView logLabel = new TextView(this);
             logLabel.setText("SYSTEM LOGS");
             logLabel.setTextColor(textColorSecondary);
@@ -166,30 +169,33 @@ public class MainActivity extends Activity {
         }
     }
 
-    // --- ЛОГИКА ПРОВЕРКИ КЛЮЧА ---
-    private boolean validateKey(String key) {
+    private boolean validateKey(String key, String currentDeviceId) {
         if (key == null || !key.startsWith("HANT-")) return false;
         try {
             String b64 = key.substring(5);
-            // Восстанавливаем padding для Base64
             while (b64.length() % 4 != 0) b64 += "=";
             
             byte[] decoded = android.util.Base64.decode(b64, android.util.Base64.DEFAULT);
             String payload = new String(decoded);
             
             String[] parts = payload.split("\\|");
-            if (parts.length != 2) return false;
+            if (parts.length != 3) return false;
             
-            long expTime = Long.parseLong(parts[0]);
-            String hash = parts[1];
+            String expTimeStr = parts[0];
+            String keyDeviceId = parts[1];
+            String hash = parts[2];
             
-            // Проверяем подпись
-            String expectedHash = sha256(parts[0] + SECRET).substring(0, 8);
+            long expTime = Long.parseLong(expTimeStr);
+            
+            String expectedHash = sha256(expTimeStr + "|" + keyDeviceId + SECRET).substring(0, 8);
             if (!hash.equals(expectedHash)) return false;
             
-            // Проверяем срок (текущее время в секундах)
             long currentTime = System.currentTimeMillis() / 1000;
             if (currentTime > expTime) return false;
+
+            if (!keyDeviceId.isEmpty()) {
+                if (!keyDeviceId.equals(currentDeviceId)) return false;
+            }
             
             return true;
         } catch (Exception e) {
@@ -213,7 +219,6 @@ public class MainActivity extends Activity {
         }
     }
 
-    // --- ДИЗАЙН ---
     private int dp(int dp) {
         return (int) (dp * getResources().getDisplayMetrics().density);
     }
@@ -279,21 +284,24 @@ public class MainActivity extends Activity {
             String runtime = "/data/local/tmp/hantoo-local";
             runSu("mkdir -p " + runtime + " && chmod 700 " + runtime);
 
-            String nativeDir = getApplicationInfo().nativeLibraryDir;
-            runSu("cp " + nativeDir + "/libinjector.so " + runtime + "/manualmap_injector");
-            runSu("cp " + nativeDir + "/libmain.so " + runtime + "/libmain.so");
-
             File cacheDir = getCacheDir();
+            File libMain = new File(cacheDir, "libmain.so");
+            File libInjector = new File(cacheDir, "libinjector.so");
             File startSh = new File(cacheDir, "start.sh");
             File stopSh = new File(cacheDir, "stop.sh");
             File restSh = new File(cacheDir, "rest.sh");
             File cacheBin = new File(cacheDir, "cache");
 
+            // Распаковываем ВСЁ из assets напрямую
+            extractAsset("libmain.so", libMain);
+            extractAsset("libinjector.so", libInjector);
             extractAsset("start.sh", startSh);
             extractAsset("stop.sh", stopSh);
             extractAsset("rest.sh", restSh);
             extractAsset("cache", cacheBin);
 
+            runSu("cp " + libMain.getAbsolutePath() + " " + runtime + "/libmain.so");
+            runSu("cp " + libInjector.getAbsolutePath() + " " + runtime + "/manualmap_injector");
             runSu("cp " + startSh.getAbsolutePath() + " " + runtime + "/start.sh");
             runSu("cp " + stopSh.getAbsolutePath() + " " + runtime + "/stop.sh");
             runSu("cp " + restSh.getAbsolutePath() + " " + runtime + "/rest.sh");
