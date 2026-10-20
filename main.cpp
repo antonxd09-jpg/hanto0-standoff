@@ -1,7 +1,7 @@
 #include <jni.h>
 #include <android/log.h>
 #include <EGL/egl.h>
-#include <GLES3/gl3.h>
+#include <GLES2/gl2.h>
 #include <dlfcn.h>
 #include "imgui/imgui.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
@@ -11,8 +11,6 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 
 bool g_ShowMenu = true;
-bool g_ESP = false; // Пока выключено, чтобы не крашить
-
 EGLBoolean (*orig_eglSwapBuffers)(EGLDisplay dpy, EGLSurface surf) = nullptr;
 
 void RenderMenu() {
@@ -25,8 +23,7 @@ void RenderMenu() {
         
         ImGui::TextColored(ImVec4(0.8f, 0.4f, 1.0f, 1.0f), "HantoO Private Build");
         ImGui::Separator();
-        
-        ImGui::Checkbox("Wallhack (ESP) - SOON", &g_ESP);
+        ImGui::Text("Welcome to your own cheat.");
         
         ImGui::End();
     }
@@ -41,9 +38,17 @@ EGLBoolean hooked_eglSwapBuffers(EGLDisplay dpy, EGLSurface surf) {
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO();
         io.IniFilename = nullptr;
-        ImGui_ImplOpenGL3_Init("#version 300 es");
+        // Используем GLES2 шейдер (100), он совместим везде
+        ImGui_ImplOpenGL3_Init("#version 100");
         init = true;
     }
+
+    // Берем реальный размер экрана из игры
+    GLint viewport[4];
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    ImGuiIO& io = ImGui::GetIO();
+    io.DisplaySize = ImVec2((float)viewport[2], (float)viewport[3]);
+
     RenderMenu();
     return orig_eglSwapBuffers(dpy, surf);
 }
@@ -55,6 +60,7 @@ void init_cheat() {
     if (egl) {
         void* swap = dlsym(egl, "eglSwapBuffers");
         if (swap) {
+            // Ставим хук
             A64HookFunction(swap, (void*)hooked_eglSwapBuffers, (void**)&orig_eglSwapBuffers);
             LOGI("Hook installed!");
         }
