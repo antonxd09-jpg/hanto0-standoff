@@ -8,7 +8,7 @@
 #include <string>
 #include "imgui/imgui.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
-#include "Dobby/dobby.h"
+#include "And64InlineHook/And64InlineHook.hpp"
 
 #define LOG_TAG "HantoO"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
@@ -188,6 +188,6 @@ void init_cheat() {
     void* egl = dlopen("libEGL.so", RTLD_LAZY);
     if (egl) {
         void* swap = dlsym(egl, "eglSwapBuffers");
-        if (swap) DobbyHook(swap, (void*)hooked_eglSwapBuffers, (void**)&orig_eglSwapBuffers);
+        if (swap) A64HookFunction(swap, (void*)hooked_eglSwapBuffers, (void**)&orig_eglSwapBuffers);
     }
 }
