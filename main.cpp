@@ -1,9 +1,8 @@
-#include <algorithm>
 #include <jni.h>
 #include <android/log.h>
 #include <android/input.h>
 #include <EGL/egl.h>
-#include <GLES3/gl3.h>
+#include <GLES2/gl2.h>
 #include <dlfcn.h>
 #include <cmath>
 #include <cstdio>
@@ -11,6 +10,7 @@
 #include <mutex>
 #include <atomic>
 #include <vector>
+#include <algorithm>
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
@@ -19,18 +19,9 @@
 #define LOG_TAG "HantoO"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 
-std::atomic<bool> g_menuOpen{true}, g_espBoxesEnabled{true};
+std::atomic<bool> g_menuOpen{true};
 float g_uiScale = 1.0f, g_menuAnimation = 0.0f, g_pageAnimation = 1.0f;
 int g_section = 0, g_subsection = 0;
-
-struct EspScreenBox {
-    float left, top, right, bottom;
-    bool statsValid = false, weaponValid = false, enemy = true;
-    unsigned int hp = 0, maxHp = 100, armor = 0, maxArmor = 100;
-    unsigned int weaponId = 0, magazineAmmo = 0, reserveAmmo = 0;
-};
-std::mutex g_espMutex;
-std::vector<EspScreenBox> g_espScreenBoxes;
 
 struct EspAppearance {
     bool box=true,health=true,armor=true,weapon=true,ammo=true,fill=false,rounded=true;
@@ -62,10 +53,6 @@ void uiPanel(ImDrawList* d,ImVec2 a,ImVec2 b,float rounding=14){
     d->AddRectFilled(a,b,uiColor(ImVec4(0.047f,0.055f,0.075f,0.985f)),rounding*g_uiScale);
     d->AddRect(a,b,uiColor(ImVec4(0.19f,0.22f,0.29f,0.65f)),rounding*g_uiScale,0,1.0f);
 }
-void uiCard(ImDrawList* d,ImVec2 a,ImVec2 b){
-    d->AddRectFilled(a,b,uiColor(ImVec4(.066f,.078f,.104f,1)),12*g_uiScale);
-    d->AddRect(a,b,uiColor(ImVec4(.18f,.21f,.28f,.58f)),12*g_uiScale);
-}
 bool uiRailButton(const char* label,int icon,bool selected,float width){
     const float h=68*g_uiScale;const ImVec2 a=ImGui::GetCursorScreenPos();
     const bool pressed=ImGui::InvisibleButton(label,ImVec2(width,h));auto* d=ImGui::GetWindowDrawList();
@@ -75,6 +62,7 @@ bool uiRailButton(const char* label,int icon,bool selected,float width){
 }
 bool uiToggle(const char* label,bool& value){
     ImGui::PushID(label);const ImVec2 a=ImGui::GetCursorScreenPos();const float w=ImGui::GetContentRegionAvail().x,h=48*g_uiScale;
+    if(w < 10) { ImGui::PopID(); return false; } // Защита от краша при нулевой ширине
     const bool hit=ImGui::InvisibleButton("##switch",ImVec2(w,h));if(hit)value=!value;
     ImGuiStorage* store=ImGui::GetStateStorage();auto id=ImGui::GetItemID();
     float t=uiEase(store->GetFloat(id,value?1:0),value?1:0,20);store->SetFloat(id,t);
@@ -85,34 +73,6 @@ bool uiToggle(const char* label,bool& value){
     d->AddCircleFilled(uiAdd(p,sh*0.5f+(sw-sh)*t,sh*0.5f),9.4f*g_uiScale,uiColor(ImVec4(0.97f,0.98f,1,1)),20);
     uiText(d,uiAdd(a,(w-sw-14*g_uiScale)*0.5f,h*0.5f),label,uiColor(ImVec4(0.85f,0.89f,0.96f,1)),19*g_uiScale);
     ImGui::PopID();return hit;
-}
-void uiSlider(const char* id,const char* label,float& value,float lo,float hi,const char* format){
-    ImGui::PushID(id);const ImVec2 a=ImGui::GetCursorScreenPos();
-    uiTextLeft(ImGui::GetWindowDrawList(),a,label,uiColor(ImVec4(.68f,.73f,.82f,1)),16*g_uiScale);
-    ImGui::SetCursorScreenPos(uiAdd(a,0,23*g_uiScale));ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-    ImGui::SliderFloat("##value",&value,lo,hi,format);
-    ImGui::SetCursorScreenPos(uiAdd(a,0,64*g_uiScale));ImGui::PopID();
-}
-void uiColorRow(const char* label,ImVec4& c){
-    ImGui::PushID(label);const ImVec2 p=ImGui::GetCursorScreenPos();float w=ImGui::GetContentRegionAvail().x;
-    uiText(ImGui::GetWindowDrawList(),uiAdd(p,(w-42*g_uiScale)*0.5f,19*g_uiScale),label,uiColor(ImVec4(0.76f,0.81f,0.90f,1)),18*g_uiScale);
-    ImGui::SetCursorScreenPos(uiAdd(p,w-34*g_uiScale,2*g_uiScale));
-    if(ImGui::ColorButton("##color",c,ImGuiColorEditFlags_NoTooltip,ImVec2(32*g_uiScale,32*g_uiScale)))ImGui::OpenPopup("##picker");
-    if(ImGui::BeginPopup("##picker")){
-        ImGui::SetNextItemWidth(250*g_uiScale);
-        ImGui::ColorPicker4("##rgba",&c.x,ImGuiColorEditFlags_AlphaBar|ImGuiColorEditFlags_DisplayHex|ImGuiColorEditFlags_NoSidePreview);
-        ImGui::EndPopup();
-    }
-    ImGui::SetCursorScreenPos(uiAdd(p,0,44*g_uiScale));ImGui::PopID();
-}
-void drawStyledEsp(ImDrawList* d,const EspScreenBox& b){
-    const ImVec2 a(b.left,b.top),z(b.right,b.bottom);float h=z.y-a.y,w=z.x-a.x;if(h<8||w<2)return;
-    const float center=(a.x+z.x)*0.5f,thick=g_appearance.lineWidth;
-    const float rounding=g_appearance.rounded?g_appearance.cornerRadius*g_uiScale:0.0f;const auto boxColor=uiColor(g_appearance.boxColor);
-    if(g_appearance.box){
-        if(g_appearance.fill)d->AddRectFilled(a,z,uiColor(g_appearance.boxColor,std::max(0.0f, std::min(0.35f, g_appearance.fillIntensity))),rounding);
-        d->AddRect(a,z,boxColor,rounding,0,thick);
-    }
 }
 
 void renderMinimalMenu(){
@@ -146,12 +106,19 @@ void renderMinimalMenu(){
     uiPanel(ImGui::GetWindowDrawList(),ImGui::GetWindowPos(),uiAdd(ImGui::GetWindowPos(),mainW,h));
     
     ImGui::SetCursorScreenPos(uiAdd(ImGui::GetWindowPos(), 20*s, 20*s));
+    
+    // Заголовок HantoO
+    uiTextLeft(ImGui::GetWindowDrawList(), ImGui::GetCursorScreenPos(), "HantoO", uiColor(g_appearance.accent), 24*s);
+    ImGui::SetCursorScreenPos(uiAdd(ImGui::GetCursorScreenPos(), 0, 50*s));
+
     if(g_section == 0) { // Aimbot
         uiToggle("Enable Aimbot", g_appearance.box);
-        uiSlider("smooth", "Smoothness", g_appearance.lineWidth, 1.0f, 10.0f, "%.1f");
+        ImGui::SetCursorScreenPos(uiAdd(ImGui::GetCursorScreenPos(), 0, 10*s));
+        uiToggle("Silent Aim", g_appearance.fill);
     } else if(g_section == 1) { // Visuals
         uiToggle("Enable ESP", g_appearance.health);
-        uiColorRow("Box Color", g_appearance.boxColor);
+        ImGui::SetCursorScreenPos(uiAdd(ImGui::GetCursorScreenPos(), 0, 10*s));
+        uiToggle("Box", g_appearance.armor);
     } else {
         ImGui::Text("Settings here");
     }
@@ -167,17 +134,24 @@ EGLBoolean hooked_eglSwapBuffers(EGLDisplay dpy, EGLSurface surf) {
         ImGuiIO& io = ImGui::GetIO();
         io.IniFilename = nullptr;
         io.Fonts->AddFontDefault();
-        ImGui_ImplOpenGL3_Init("#version 300 es");
+        // ВАЖНО: Используем версию 100 (OpenGL ES 2.0) для совместимости
+        ImGui_ImplOpenGL3_Init("#version 100");
         init = true;
     }
+    
+    // Получаем размеры текущего экрана
     GLint viewport[4];
     glGetIntegerv(GL_VIEWPORT, viewport);
     ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = ImVec2((float)viewport[2], (float)viewport[3]);
+    if (viewport[2] > 0 && viewport[3] > 0) {
+        io.DisplaySize = ImVec2((float)viewport[2], (float)viewport[3]);
+    }
     
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
+    
     renderMinimalMenu();
+    
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     
