@@ -13,6 +13,8 @@ jobs:
         run: |
           echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;21.4.7075529"
           echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/21.4.7075529" >> $GITHUB_ENV
+      - name: Download Hook Library
+        run: git clone https://github.com/Rprop/And64InlineHook.git
       - name: Compile Cheat C++
         run: |
           $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android26-clang++ \
