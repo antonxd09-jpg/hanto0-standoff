@@ -45,9 +45,9 @@ void SetupStyle() {
     colors[ImGuiCol_CheckMark]              = ImVec4(0.90f, 0.30f, 0.30f, 1.00f);
     colors[ImGuiCol_SliderGrab]             = ImVec4(0.90f, 0.30f, 0.30f, 1.00f);
     colors[ImGuiCol_SliderGrabActive]       = ImVec4(0.90f, 0.30f, 0.30f, 1.00f);
-    colors[ImGuiCol_Tab]                    = ImVec4(0.06f, 0.06f, 0.07f, 1.00f);
-    colors[ImGuiCol_TabHovered]             = ImVec4(0.90f, 0.30f, 0.30f, 1.00f);
-    colors[ImGuiCol_TabActive]              = ImVec4(0.15f, 0.15f, 0.16f, 1.00f);
+    colors[ImGuiCol_Header]                    = ImVec4(0.06f, 0.06f, 0.07f, 1.00f);
+    colors[ImGuiCol_HeaderHovered]             = ImVec4(0.90f, 0.30f, 0.30f, 1.00f);
+    colors[ImGuiCol_HeaderActive]              = ImVec4(0.15f, 0.15f, 0.16f, 1.00f);
 }
 
 bool ToggleButton(const char* label, bool* v) {
