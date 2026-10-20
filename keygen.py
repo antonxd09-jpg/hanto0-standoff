@@ -4,21 +4,13 @@ SECRET = "HantoO_Super_Secret_Salt_2024"
 BASE_TIME = 1704067200 # 1 января 2024
 CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-def to_base62_2(num):
-    if num == 0: return "00"
+def to_base62(num, length):
+    if num == 0: return "0" * length
     res = ""
     while num > 0:
         res = CHARS[num % 62] + res
         num //= 62
-    return res.zfill(2)
-
-def to_base62_4(num):
-    if num == 0: return "0000"
-    res = ""
-    while num > 0:
-        res = CHARS[num % 62] + res
-        num //= 62
-    return res.zfill(4)
+    return res.zfill(length)
 
 if __name__ == "__main__":
     try:
@@ -30,7 +22,8 @@ if __name__ == "__main__":
 
         target_time = int(time.time()) + (days * 86400)
         days_from_base = int((target_time - BASE_TIME) / 86400)
-        time_str = to_base62_2(days_from_base)
+        
+        time_str = to_base62(days_from_base, 2)
         type_str = 'G' if key_type == "G" else 'S'
 
         for _ in range(count):
@@ -39,7 +32,7 @@ if __name__ == "__main__":
 
             sig_raw = hashlib.sha256((part1 + SECRET).encode()).hexdigest()
             sig_num = int(sig_raw[:8], 16) % (62**4)
-            part2 = to_base62_4(sig_num)
+            part2 = to_base62(sig_num, 4)
 
             print(f"KEY-{part1}-{part2}")
 

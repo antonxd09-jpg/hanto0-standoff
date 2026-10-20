@@ -171,7 +171,14 @@ public class MainActivity extends Activity {
     }
 
     private String validateKey(String key, String currentDeviceId) {
-        if (key == null || !key.startsWith("KEY-")) return "Неверный формат";
+        if (key == null || key.isEmpty()) return "Пустой ключ";
+
+        // ЖЕСТКИЙ БЛОК СТАРЫХ КЛЮЧЕЙ
+        if (key.startsWith("HANT-")) {
+            return "Старые ключи больше не работают!";
+        }
+
+        if (!key.startsWith("KEY-")) return "Неверный формат";
         try {
             String[] parts = key.split("-");
             if (parts.length != 3) return "Ошибка структуры";
