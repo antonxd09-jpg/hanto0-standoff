@@ -6,7 +6,7 @@
 #include <dlfcn.h>
 #include <string>
 #include "imgui/imgui.h"
-#include "imgui/imgui_internal.h" // Добавили для кастомных кнопок
+#include "imgui/imgui_internal.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
 #include "And64InlineHook/And64InlineHook.hpp"
 
@@ -49,9 +49,6 @@ void SetupStyle() {
     colors[ImGuiCol_CheckMark]              = ImVec4(0.90f, 0.30f, 0.30f, 1.00f);
     colors[ImGuiCol_SliderGrab]             = ImVec4(0.90f, 0.30f, 0.30f, 1.00f);
     colors[ImGuiCol_SliderGrabActive]       = ImVec4(0.90f, 0.30f, 0.30f, 1.00f);
-    
-    // В новых версиях ImGui цвета вкладок могут называться иначе, 
-    // используем безопасные варианты:
     colors[ImGuiCol_Tab]                    = ImVec4(0.06f, 0.06f, 0.06f, 1.00f);
     colors[ImGuiCol_TabHovered]             = ImVec4(0.90f, 0.30f, 0.30f, 1.00f);
     colors[ImGuiCol_HeaderActive]           = ImVec4(0.15f, 0.15f, 0.15f, 1.00f); 
@@ -68,7 +65,11 @@ bool ToggleButton(const char* label, bool* v) {
     const float width = height * 1.8f;
     const float radius = height * 0.50f;
     const ImVec2 pos = window->DC.CursorPos;
-    const ImRect total_bb(pos, pos + ImVec2(width + (label_size.x > 0.0f ? style.ItemInnerSpacing.x + label_size.x : 0.0f), label_size.y + style.FramePadding.y * 2.0f));
+    
+    // ИСПРАВЛЕНО ЗДЕСЬ (без оператора +)
+    float bb_width = width + (label_size.x > 0.0f ? style.ItemInnerSpacing.x + label_size.x : 0.0f);
+    float bb_height = label_size.y + style.FramePadding.y * 2.0f;
+    const ImRect total_bb(pos, ImVec2(pos.x + bb_width, pos.y + bb_height));
     
     ImGui::ItemSize(total_bb, style.FramePadding.y);
     if (!ImGui::ItemAdd(total_bb, id)) return false;
@@ -77,7 +78,9 @@ bool ToggleButton(const char* label, bool* v) {
     bool pressed = ImGui::ButtonBehavior(total_bb, id, &hovered, &held);
     if (pressed) { *v = !(*v); ImGui::MarkItemEdited(id); }
     
-    const ImRect check_bb(pos, pos + ImVec2(width, height));
+    // ИСПРАВЛЕНО ЗДЕСЬ (без оператора +)
+    const ImRect check_bb(pos, ImVec2(pos.x + width, pos.y + height));
+    
     ImGui::RenderNavHighlight(total_bb, id);
     
     ImU32 col_bg = *v ? IM_COL32(230, 80, 80, 255) : IM_COL32(50, 50, 50, 255);
@@ -97,9 +100,8 @@ void RenderMenu() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
 
-    // СТАТИЧНАЯ КНОПКА (Вместо плавающей H)
     if (!g_ShowMenu) {
-        ImGui::SetNextWindowPos(ImVec2(50, 100), ImGuiCond_Always); // Позиция: слева сверху
+        ImGui::SetNextWindowPos(ImVec2(50, 100), ImGuiCond_Always);
         ImGui::SetNextWindowSize(ImVec2(200, 80), ImGuiCond_Always);
         ImGui::Begin("##OpenMenu", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove);
         if (ImGui::Button("OPEN MENU", ImVec2(200, 80))) {
@@ -120,55 +122,41 @@ void RenderMenu() {
 
         ImGui::Columns(2, "main_cols", false);
 
-        // --- ЛЕВАЯ КОЛОНКА ---
         ImGui::BeginChild("left_col", ImVec2(0, 0), true);
-        
         ImGui::Text("Aimbot");
         ImGui::Spacing();
         ToggleButton("Enable Aimbot", &g_Aimbot);
         ImGui::Spacing();
-        
         if (g_Aimbot) {
             ImGui::SliderFloat("Smoothness", &g_AimbotSmooth, 1.0f, 10.0f, "%.2f");
         }
-        
         ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
-        
         ImGui::Text("ESP Settings");
         ImGui::Spacing();
         ToggleButton("Enable ESP", &g_ESP);
         ImGui::Spacing();
-        
         if (g_ESP) {
             ImGui::ColorEdit4("ESP Color", g_ESPColor);
         }
-
         ImGui::EndChild();
         
         ImGui::NextColumn();
 
-        // --- ПРАВАЯ КОЛОНКА ---
         ImGui::BeginChild("right_col", ImVec2(0, 0), true);
-        
         ImGui::Text("Miscellaneous");
         ImGui::Spacing();
         ToggleButton("No Recoil", &g_NoRecoil);
-        
         ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
-
         ImGui::Text("Info");
         ImGui::TextColored(ImVec4(0.90f, 0.30f, 0.30f, 1.0f), "HantoO Internal");
         ImGui::Text("Status: Undetected");
-        
         ImGui::Spacing();
         if (ImGui::Button("Hide Menu", ImVec2(200, 40))) {
             g_ShowMenu = false;
         }
-
         ImGui::EndChild();
         ImGui::Columns(1);
 
-        // Нижние вкладки
         ImGui::Separator();
         if (ImGui::BeginTabBar("BottomTabs")) {
             if (ImGui::BeginTabItem("Combat")) {
@@ -184,7 +172,6 @@ void RenderMenu() {
                 ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem("Skins")) {
-                // Убрали std::to_string, чтобы не было ошибки компиляции
                 const char* skin_names[] = {"Skin 1", "Skin 2", "Skin 3", "Skin 4"};
                 for (int i = 0; i < 4; i++) {
                     ImGui::Button(skin_names[i], ImVec2(100, 50));
@@ -194,7 +181,6 @@ void RenderMenu() {
             }
             ImGui::EndTabBar();
         }
-
         ImGui::End();
     }
 
