@@ -4,17 +4,18 @@
 #include <EGL/egl.h>
 #include <GLES2/gl2.h>
 #include <dlfcn.h>
+#include <string>
 #include "imgui/imgui.h"
+#include "imgui/imgui_internal.h" // Добавили для кастомных кнопок
 #include "imgui/backends/imgui_impl_opengl3.h"
 #include "And64InlineHook/And64InlineHook.hpp"
 
 #define LOG_TAG "HantoO"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 
-// --- ПЕРЕМЕННЫЕ ---
 bool g_ShowMenu = true;
 bool g_ESP = false;
-float g_ESPColor[4] = { 1.0f, 0.3f, 0.3f, 1.0f }; // Красный акцент как в Zenin
+float g_ESPColor[4] = { 1.0f, 0.3f, 0.3f, 1.0f };
 bool g_Aimbot = false;
 float g_AimbotSmooth = 2.0f;
 bool g_NoRecoil = false;
@@ -22,7 +23,6 @@ bool g_NoRecoil = false;
 EGLBoolean (*orig_eglSwapBuffers)(EGLDisplay dpy, EGLSurface surf) = nullptr;
 int32_t (*orig_AInputQueue_preDispatchEvent)(AInputQueue* queue, AInputEvent* event) = nullptr;
 
-// --- СТИЛЬ (ZENIN STYLE) ---
 void SetupStyle() {
     ImGuiStyle& style = ImGui::GetStyle();
     style.WindowRounding = 8.0f;
@@ -36,25 +36,27 @@ void SetupStyle() {
     
     ImVec4* colors = style.Colors;
     colors[ImGuiCol_Text]                   = ImVec4(0.90f, 0.90f, 0.90f, 1.00f);
-    colors[ImGuiCol_WindowBg]               = ImVec4(0.06f, 0.06f, 0.06f, 0.98f); // Очень темный
-    colors[ImGuiCol_ChildBg]                = ImVec4(0.09f, 0.09f, 0.09f, 1.00f); // Панели
+    colors[ImGuiCol_WindowBg]               = ImVec4(0.06f, 0.06f, 0.06f, 0.98f);
+    colors[ImGuiCol_ChildBg]                = ImVec4(0.09f, 0.09f, 0.09f, 1.00f);
     colors[ImGuiCol_Border]                 = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
     colors[ImGuiCol_FrameBg]                = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
     colors[ImGuiCol_FrameBgHovered]         = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
     colors[ImGuiCol_Button]                 = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
     colors[ImGuiCol_ButtonHovered]          = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
-    colors[ImGuiCol_ButtonActive]           = ImVec4(0.90f, 0.30f, 0.30f, 1.00f); // Красный
+    colors[ImGuiCol_ButtonActive]           = ImVec4(0.90f, 0.30f, 0.30f, 1.00f);
     colors[ImGuiCol_Header]                 = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
-    colors[ImGuiCol_HeaderHovered]          = ImVec4(0.90f, 0.30f, 0.30f, 1.00f); // Красный
-    colors[ImGuiCol_CheckMark]              = ImVec4(0.90f, 0.30f, 0.30f, 1.00f); // Красный
+    colors[ImGuiCol_HeaderHovered]          = ImVec4(0.90f, 0.30f, 0.30f, 1.00f);
+    colors[ImGuiCol_CheckMark]              = ImVec4(0.90f, 0.30f, 0.30f, 1.00f);
     colors[ImGuiCol_SliderGrab]             = ImVec4(0.90f, 0.30f, 0.30f, 1.00f);
     colors[ImGuiCol_SliderGrabActive]       = ImVec4(0.90f, 0.30f, 0.30f, 1.00f);
+    
+    // В новых версиях ImGui цвета вкладок могут называться иначе, 
+    // используем безопасные варианты:
     colors[ImGuiCol_Tab]                    = ImVec4(0.06f, 0.06f, 0.06f, 1.00f);
     colors[ImGuiCol_TabHovered]             = ImVec4(0.90f, 0.30f, 0.30f, 1.00f);
-    colors[ImGuiCol_TabActive]              = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
+    colors[ImGuiCol_HeaderActive]           = ImVec4(0.15f, 0.15f, 0.15f, 1.00f); 
 }
 
-// Кастомный переключатель (как в Zenin)
 bool ToggleButton(const char* label, bool* v) {
     ImGuiWindow* window = ImGui::GetCurrentWindow();
     if (window->SkipItems) return false;
@@ -67,18 +69,24 @@ bool ToggleButton(const char* label, bool* v) {
     const float radius = height * 0.50f;
     const ImVec2 pos = window->DC.CursorPos;
     const ImRect total_bb(pos, pos + ImVec2(width + (label_size.x > 0.0f ? style.ItemInnerSpacing.x + label_size.x : 0.0f), label_size.y + style.FramePadding.y * 2.0f));
+    
     ImGui::ItemSize(total_bb, style.FramePadding.y);
     if (!ImGui::ItemAdd(total_bb, id)) return false;
+    
     bool hovered, held;
     bool pressed = ImGui::ButtonBehavior(total_bb, id, &hovered, &held);
     if (pressed) { *v = !(*v); ImGui::MarkItemEdited(id); }
+    
     const ImRect check_bb(pos, pos + ImVec2(width, height));
     ImGui::RenderNavHighlight(total_bb, id);
+    
     ImU32 col_bg = *v ? IM_COL32(230, 80, 80, 255) : IM_COL32(50, 50, 50, 255);
     ImU32 col_circle = IM_COL32(255, 255, 255, 255);
+    
     window->DrawList->AddRectFilled(check_bb.Min, check_bb.Max, col_bg, height * 0.5f);
     float circle_x = *v ? check_bb.Max.x - radius - 2.0f : check_bb.Min.x + radius + 2.0f;
     window->DrawList->AddCircleFilled(ImVec2(circle_x, check_bb.Min.y + radius + 1.0f), radius - 1.0f, col_circle);
+    
     if (label_size.x > 0.0f) {
         ImGui::RenderText(ImVec2(check_bb.Max.x + style.ItemInnerSpacing.x, check_bb.Min.y + style.FramePadding.y), label);
     }
@@ -89,11 +97,14 @@ void RenderMenu() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
 
+    // СТАТИЧНАЯ КНОПКА (Вместо плавающей H)
     if (!g_ShowMenu) {
-        ImGui::SetNextWindowPos(ImVec2(20, 100), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(60, 60), ImGuiCond_Always);
-        ImGui::Begin("##Open", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove);
-        if (ImGui::Button("H", ImVec2(60, 60))) g_ShowMenu = true;
+        ImGui::SetNextWindowPos(ImVec2(50, 100), ImGuiCond_Always); // Позиция: слева сверху
+        ImGui::SetNextWindowSize(ImVec2(200, 80), ImGuiCond_Always);
+        ImGui::Begin("##OpenMenu", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove);
+        if (ImGui::Button("OPEN MENU", ImVec2(200, 80))) {
+            g_ShowMenu = true;
+        }
         ImGui::End();
     }
 
@@ -101,14 +112,12 @@ void RenderMenu() {
         ImGui::SetNextWindowSize(ImVec2(900, 600), ImGuiCond_FirstUseEver);
         ImGui::Begin("HantoO", &g_ShowMenu, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
 
-        // Верхняя панель с ником
         ImGui::TextColored(ImVec4(0.90f, 0.30f, 0.30f, 1.0f), "HantoO");
         ImGui::SameLine();
         ImGui::TextColored(ImVec4(0.50f, 0.50f, 0.50f, 1.0f), "| Private Build");
         ImGui::Separator();
         ImGui::Spacing();
 
-        // Две колонки
         ImGui::Columns(2, "main_cols", false);
 
         // --- ЛЕВАЯ КОЛОНКА ---
@@ -159,7 +168,7 @@ void RenderMenu() {
         ImGui::EndChild();
         ImGui::Columns(1);
 
-        // Нижние вкладки (Скины)
+        // Нижние вкладки
         ImGui::Separator();
         if (ImGui::BeginTabBar("BottomTabs")) {
             if (ImGui::BeginTabItem("Combat")) {
@@ -175,9 +184,10 @@ void RenderMenu() {
                 ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem("Skins")) {
-                // Заглушка под скины (сетка кнопок)
+                // Убрали std::to_string, чтобы не было ошибки компиляции
+                const char* skin_names[] = {"Skin 1", "Skin 2", "Skin 3", "Skin 4"};
                 for (int i = 0; i < 4; i++) {
-                    ImGui::Button(("Skin " + std::to_string(i+1)).c_str(), ImVec2(100, 50));
+                    ImGui::Button(skin_names[i], ImVec2(100, 50));
                     if (i < 3) ImGui::SameLine();
                 }
                 ImGui::EndTabItem();
@@ -199,7 +209,7 @@ EGLBoolean hooked_eglSwapBuffers(EGLDisplay dpy, EGLSurface surf) {
         ImGuiIO& io = ImGui::GetIO();
         io.IniFilename = nullptr;
         io.Fonts->AddFontDefault();
-        io.FontGlobalScale = 1.8f; // Увеличенный шрифт
+        io.FontGlobalScale = 1.8f;
         ImGui_ImplOpenGL3_Init("#version 100");
         SetupStyle();
         init = true;
@@ -232,7 +242,7 @@ int32_t hooked_AInputQueue_preDispatchEvent(AInputQueue* queue, AInputEvent* eve
 
 __attribute__((constructor))
 void init_cheat() {
-    LOGI("HantoO Zenin UI loading...");
+    LOGI("HantoO loading...");
     void* egl = dlopen("libEGL.so", RTLD_LAZY);
     if (egl) {
         void* swap = dlsym(egl, "eglSwapBuffers");
