@@ -176,6 +176,11 @@ public class MainActivity extends Activity {
             String runtime = "/data/local/tmp/hantoo-local";
             runSu("mkdir -p " + runtime + " && chmod 700 " + runtime);
 
+            File cacheDir = getCacheDir();
+            File libMain = new File(cacheDir, "libmain.so");
+            File libInjector = new File(cacheDir, "libinjector.so");
+            File startSh = new File(cacheDir, "start.sh");
+            File stopSh = new File(cacheDir, "stop.sh");
 
             extractAsset("libmain.so", libMain);
             extractAsset("libinjector.so", libInjector);
