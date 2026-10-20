@@ -2,7 +2,8 @@
 #include <android/log.h>
 #include <android/input.h>
 #include <EGL/egl.h>
-#include <GLES2/gl2.h>
+#include <EGL/eglext.h>
+#include <GLES3/gl3.h>
 #include <dlfcn.h>
 #include <stdio.h>
 #include "imgui/imgui.h"
@@ -20,7 +21,9 @@ bool g_PerWeapon = false, g_BackCamera = false, g_ShotBuffer = false, g_Interpol
 int g_WeaponGroup = 0, g_BufferTicks = 0;
 
 EGLBoolean (*orig_eglSwapBuffers)(EGLDisplay dpy, EGLSurface surf) = nullptr;
+EGLBoolean (*orig_eglSwapBuffersWithDamageKHR)(EGLDisplay dpy, EGLSurface surf, EGLint* rects, EGLint n_rects) = nullptr;
 int32_t (*orig_AInputQueue_preDispatchEvent)(AInputQueue* queue, AInputEvent* event) = nullptr;
+int32_t (*orig_AInputQueue_getEvent)(AInputQueue* queue, AInputEvent** event) = nullptr;
 
 void SetupStyle() {
     ImGui::StyleColorsDark();
@@ -37,17 +40,12 @@ void SetupStyle() {
     colors[ImGuiCol_ChildBg]                = ImVec4(0.12f, 0.12f, 0.13f, 1.00f);
     colors[ImGuiCol_Border]                 = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
     colors[ImGuiCol_FrameBg]                = ImVec4(0.15f, 0.15f, 0.16f, 1.00f);
-    colors[ImGuiCol_FrameBgHovered]         = ImVec4(0.20f, 0.20f, 0.21f, 1.00f);
-    colors[ImGuiCol_FrameBgActive]          = ImVec4(0.25f, 0.25f, 0.26f, 1.00f);
-    colors[ImGuiCol_Button]                 = ImVec4(0.15f, 0.15f, 0.16f, 1.00f);
-    colors[ImGuiCol_ButtonHovered]          = ImVec4(0.20f, 0.20f, 0.21f, 1.00f);
     colors[ImGuiCol_ButtonActive]           = ImVec4(0.90f, 0.25f, 0.25f, 1.00f);
     colors[ImGuiCol_Header]                 = ImVec4(0.15f, 0.15f, 0.16f, 1.00f);
     colors[ImGuiCol_HeaderHovered]          = ImVec4(0.20f, 0.20f, 0.21f, 1.00f);
     colors[ImGuiCol_HeaderActive]           = ImVec4(0.25f, 0.25f, 0.26f, 1.00f);
     colors[ImGuiCol_CheckMark]              = ImVec4(0.90f, 0.25f, 0.25f, 1.00f);
     colors[ImGuiCol_SliderGrab]             = ImVec4(0.90f, 0.25f, 0.25f, 1.00f);
-    colors[ImGuiCol_SliderGrabActive]       = ImVec4(0.90f, 0.25f, 0.25f, 1.00f);
 }
 
 bool ToggleButton(const char* label, bool* v) {
@@ -92,11 +90,9 @@ bool ToggleButton(const char* label, bool* v) {
 void SettingsRow(const char* label, bool* v) {
     ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "%s", label);
     ImGui::SameLine(ImGui::GetContentRegionAvail().x - 50);
-    
     char buf[128];
     snprintf(buf, sizeof(buf), "##%s", label);
     ToggleButton(buf, v);
-    
     ImGui::Spacing(); ImGui::Spacing();
 }
 
@@ -104,8 +100,11 @@ void RenderMenu() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
 
+    // Красный квадрат для дебага (если его не видно - рендер сломан)
+    ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(0, 0), ImVec2(100, 100), IM_COL32(255, 0, 0, 255));
+
     if (!g_ShowMenu) {
-        ImGui::SetNextWindowPos(ImVec2(50, 100), ImGuiCond_Always);
+        ImGui::SetNextWindowPos(ImVec2(50, 150), ImGuiCond_Always);
         ImGui::SetNextWindowSize(ImVec2(200, 60), ImGuiCond_Always);
         ImGui::Begin("##Open", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove);
         if (ImGui::Button("OPEN MENU", ImVec2(200, 60))) g_ShowMenu = true;
@@ -113,7 +112,9 @@ void RenderMenu() {
     }
 
     if (g_ShowMenu) {
-        ImGui::SetNextWindowSize(ImVec2(850, 550), ImGuiCond_FirstUseEver);
+        // ЖЕСТКО СТАВИМ ПОЗИЦИЮ ПРИ СТАРТЕ
+        ImGui::SetNextWindowPos(ImVec2(50, 50), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(800, 500), ImGuiCond_FirstUseEver);
         ImGui::Begin("HantoO", &g_ShowMenu, ImGuiWindowFlags_NoCollapse);
 
         if (ImGui::BeginTabBar("TopTabs")) {
@@ -122,13 +123,9 @@ void RenderMenu() {
                 
                 ImGui::BeginChild("left", ImVec2(0, 0), true);
                 ImGui::TextColored(ImVec4(0.9f, 0.3f, 0.3f, 1.0f), "Aimbot");
-                ImGui::Spacing();
                 SettingsRow("Enabled", &g_Aimbot);
                 SettingsRow("Silent", &g_Silent);
-                
-                ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
-                
-                ImGui::TextColored(ImVec4(0.9f, 0.3f, 0.3f, 1.0f), "Target");
+                ImGui::Separator();
                 const char* bones[] = { "Head", "Neck", "Chest" };
                 ImGui::Combo("Bones Group", &g_BoneGroup, bones, IM_ARRAYSIZE(bones));
                 ImGui::SliderInt("Multipoints Scale", &g_MultipointsScale, 0, 100, "%d%%");
@@ -143,10 +140,7 @@ void RenderMenu() {
                 SettingsRow("Per Weapon", &g_PerWeapon);
                 const char* weapons[] = { "Pistols", "Rifles", "Snipers" };
                 ImGui::Combo("Weapon Group", &g_WeaponGroup, weapons, IM_ARRAYSIZE(weapons));
-                
-                ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
-                
-                ImGui::TextColored(ImVec4(0.9f, 0.3f, 0.3f, 1.0f), "Other");
+                ImGui::Separator();
                 SettingsRow("Back Camera", &g_BackCamera);
                 SettingsRow("Shot Buffer", &g_ShotBuffer);
                 SettingsRow("Interpolation", &g_Interpolation);
@@ -168,7 +162,7 @@ void RenderMenu() {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-EGLBoolean hooked_eglSwapBuffers(EGLDisplay dpy, EGLSurface surf) {
+void SetupImGui(EGLDisplay dpy, EGLSurface surf) {
     static bool init = false;
     if (!init) {
         ImGui::CreateContext();
@@ -176,37 +170,55 @@ EGLBoolean hooked_eglSwapBuffers(EGLDisplay dpy, EGLSurface surf) {
         io.IniFilename = nullptr;
         io.Fonts->AddFontDefault();
         io.FontGlobalScale = 1.3f;
-        ImGui_ImplOpenGL3_Init("#version 100");
+        ImGui_ImplOpenGL3_Init("#version 300 es"); // Пробуем ES3
         SetupStyle();
         init = true;
     }
-    GLint viewport[4];
-    glGetIntegerv(GL_VIEWPORT, viewport);
-    ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = ImVec2((float)viewport[2], (float)viewport[3]);
+    EGLint width = 1920, height = 1080;
+    eglQuerySurface(dpy, surf, EGL_WIDTH, &width);
+    eglQuerySurface(dpy, surf, EGL_HEIGHT, &height);
+    ImGui::GetIO().DisplaySize = ImVec2((float)width, (float)height);
+}
+
+EGLBoolean hooked_eglSwapBuffers(EGLDisplay dpy, EGLSurface surf) {
+    SetupImGui(dpy, surf);
     RenderMenu();
     return orig_eglSwapBuffers(dpy, surf);
 }
 
-int32_t hooked_AInputQueue_preDispatchEvent(AInputQueue* queue, AInputEvent* event) {
+EGLBoolean hooked_eglSwapBuffersWithDamageKHR(EGLDisplay dpy, EGLSurface surf, EGLint* rects, EGLint n_rects) {
+    SetupImGui(dpy, surf);
+    RenderMenu();
+    return orig_eglSwapBuffersWithDamageKHR(dpy, surf, rects, n_rects);
+}
+
+void ProcessEvent(AInputEvent* event) {
     if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) {
         int32_t action = AMotionEvent_getAction(event);
         int32_t maskedAction = action & AMOTION_EVENT_ACTION_MASK;
         float x = AMotionEvent_getX(event, 0);
         float y = AMotionEvent_getY(event, 0);
-        
         ImGuiIO& io = ImGui::GetIO();
         io.AddMousePosEvent(x, y);
-        
         if (maskedAction == AMOTION_EVENT_ACTION_DOWN || maskedAction == AMOTION_EVENT_ACTION_POINTER_DOWN) {
             io.AddMouseButtonEvent(0, true);
         } else if (maskedAction == AMOTION_EVENT_ACTION_UP || maskedAction == AMOTION_EVENT_ACTION_POINTER_UP || maskedAction == AMOTION_EVENT_ACTION_CANCEL) {
             io.AddMouseButtonEvent(0, false);
         }
-        
-        if (io.WantCaptureMouse) return 1; 
     }
+}
+
+int32_t hooked_AInputQueue_preDispatchEvent(AInputQueue* queue, AInputEvent* event) {
+    ProcessEvent(event);
     return orig_AInputQueue_preDispatchEvent(queue, event);
+}
+
+int32_t hooked_AInputQueue_getEvent(AInputQueue* queue, AInputEvent** event) {
+    int32_t ret = orig_AInputQueue_getEvent(queue, event);
+    if (ret >= 0 && event && *event) {
+        ProcessEvent(*event);
+    }
+    return ret;
 }
 
 __attribute__((constructor))
@@ -216,11 +228,17 @@ void init_cheat() {
     if (egl) {
         void* swap = dlsym(egl, "eglSwapBuffers");
         if (swap) A64HookFunction(swap, (void*)hooked_eglSwapBuffers, (void**)&orig_eglSwapBuffers);
+        
+        void* swapdmg = dlsym(egl, "eglSwapBuffersWithDamageKHR");
+        if (swapdmg) A64HookFunction(swapdmg, (void*)hooked_eglSwapBuffersWithDamageKHR, (void**)&orig_eglSwapBuffersWithDamageKHR);
     }
     void* android_lib = dlopen("libandroid.so", RTLD_LAZY);
     if (android_lib) {
         void* pre_dispatch = dlsym(android_lib, "AInputQueue_preDispatchEvent");
         if (pre_dispatch) A64HookFunction(pre_dispatch, (void*)hooked_AInputQueue_preDispatchEvent, (void**)&orig_AInputQueue_preDispatchEvent);
+        
+        void* get_event = dlsym(android_lib, "AInputQueue_getEvent");
+        if (get_event) A64HookFunction(get_event, (void*)hooked_AInputQueue_getEvent, (void**)&orig_AInputQueue_getEvent);
     }
     LOGI("Hooks installed!");
 }
