@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <jni.h>
 #include <android/log.h>
 #include <android/input.h>
