@@ -69,7 +69,7 @@ public class MainActivity extends Activity {
             devIdText.setPadding(0, dp(5), 0, dp(10));
             
             keyInput = new EditText(this);
-            keyInput.setHint("HANT-...");
+            keyInput.setHint("KEY-XXXX-YYYY");
             keyInput.setTextColor(textColorPrimary);
             keyInput.setHintTextColor(textColorSecondary);
             keyInput.setTextSize(14);
@@ -171,31 +171,64 @@ public class MainActivity extends Activity {
     }
 
     private String validateKey(String key, String currentDeviceId) {
-        if (key == null || !key.startsWith("HANT-")) return "Неверный формат";
+        if (key == null || !key.startsWith("KEY-")) return "Неверный формат";
         try {
             String[] parts = key.split("-");
-            if (parts.length != 4) return "Ошибка структуры";
-            
-            String expHex = parts[1];
-            String keyDeviceId = parts[2];
-            String hash = parts[3];
-            
-            long expTime = Long.parseLong(expHex, 16);
-            String expectedHash = sha256(expHex + ":" + keyDeviceId + SECRET).substring(0, 8);
-            
-            if (!hash.equals(expectedHash)) return "Ключ подделан";
-            
+            if (parts.length != 3) return "Ошибка структуры";
+
+            String part1 = parts[1];
+            String part2 = parts[2];
+
+            if (part1.length() != 4) return "Неверная длина ключа";
+
+            String timeStr = part1.substring(0, 2);
+            String typeStr = part1.substring(2, 3);
+
+            long days = fromBase62(timeStr);
+            long expTime = 1704067200L + (days * 86400L);
             long currentTime = System.currentTimeMillis() / 1000;
-            if (currentTime > expTime) return "Срок истек";
-            
-            if (!keyDeviceId.equals("none") && !keyDeviceId.equals(currentDeviceId)) {
-                return "Чужое устройство";
+
+            if (currentTime > expTime) return "Срок действия истек";
+
+            String expectedSigRaw = sha256(part1 + "HantoO_Super_Secret_Salt_2024");
+            long expectedSigLong = Long.parseLong(expectedSigRaw.substring(0, 8), 16) % (62L * 62L * 62L * 62L);
+            String expectedSigStr = toBase62_4(expectedSigLong);
+
+            if (!part2.equals(expectedSigStr)) return "Ключ подделан";
+
+            if (typeStr.equals("S")) {
+                SharedPreferences prefs = getSharedPreferences("HantoO", Context.MODE_PRIVATE);
+                String savedDevice = prefs.getString("bound_device_id", "");
+                if (savedDevice.isEmpty()) {
+                    prefs.edit().putString("bound_device_id", currentDeviceId).apply();
+                } else if (!savedDevice.equals(currentDeviceId)) {
+                    return "Ключ уже активирован на другом устройстве";
+                }
             }
-            
             return "OK";
         } catch (Exception e) {
-            return "Ошибка парсинга";
+            return "Ошибка парсинга ключа";
         }
+    }
+
+    private long fromBase62(String str) {
+        String chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        long num = 0;
+        for (char c : str.toCharArray()) {
+            num = num * 62 + chars.indexOf(c);
+        }
+        return num;
+    }
+
+    private String toBase62_4(long num) {
+        String chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        if (num == 0) return "0000";
+        StringBuilder res = new StringBuilder();
+        while (num > 0) {
+            res.insert(0, chars.charAt((int) (num % 62)));
+            num /= 62;
+        }
+        return res.toString().length() > 4 ? res.toString().substring(0, 4) : res.toString();
     }
 
     private String sha256(String base) {
