@@ -110,7 +110,7 @@ void drawStyledEsp(ImDrawList* d,const EspScreenBox& b){
     const float center=(a.x+z.x)*0.5f,thick=g_appearance.lineWidth;
     const float rounding=g_appearance.rounded?g_appearance.cornerRadius*g_uiScale:0.0f;const auto boxColor=uiColor(g_appearance.boxColor);
     if(g_appearance.box){
-        if(g_appearance.fill)d->AddRectFilled(a,z,uiColor(g_appearance.boxColor,std::clamp(g_appearance.fillIntensity,0.0f,0.35f)),rounding);
+        if(g_appearance.fill)d->AddRectFilled(a,z,uiColor(g_appearance.boxColor,std::max(0.0f, std::min(0.35f, g_appearance.fillIntensity))),rounding);
         d->AddRect(a,z,boxColor,rounding,0,thick);
     }
 }
