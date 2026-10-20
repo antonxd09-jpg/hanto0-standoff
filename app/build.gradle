@@ -3,7 +3,7 @@ android {
     namespace 'com.exodium.launcher'
     compileSdk 34
     defaultConfig {
-        applicationId "com.exodium.launcher"
+        applicationId "com.exodium.launcher.internal"
         minSdk 26
         targetSdk 34
         versionCode 1
