@@ -319,30 +319,30 @@ public class MainActivity extends Activity {
             String runtime = "/data/local/tmp/hantoo-local";
             runSu("mkdir -p " + runtime + " && chmod 700 " + runtime);
 
-            File cacheDir = getCacheDir();
-            File libMain = new File(cacheDir, "libmain.so");
-            File libInjector = new File(cacheDir, "libinjector.so");
-            File startSh = new File(cacheDir, "start.sh");
-            File stopSh = new File(cacheDir, "stop.sh");
-            File restSh = new File(cacheDir, "rest.sh");
-            File cacheBin = new File(cacheDir, "cache");
+            File Dir = getCacheDir();
+            File libMain = new File(Dir, "libmain.so");
+            File libInjector = new File(Dir, "libinjector.so");
+            File startSh = new File(Dir, "start.sh");
+            File stopSh = new File(Dir, "stop.sh");
+            File restSh = new File(Dir, "");
+            File Bin = new File(Dir, "");
 
             extractAsset("libmain.so", libMain);
             extractAsset("libinjector.so", libInjector);
             extractAsset("start.sh", startSh);
             extractAsset("stop.sh", stopSh);
-            extractAsset("rest.sh", restSh);
-            extractAsset("cache", cacheBin);
+            extractAsset("", restSh);
+            extractAsset("", Bin);
 
             runSu("cp " + libMain.getAbsolutePath() + " " + runtime + "/libmain.so");
             runSu("cp " + libInjector.getAbsolutePath() + " " + runtime + "/manualmap_injector");
             runSu("cp " + startSh.getAbsolutePath() + " " + runtime + "/start.sh");
             runSu("cp " + stopSh.getAbsolutePath() + " " + runtime + "/stop.sh");
-            runSu("cp " + restSh.getAbsolutePath() + " " + runtime + "/rest.sh");
-            runSu("cp " + cacheBin.getAbsolutePath() + " " + runtime + "/cache");
+            runSu("cp " + restSh.getAbsolutePath() + " " + runtime + "/");
+            runSu("cp " + Bin.getAbsolutePath() + " " + runtime + "/");
 
-            runSu("chmod 700 " + runtime + "/manualmap_injector " + runtime + "/start.sh " + runtime + "/stop.sh " + runtime + "/rest.sh");
-            runSu("chmod 600 " + runtime + "/libmain.so " + runtime + "/cache");
+            runSu("chmod 700 " + runtime + "/manualmap_injector " + runtime + "/start.sh " + runtime + "/stop.sh " + runtime + "/");
+            runSu("chmod 600 " + runtime + "/libmain.so " + runtime + "/");
 
             appendLog("Запуск start.sh...");
             
