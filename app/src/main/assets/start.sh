@@ -44,7 +44,6 @@ GAME_LABEL=$(ls -Zd "$PACKAGE_DIR" | awk '{print $1}')
 chcon "$GAME_LABEL" "$GAME_FILES" 2>/dev/null || true
 
 cd "$SOURCE"
-chmod 700 "$SOURCE/manualmap_injector" "$SOURCE/rest.sh" 2>/dev/null || true
 chmod 600 "$SOURCE/libmain.so" 2>/dev/null || true
 
 mkdir -p "$GAME_FILES/exodium"
@@ -82,7 +81,6 @@ fi
 
 rm -f "$SOURCE/rest.ready" "$SOURCE/rest.exit"
 nohup /system/bin/sh -c '
-    EXODIUM_READY_FILE="$1/rest.ready" "$1/rest.sh" > "$1/rest.log" 2>&1
     RC=$?
     printf "%s\n" "$RC" > "$1/rest.exit"
 ' exodium-worker "$SOURCE" > /dev/null 2>&1 < /dev/null &
