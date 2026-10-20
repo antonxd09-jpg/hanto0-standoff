@@ -22,7 +22,7 @@ jobs:
             imgui/imgui.cpp imgui/imgui_draw.cpp imgui/imgui_tables.cpp imgui/imgui_widgets.cpp \
             imgui/backends/imgui_impl_opengl3.cpp \
             -I./ -I./imgui -I./imgui/backends -I./And64InlineHook \
-            -lEGL -lGLESv3 -llog -ldl \
+            -lEGL -lGLESv2 -landroid -llog -ldl \
             -static-libstdc++ \
             -o libmain.so
           mkdir -p app/src/main/assets
