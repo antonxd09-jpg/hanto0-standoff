@@ -4,6 +4,7 @@
 #include <EGL/egl.h>
 #include <GLES2/gl2.h>
 #include <dlfcn.h>
+#include <stdio.h>
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
@@ -20,7 +21,6 @@ int g_WeaponGroup = 0, g_BufferTicks = 0;
 
 EGLBoolean (*orig_eglSwapBuffers)(EGLDisplay dpy, EGLSurface surf) = nullptr;
 int32_t (*orig_AInputQueue_preDispatchEvent)(AInputQueue* queue, AInputEvent* event) = nullptr;
-int32_t (*orig_AInputQueue_getEvent)(AInputQueue* queue, AInputEvent** event) = nullptr;
 
 void SetupStyle() {
     ImGui::StyleColorsDark();
@@ -33,7 +33,7 @@ void SetupStyle() {
     
     ImVec4* colors = style.Colors;
     colors[ImGuiCol_Text]                   = ImVec4(0.95f, 0.95f, 0.95f, 1.00f);
-    colors[ImGuiCol_WindowBg]               = ImVec4(0.08f, 0.08f, 0.09f, 0.98f); // Темный фон Zenin
+    colors[ImGuiCol_WindowBg]               = ImVec4(0.08f, 0.08f, 0.09f, 0.98f);
     colors[ImGuiCol_ChildBg]                = ImVec4(0.12f, 0.12f, 0.13f, 1.00f);
     colors[ImGuiCol_Border]                 = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
     colors[ImGuiCol_FrameBg]                = ImVec4(0.15f, 0.15f, 0.16f, 1.00f);
@@ -89,11 +89,14 @@ bool ToggleButton(const char* label, bool* v) {
     return pressed;
 }
 
-// Вспомогательная функция для отрисовки "карточек" с настройками
 void SettingsRow(const char* label, bool* v) {
-    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), label);
-    ImGui::SameLine(ImGui::GetContentRegionAvail().x - 60);
-    ToggleButton(("##" + std::string(label)).c_str(), v);
+    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "%s", label);
+    ImGui::SameLine(ImGui::GetContentRegionAvail().x - 50);
+    
+    char buf[128];
+    snprintf(buf, sizeof(buf), "##%s", label);
+    ToggleButton(buf, v);
+    
     ImGui::Spacing(); ImGui::Spacing();
 }
 
@@ -117,7 +120,6 @@ void RenderMenu() {
             if (ImGui::BeginTabItem("Aimbot")) {
                 ImGui::Columns(2, "cols", false);
                 
-                // ЛЕВАЯ КОЛОНКА
                 ImGui::BeginChild("left", ImVec2(0, 0), true);
                 ImGui::TextColored(ImVec4(0.9f, 0.3f, 0.3f, 1.0f), "Aimbot");
                 ImGui::Spacing();
@@ -137,7 +139,6 @@ void RenderMenu() {
                 
                 ImGui::NextColumn();
 
-                // ПРАВАЯ КОЛОНКА
                 ImGui::BeginChild("right", ImVec2(0, 0), true);
                 SettingsRow("Per Weapon", &g_PerWeapon);
                 const char* weapons[] = { "Pistols", "Rifles", "Snipers" };
@@ -174,7 +175,7 @@ EGLBoolean hooked_eglSwapBuffers(EGLDisplay dpy, EGLSurface surf) {
         ImGuiIO& io = ImGui::GetIO();
         io.IniFilename = nullptr;
         io.Fonts->AddFontDefault();
-        io.FontGlobalScale = 1.3f; // Оптимальный масштаб
+        io.FontGlobalScale = 1.3f;
         ImGui_ImplOpenGL3_Init("#version 100");
         SetupStyle();
         init = true;
@@ -187,7 +188,6 @@ EGLBoolean hooked_eglSwapBuffers(EGLDisplay dpy, EGLSurface surf) {
     return orig_eglSwapBuffers(dpy, surf);
 }
 
-// ГЛАВНЫЙ ФИКС ТАЧЕЙ
 int32_t hooked_AInputQueue_preDispatchEvent(AInputQueue* queue, AInputEvent* event) {
     if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) {
         int32_t action = AMotionEvent_getAction(event);
@@ -204,7 +204,6 @@ int32_t hooked_AInputQueue_preDispatchEvent(AInputQueue* queue, AInputEvent* eve
             io.AddMouseButtonEvent(0, false);
         }
         
-        // Если ImGui перехватил клик, возвращаем 1 (событие поглощено, игра не стреляет)
         if (io.WantCaptureMouse) return 1; 
     }
     return orig_AInputQueue_preDispatchEvent(queue, event);
