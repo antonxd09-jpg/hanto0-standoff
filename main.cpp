@@ -7,118 +7,79 @@
 #include <dlfcn.h>
 #include <cmath>
 #include <cstdio>
-#include <cfloat>
-#include <mutex>
-#include <atomic>
-#include <vector>
-#include <algorithm>
 #include "imgui/imgui.h"
-#include "imgui/imgui_internal.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
 #include "And64InlineHook/And64InlineHook.hpp"
 
 #define LOG_TAG "HantoO"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 
-std::atomic<bool> g_menuOpen{true};
-float g_uiScale = 1.0f, g_menuAnimation = 0.0f;
-int g_section = 0;
-
-struct EspAppearance {
-    bool box=true, health=true;
-    ImVec4 accent{0.59f,0.68f,1.0f,1.0f};
-};
-EspAppearance g_appearance;
+bool g_ShowMenu = true;
+bool g_Aimbot = false, g_Visuals = false, g_Misc = false;
 
 EGLBoolean (*orig_eglSwapBuffers)(EGLDisplay dpy, EGLSurface surf) = nullptr;
 EGLBoolean (*orig_eglSwapBuffersWithDamageKHR)(EGLDisplay dpy, EGLSurface surf, EGLint* rects, EGLint n_rects) = nullptr;
 int32_t (*orig_AInputQueue_preDispatchEvent)(AInputQueue* queue, AInputEvent* event) = nullptr;
 int32_t (*orig_AInputQueue_getEvent)(AInputQueue* queue, AInputEvent** event) = nullptr;
 
-ImU32 uiColor(ImVec4 c,float alpha=1.0f){c.w*=alpha*ImGui::GetStyle().Alpha;return ImGui::ColorConvertFloat4ToU32(c);}
-ImVec2 uiAdd(ImVec2 a,float x,float y){return ImVec2(a.x+x,a.y+y);}
+void SetupStyle() {
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.WindowRounding = 8.0f;
+    style.FrameRounding = 6.0f;
+    style.WindowPadding = ImVec2(15, 15);
+    style.FramePadding = ImVec2(10, 10);
+    style.ItemSpacing = ImVec2(10, 12);
 
-void uiTextLeft(ImDrawList* d,ImVec2 p,const char* text,ImU32 color,float size=0){
-    ImFont* font=ImGui::GetFont();if(size<=0)size=21*g_uiScale;
-    d->AddText(font,size,p,color,text);
+    ImVec4* colors = style.Colors;
+    colors[ImGuiCol_Text]                   = ImVec4(0.90f, 0.90f, 0.90f, 1.00f);
+    colors[ImGuiCol_WindowBg]               = ImVec4(0.08f, 0.08f, 0.09f, 0.98f); // Темный фон
+    colors[ImGuiCol_Border]                 = ImVec4(0.20f, 0.20f, 0.25f, 0.50f);
+    colors[ImGuiCol_FrameBg]                = ImVec4(0.12f, 0.12f, 0.15f, 1.00f);
+    colors[ImGuiCol_Button]                 = ImVec4(0.15f, 0.15f, 0.20f, 1.00f);
+    colors[ImGuiCol_ButtonHovered]          = ImVec4(0.25f, 0.20f, 0.30f, 1.00f);
+    colors[ImGuiCol_ButtonActive]           = ImVec4(0.90f, 0.30f, 0.30f, 1.00f); // Красный
+    colors[ImGuiCol_Header]                 = ImVec4(0.15f, 0.15f, 0.20f, 1.00f);
+    colors[ImGuiCol_HeaderHovered]          = ImVec4(0.25f, 0.20f, 0.30f, 1.00f);
+    colors[ImGuiCol_HeaderActive]           = ImVec4(0.90f, 0.30f, 0.30f, 1.00f); // Красный
+    colors[ImGuiCol_CheckMark]              = ImVec4(0.90f, 0.30f, 0.30f, 1.00f);
+    colors[ImGuiCol_SliderGrab]             = ImVec4(0.90f, 0.30f, 0.30f, 1.00f);
 }
 
-void uiPanel(ImDrawList* d,ImVec2 a,ImVec2 b,float rounding=14){
-    d->AddRectFilled(a,b,uiColor(ImVec4(0.047f,0.055f,0.075f,0.985f)),rounding*g_uiScale);
-    d->AddRect(a,b,uiColor(ImVec4(0.19f,0.22f,0.29f,0.65f)),rounding*g_uiScale,0,1.0f);
-}
+void RenderMenu() {
+    ImGui::SetNextWindowSize(ImVec2(800, 500), ImGuiCond_FirstUseEver);
+    
+    // Убрали NoMove, чтобы можно было таскать
+    ImGui::Begin("HantoO Internal", &g_ShowMenu, ImGuiWindowFlags_NoCollapse);
 
-bool uiRailButton(const char* label,int icon,bool selected,float width){
-    const float h=68*g_uiScale;const ImVec2 a=ImGui::GetCursorScreenPos();
-    const bool pressed=ImGui::InvisibleButton(label,ImVec2(width,h));auto* d=ImGui::GetWindowDrawList();
-    if(selected)d->AddRectFilled(a,uiAdd(a,width,h),uiColor(ImVec4(0.10f,0.13f,0.21f,0.88f)),11*g_uiScale);
-    uiTextLeft(d,uiAdd(a, 15*g_uiScale, 25*g_uiScale),label,uiColor(selected?ImVec4(0.93f,0.95f,1,1):ImVec4(0.54f,0.60f,0.71f,1)),18*g_uiScale);
-    return pressed;
-}
-
-bool uiToggle(const char* label,bool& value){
-    ImGui::PushID(label);const ImVec2 a=ImGui::GetCursorScreenPos();const float w=ImGui::GetContentRegionAvail().x,h=48*g_uiScale;
-    if(w < 10) { ImGui::PopID(); return false; }
-    const bool hit=ImGui::InvisibleButton("##switch",ImVec2(w,h));if(hit)value=!value;
-    auto* d=ImGui::GetWindowDrawList();const float sh=26*g_uiScale,sw=48*g_uiScale;
-    const ImVec2 p=uiAdd(a,w-sw,0.5f*(h-sh));ImVec4 off(0.15f,0.18f,0.24f,1),on=g_appearance.accent;
-    ImVec4 track = value ? on : off;
-    d->AddRectFilled(p,uiAdd(p,sw,sh),uiColor(track),sh*0.5f);
-    d->AddCircleFilled(uiAdd(p, (value ? sw-sh : 0) + sh*0.5f, sh*0.5f),9.4f*g_uiScale,uiColor(ImVec4(0.97f,0.98f,1,1)),20);
-    uiTextLeft(d,a,label,uiColor(ImVec4(0.85f,0.89f,0.96f,1)),19*g_uiScale);
-    ImGui::PopID();return hit;
-}
-
-void renderMinimalMenu(){
-    auto& io=ImGui::GetIO();g_uiScale=std::min({io.DisplaySize.y/1080.0f,io.DisplaySize.x/1440.0f,1.25f});
-    g_uiScale=std::max(0.25f,g_uiScale);io.FontGlobalScale=g_uiScale;
-    
-    const bool open=g_menuOpen.load();if(!open) return;
-    const float s=g_uiScale,w=std::round(820*s),h=std::round(650*s);
-    
-    // РАЗРЕШАЕМ ДВИГАТЬ ОКНО (убрали NoMove и NoDecoration)
-    auto flags = ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBackground;
-    
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,ImVec2(12*s,12*s));
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,ImVec2(0,6*s));
-    
-    const char* sectionNames[]={"Aimbot","Visuals","Misc","Settings"};
-    const int sectionCount=4;const float primaryH=(24+sectionCount*74)*s;
-    
-    // ЛЕВОЕ МЕНЮ (Вкладки) - жестко привязано к главному окну
-    ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver);
-    ImGui::Begin("HantoO", nullptr, flags);
-    uiPanel(ImGui::GetWindowDrawList(),ImGui::GetWindowPos(),uiAdd(ImGui::GetWindowPos(),w,h));
-    
-    // Отрисовка сайдбара вручную внутри главного окна
-    ImGui::BeginChild("##sidebar", ImVec2(150*s, h - 24*s), false, ImGuiWindowFlags_NoScrollbar);
-    ImGui::SetCursorPosY(20*s);
-    for(int i=0;i<sectionCount;++i) {
-        if(uiRailButton(sectionNames[i], i, g_section==i, 130*s)) g_section=i;
-    }
-    ImGui::EndChild();
-    
+    ImGui::TextColored(ImVec4(0.90f, 0.30f, 0.30f, 1.0f), "HantoO");
     ImGui::SameLine();
-    
-    // ПРАВАЯ ЧАСТЬ
-    ImGui::BeginChild("##content", ImVec2(0, h - 24*s), false, ImGuiWindowFlags_NoScrollbar);
-    ImGui::SetCursorPos(ImVec2(20*s, 20*s));
-    
-    uiTextLeft(ImGui::GetWindowDrawList(), ImGui::GetCursorScreenPos(), "HantoO Internal", uiColor(g_appearance.accent), 24*s);
-    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 50*s);
+    ImGui::TextColored(ImVec4(0.50f, 0.50f, 0.50f, 1.0f), "| Private Build");
+    ImGui::Separator();
+    ImGui::Spacing();
 
-    if(g_section == 0) { // Aimbot
-        uiToggle("Enable Aimbot", g_appearance.box);
-        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10*s);
-        uiToggle("Silent Aim", g_appearance.health);
-    } else if(g_section == 1) { // Visuals
-        uiToggle("Enable ESP", g_appearance.box);
+    if (ImGui::BeginTabBar("TopTabs")) {
+        if (ImGui::BeginTabItem("Aimbot")) {
+            ImGui::Spacing();
+            ImGui::Checkbox("Enable Aimbot", &g_Aimbot);
+            ImGui::Spacing();
+            if (g_Aimbot) {
+                ImGui::Text("Aimbot Settings Here...");
+            }
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Visuals")) {
+            ImGui::Spacing();
+            ImGui::Checkbox("Enable ESP", &g_Visuals);
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Misc")) {
+            ImGui::Spacing();
+            ImGui::Checkbox("No Recoil", &g_Misc);
+            ImGui::EndTabItem();
+        }
+        ImGui::EndTabBar();
     }
-    
-    ImGui::EndChild();
-    
     ImGui::End();
-    ImGui::PopStyleVar(2);
 }
 
 void SetupImGui(EGLDisplay dpy, EGLSurface surf) {
@@ -128,9 +89,12 @@ void SetupImGui(EGLDisplay dpy, EGLSurface surf) {
         ImGuiIO& io = ImGui::GetIO();
         io.IniFilename = nullptr;
         io.Fonts->AddFontDefault();
+        io.FontGlobalScale = 1.3f;
         ImGui_ImplOpenGL3_Init("#version 100");
+        SetupStyle();
         init = true;
     }
+    
     EGLint width = 1920, height = 1080;
     eglQuerySurface(dpy, surf, EGL_WIDTH, &width);
     eglQuerySurface(dpy, surf, EGL_HEIGHT, &height);
@@ -138,7 +102,9 @@ void SetupImGui(EGLDisplay dpy, EGLSurface surf) {
     
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
-    renderMinimalMenu();
+    
+    RenderMenu();
+    
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
@@ -173,8 +139,7 @@ void ProcessEvent(AInputEvent* event) {
 
 int32_t hooked_AInputQueue_preDispatchEvent(AInputQueue* queue, AInputEvent* event) {
     ProcessEvent(event);
-    // Если кликнули по меню - блокируем передачу в игру
-    if (ImGui::GetIO().WantCaptureMouse) return 1;
+    if (ImGui::GetIO().WantCaptureMouse) return 1; 
     return orig_AInputQueue_preDispatchEvent(queue, event);
 }
 
@@ -205,4 +170,5 @@ void init_cheat() {
         void* get_event = dlsym(android_lib, "AInputQueue_getEvent");
         if (get_event) A64HookFunction(get_event, (void*)hooked_AInputQueue_getEvent, (void**)&orig_AInputQueue_getEvent);
     }
+    LOGI("Hooks installed!");
 }
