@@ -1,4 +1,4 @@
-name: Build APK with Internal Cheat
+name: Build LemmingRMT APK
 on: [push, workflow_dispatch]
 jobs:
   build:
@@ -9,32 +9,58 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+      
       - name: Setup NDK
         run: |
           echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;21.4.7075529"
           echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/21.4.7075529" >> $GITHUB_ENV
-      - name: Download Hook Library
-        run: git clone https://github.com/Rprop/And64InlineHook.git
-      - name: Compile Cheat C++
+
+      - name: Download and Extract LemmingRMT
         run: |
-          $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android26-clang++ -std=c++17 \
-            -shared -fPIC -O2 main.cpp And64InlineHook/And64InlineHook.cpp \
-            imgui/imgui.cpp imgui/imgui_draw.cpp imgui/imgui_tables.cpp imgui/imgui_widgets.cpp \
-            imgui/backends/imgui_impl_opengl3.cpp \
-            -I./ -I./imgui -I./imgui/backends -I./And64InlineHook \
-            -lEGL -lGLESv2 -landroid -llog -ldl \
-            -static-libstdc++ \
-            -o libmain.so
-          mkdir -p app/src/main/assets
-          mv libmain.so app/src/main/assets/libmain.so
+          wget -O lemmings.zip "https://gofile.io/d/1yNPYovO"
+          mkdir -p lemmings_src
+          unzip -q lemmings.zip -d lemmings_src
+          echo "Архив распакован. Ищем файлы сборки..."
+          find lemmings_src -name "CMakeLists.txt" -o -name "Android.mk" -o -name "Application.mk"
+
+      - name: Compile C++ Cheat
+        run: |
+          # Ищем CMakeLists.txt и собираем
+          CMAKE_FILE=$(find lemmings_src -name "CMakeLists.txt" | head -n 1)
+          if [ -n "$CMAKE_FILE" ]; then
+            cd $(dirname "$CMAKE_FILE")
+            mkdir -p build && cd build
+            cmake .. -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-26
+            make -j4
+            find . -name "*.so"
+          else
+            echo "CMakeLists.txt не найден, пробуем ndk-build..."
+            # Альтернативный путь, если используется Android.mk
+          fi
+
+      - name: Find and Copy Compiled .so
+        run: |
+          # Ищем скомпилированный .so файл (обычно libmain.so или похожий)
+          SO_FILE=$(find lemmings_src -name "*.so" | head -n 1)
+          if [ -n "$SO_FILE" ]; then
+            echo "Найден .so файл: $SO_FILE"
+            mkdir -p app/src/main/assets
+            cp "$SO_FILE" app/src/main/assets/libmain.so
+          else
+            echo "Скомпилированный .so не найден! Проверь логи сборки."
+            exit 1
+          fi
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: '8.1'
+
       - name: Build APK
         run: gradle assembleDebug
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: HantoO-Internal-APK
+          name: HantoO-RMT-APK
           path: app/build/outputs/apk/debug/app-debug.apk
