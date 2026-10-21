@@ -1,0 +1,9 @@
+In file included from diagnostics/premium-ui-20260930/tests/ui_test.cpp:4:
+jni/imgui/backends/imgui_impl_opengl3.h:29:10: fatal error: imgui.h: No such file or directory
+   29 | #include "imgui.h"      // IMGUI_IMPL_API
+      |          ^~~~~~~~~
+compilation terminated.
+jni/imgui/backends/imgui_impl_opengl3.cpp:117:10: fatal error: imgui.h: No such file or directory
+  117 | #include "imgui.h"
+      |          ^~~~~~~~~
+compilation terminated.

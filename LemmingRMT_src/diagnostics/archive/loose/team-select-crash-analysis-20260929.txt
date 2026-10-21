@@ -1,0 +1,10 @@
+Profile: Standoff2-1.0.0-arm64-il2cppdump-v8-ake-update-hook
+Crash: 2026-09-29 22:47:48.091 +03:00, PID 28978, UnityGfxDeviceW
+Signal: SIGSEGV / null pointer dereference
+libunity Build ID: 69a652effabe2f13
+PC: libunity.so+0x5371D60
+Caller: injected module+0x46690 -> esp_runtime.hpp:1345
+Exact call: g_runtime.componentTransform(camera)
+Cause: Unity Component_get_transform internal native chain dereferenced a null object during the team-selection scene transition.
+The ake vtable hook was NOT installed: vtable_count remained 0 and hookCalls remained 0.
+Fix: stop calling Component_get_transform for optional camera-distance filtering; keep Camera.main only for WorldToScreen.

@@ -1,0 +1,37 @@
+{
+  "profile": "v16-command-phase-hitbox",
+  "output": "/home/leftcode/Projects/LemmingRMT/out/arm64-v8a/liblemmingrmt.so",
+  "bytes": 1689200,
+  "sha256": "cc9bedef7d53a3c36527b9d3bf960f039645c139418cd883c6b12039d91eb827",
+  "build_id": "7f8d663c66a85a15a4545539c509aa79cfea102a",
+  "elf": "/home/leftcode/Projects/LemmingRMT/out/arm64-v8a/liblemmingrmt.so: ELF 64-bit LSB shared object, ARM aarch64, version 1 (SYSV), dynamically linked, for Android 23, built by NDK r30 (16248370), BuildID[sha1]=7f8d663c66a85a15a4545539c509aa79cfea102a, stripped",
+  "build_exit": 0,
+  "full_tests_exit": 0,
+  "host_logs": "/home/leftcode/Projects/LemmingRMT/diagnostics/tests/20261001-142834-16142",
+  "native_words_checked": 16,
+  "branch_destinations_checked": 2,
+  "preserved": {
+    "jni/src/features/visuals/esp_runtime.hpp": true,
+    "jni/src/game/offsets.hpp": true,
+    "jni/src/features/aim/hook_support.hpp": true,
+    "jni/src/features/aim/assists.hpp": true,
+    "jni/src/features/aim/assist_runtime.hpp": true,
+    "jni/src/features/aim/automation.hpp": true,
+    "jni/src/features/aim/prediction.hpp": true,
+    "jni/src/ui/premium.hpp": true,
+    "installCamera": true,
+    "installSilent": true
+  },
+  "device_connected": false,
+  "device_file": "/home/leftcode/Projects/LemmingRMT/diagnostics/aim-debug/consumer-silent-20261001-140353/devices-final.txt",
+  "deployed": false,
+  "game_restarted": false,
+  "live_v16_verified": false,
+  "server_damage_verified": false,
+  "limitations": [
+    "Auto scope requires verified enum values; unavailable scope does not block Triggerbot/Back camera.",
+    "Identity token guard is not a complete command lifetime proof.",
+    "Camera manual deltas during a snap are not separately integrated.",
+    "Silent client direction changes do not prove server headshots or damage."
+  ]
+}

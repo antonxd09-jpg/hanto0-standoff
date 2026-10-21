@@ -1,0 +1,32 @@
+Native camera cache correction, 2026-09-30
+
+Confirmed previous crash: UnityMain called the view getter from the ake hook.
+PC 0x55493B0: ldr x8,[x20]; x20=0x4B2 after dereferencing the invalid chain.
+Original callback had returned; the vtable hook itself executed on UnityMain.
+
+Static evidence from matching APK/libunity (BuildID 69a652effabe2f13):
+0x53653C4 calls native main at 0x54C1338, then 0x5384E3C returns native+0x18.
+Managed get_main at 0x6D28F70 calls 0x67EC810 to unmarshal that GC handle.
+Previous code skipped this conversion and read handle+0x10 as m_CachedPtr.
+0x67EC810 has separate low-bit tagged / untagged handle conversion paths.
+
+Implemented:
+- native Camera::GetMain 0x54C1338 only on UnityMain, no +0x10 unwrap.
+- safe cached matrix copies native+0x70 / native+0xB0; no native matrix getters.
+- finite/affine/projection/header validation; invalid samples fail closed.
+- position snapshots after the live player's original opmn on UnityMain.
+- validate exact player class, world, parts, list/array bounds, dwc presence.
+- render uses 500ms-expiry positions; never calls the position getter.
+- fix zero==zero MethodInfo false match; require own class/name for slot path.
+- atomic safe-reader backend and serialized fallback FD setup.
+- stale projected counter reset and snapshot diagnostics.
+
+OFFLINE TEST: PASS (host g++, ASan+UBSan).
+Covers valid/invalid/concurrent memory reads; success and invalid native camera;
+invalid affine/NaN matrices; wrong-thread rejection; no matrix getter calls;
+projection front/back/Y inversion; position cache, expiry, world identity, bounds.
+These are simulated inputs; not proof of live game stability or visible ESP.
+
+LIVE RETEST: REQUIRED. Device reconnected, game not running during inspection.
+No automatic injection or live match test was performed in this pass.
+Aim/silent/gameplay writes remain disabled.

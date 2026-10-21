@@ -1,0 +1,21 @@
+{
+  "profile": "v11-aim-hook-fix",
+  "build": "PASS",
+  "host_tests": "PASS",
+  "ui_gles3_six_viewports": "PASS",
+  "hook_support_regression": "PASS",
+  "output": "out/arm64-v8a/liblemmingrmt.so",
+  "bytes": 1616384,
+  "sha256": "270ddfceb8fe3b388c4aff677ee2bf7251123cf24629b3b3e6ef1a820119b1e3",
+  "backup": "/home/leftcode/Projects/LemmingRMT/backups/20261001-021616-before-aim-hook-fix",
+  "evidence": "tagged-buffer.log in this session",
+  "verified_v10_blockers": [
+    "exact camera native pointer rejected by incompatible adjacent metadata check",
+    "silent near relay allocation fails before any handler/selection call"
+  ],
+  "changed_scope": "installers, near-allocation support, version/diagnostic markers; handlers/math/game RVAs/ESP/UI unchanged",
+  "phone_deployed": false,
+  "game_restarted": false,
+  "live_v11_verified": false,
+  "last_adb_status": "no devices; initial log capture succeeded"
+}

@@ -1,0 +1,131 @@
+{
+  "backup": "/home/leftcode/Projects/LemmingRMT/backups/20261001-014809-before-project-organization",
+  "runtime_sources_unchanged_except_include_paths": [
+    "jni/src/core/entry.cpp",
+    "jni/src/game/offsets.hpp",
+    "jni/src/features/visuals/esp_runtime.hpp",
+    "jni/src/features/aim/core.hpp",
+    "jni/src/features/aim/offsets.hpp",
+    "jni/src/features/aim/runtime.hpp",
+    "jni/src/features/aim/debug.hpp",
+    "jni/src/ui/pages/aim.hpp",
+    "jni/src/ui/premium.hpp",
+    "jni/src/ui/icons/lucide_vectors.hpp",
+    "jni/src/ui/fonts/mozilla_text.hpp"
+  ],
+  "preserved_files_sha256_verified": 724,
+  "documented_changes": [
+    {
+      "old": ".gitignore",
+      "new": ".gitignore",
+      "reason": "documented source/include/build/test update"
+    },
+    {
+      "old": "build.sh",
+      "new": "scripts/build.sh",
+      "reason": "documented source/include/build/test update"
+    },
+    {
+      "old": "aim_debug.sh",
+      "new": "scripts/debug/aim_debug.sh",
+      "reason": "documented source/include/build/test update"
+    },
+    {
+      "old": "jni/Android.mk",
+      "new": "jni/Android.mk",
+      "reason": "documented source/include/build/test update"
+    },
+    {
+      "old": "jni/main.cpp",
+      "new": "jni/src/core/entry.cpp",
+      "reason": "documented source/include/build/test update"
+    },
+    {
+      "old": "jni/esp_runtime.hpp",
+      "new": "jni/src/features/visuals/esp_runtime.hpp",
+      "reason": "documented source/include/build/test update"
+    },
+    {
+      "old": "jni/game_offsets.hpp",
+      "new": "jni/src/game/offsets.hpp",
+      "reason": "documented source/include/build/test update"
+    },
+    {
+      "old": "jni/lucide_vectors.hpp",
+      "new": "jni/src/ui/icons/lucide_vectors.hpp",
+      "reason": "documented source/include/build/test update"
+    },
+    {
+      "old": "jni/ui_premium.hpp",
+      "new": "jni/src/ui/premium.hpp",
+      "reason": "documented source/include/build/test update"
+    },
+    {
+      "old": "jni/aim_offsets.hpp",
+      "new": "jni/src/features/aim/offsets.hpp",
+      "reason": "documented source/include/build/test update"
+    },
+    {
+      "old": "jni/aim_core.hpp",
+      "new": "jni/src/features/aim/core.hpp",
+      "reason": "documented source/include/build/test update"
+    },
+    {
+      "old": "jni/aim_runtime.hpp",
+      "new": "jni/src/features/aim/runtime.hpp",
+      "reason": "documented source/include/build/test update"
+    },
+    {
+      "old": "jni/aim_ui.hpp",
+      "new": "jni/src/ui/pages/aim.hpp",
+      "reason": "documented source/include/build/test update"
+    },
+    {
+      "old": "jni/aim_debug.hpp",
+      "new": "jni/src/features/aim/debug.hpp",
+      "reason": "documented source/include/build/test update"
+    },
+    {
+      "old": "docs/AIM_OFFSETS_1.0.0_ARM64.md",
+      "new": "docs/game/AIM_OFFSETS_1.0.0_ARM64.md",
+      "reason": "documented source/include/build/test update"
+    },
+    {
+      "old": "docs/AIM_DEBUG.md",
+      "new": "docs/debug/AIM_DEBUG.md",
+      "reason": "documented source/include/build/test update"
+    },
+    {
+      "old": "diagnostics/aim_test.cpp",
+      "new": "tests/aim/aim_test.cpp",
+      "reason": "documented source/include/build/test update"
+    },
+    {
+      "old": "out/arm64-v8a/liblemmingrmt.so",
+      "new": "out/arm64-v8a/liblemmingrmt.so",
+      "reason": "rebuilt output; old bytes verified in backup"
+    },
+    {
+      "old": "diagnostics/aim-debug/aim_debug_smoke.cpp",
+      "new": "tests/aim/debug_smoke.cpp",
+      "reason": "documented source/include/build/test update"
+    },
+    {
+      "old": "diagnostics/premium-ui-20260930/tests/ui_test.cpp",
+      "new": "tests/ui/ui_test.cpp",
+      "reason": "documented source/include/build/test update"
+    },
+    {
+      "old": "diagnostics/premium-ui-20260930/tests/android/log.h",
+      "new": "tests/stubs/android/log.h",
+      "reason": "documented source/include/build/test update"
+    },
+    {
+      "old": "jni/fonts/mozilla_text.hpp",
+      "new": "jni/src/ui/fonts/mozilla_text.hpp",
+      "reason": "documented source/include/build/test update"
+    }
+  ],
+  "errors": [],
+  "phone_operations_performed": false
+}

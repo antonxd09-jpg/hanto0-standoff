@@ -1,0 +1,17 @@
+
+
+## Premium UI / ARM64 (2026-09-30)
+- Main rectangle is screen-centered; category and subcategory rails are independent panels to its left.
+- Centered top watermark is the only menu open/close control. No title bar, X, close button, screen diagnostics, or SIGUSR1 menu toggle. ADB diagnostics/SIGUSR2 are retained.
+- Exponential menu/page/switch animations; frame-independent and cosmetic only.
+- Visuals > Players: master enemy ESP, box, skeleton, HP, armor, weapon ID, ammo, soft fill; full/corner frame.
+- Visuals > Appearance and Settings > Theme: live RGBA pickers; line weight. Colors are held for this process only.
+- Aim/Chams/World/Misc are clearly marked reserved; no aim, chams, movement or world features implemented.
+- Lucide SVG assets fetched from the official project, compiled as vector lines, no game-time networking. Licensing: assets/lucide/LICENSE.
+- Skeleton is opt-in (off initially): actual jgi+0x30 > CharacterBindings+0x20 > BonesDictionary > m_dict/_entries, with metadata-discovered field offsets, serialized-array fallback. ARM64 Dictionary<int,Transform> Entry stride 0x18. Invalid/cyclic/stale hierarchies are skipped, not replaced by mannequin data.
+- Bone native TransformHierarchy: managed cached ptr +0x10, native hierarchy +0x28, index +0x30; hierarchy TRS array +0x18 (stride 0x30), parent indices +0x20 (stride 4). Confirmed from native GetPositionAndRotation at 0x554A610/0x554A634. Reader uses safe kernel copies, no new Unity getter calls. Capture only UnityMain after original callback, 25ms cadence, 150ms expiry, world identity check, 128-parent traversal bound and cycle/finite/quaternion/proximity checks.
+- Fresh present-camera projection is preserved; no pixel smoothing or 30 FPS screen cache.
+- Restart the game before loading the uniquely named SO; do not stack libraries in one process. New skeleton path still requires live device validation.
+
+backup=/home/leftcode/Projects/LemmingRMT/backups/20260930-182729-before-premium-ui
+icon_segments=824

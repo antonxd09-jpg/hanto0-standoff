@@ -1,0 +1,4 @@
+[arm64-v8a] Compile++      : lemmingrmt <= main.cpp
+[arm64-v8a] SharedLibrary  : liblemmingrmt.so
+[arm64-v8a] Install        : liblemmingrmt.so => libs/arm64-v8a/liblemmingrmt.so
+Built: /home/leftcode/Projects/LemmingRMT/out/arm64-v8a/liblemmingrmt.so

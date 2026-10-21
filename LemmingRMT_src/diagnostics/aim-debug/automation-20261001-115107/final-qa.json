@@ -1,0 +1,25 @@
+{
+  "profile": "v13-aim-automation",
+  "artifact": "out/arm64-v8a/liblemmingrmt.so",
+  "bytes": 1663440,
+  "sha256": "900d62e229b4345df421fe05de2b0b1f563f49dfcaf133aaaeaed2ea72dcecd6",
+  "buildId": "88d36cc22dd9b94ffda378f68a4c209474b17648",
+  "arm64_build_exit": 0,
+  "host_tests_exit": 0,
+  "host_test_run": "/home/leftcode/Projects/LemmingRMT/diagnostics/tests/20261001-115958-12414",
+  "new_native_rva_guards": {
+    "0xaaf79d0": true,
+    "0x944e2a8": true,
+    "0x945bb7c": true,
+    "0x945b774": true,
+    "0x94479f8": true,
+    "0x6327ad0": true,
+    "0x6327c50": true
+  },
+  "silent_direction_logic_preserved": true,
+  "camera_and_shot_installers_preserved": true,
+  "esp_runtime_and_hook_support_preserved": true,
+  "phone_deployed": false,
+  "live_v13_verified": false,
+  "silent_damage_fixed": false
+}

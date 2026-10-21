@@ -1,0 +1,16 @@
+PASS structure: 52 local includes resolved, build sources/licenses/reserved modules and compatibility links present
+PASS aim math, multipoints, multi-select, FOV/range/priority/lock, config guards, stale/team/world/dead filters, stack-span checks and original-call passthrough
+PASS diagnostic formatting, callback counters, disabled/runtime guards and original-call passthrough
+PASS exact native camera-slot validation with non-plaintext metadata, BL limits/opcodes, 4K/16K/64K free-gap search beyond old hints, and real non-clobbering near allocation
+PASS projection FOV/aspect/zoom/invalid inputs, recoil axes/strength/delta/reset, per-point visibility fallback, native ABI/first owned collider/thread guards/query budget
+PASS independent local-input retry, remote-callback initialization despite busy common timer, six component arrays/dictionary fallback, deleted/foreign/world/invalid bounds guards, and explicit install failures
+PASS velocity lead, duplicate snapshots, stops/reversals, stale/teleport/world/team/NaN resets, 1m cap, camera ownership expiry and real camera callback fallback with all automation toggles enabled
+PASS 360 rear targets, immediate-aim defaults, shot acknowledgement, delay, scope preservation, cancellation, timeout, invalid clock and manual override
+PASS command ABI, scoped/unscoped/knife filtering, owned button release preserving physical holds, remote/wrong-thread original passthrough, real first-hit/blocked/clear/stale/team/nonfinite ray gates
+PASS unchanged original gate return, original end exactly once before restore, local/world/thread ownership, scope survives late consumer, 12-byte Look restore, physical hold preservation, producer-token reuse no-write
+tests/aim/silent_accuracy_test.cpp: In function ‘int main()’:
+tests/aim/silent_accuracy_test.cpp:20:148: error: invalid conversion from ‘bool (*)(uint64_t*, lemming::aim::runtime::Ray*, lemming::aim::assists::RaycastHit*, float, int, int)’ {aka ‘bool (*)(long unsigned int*, lemming::aim::runtime::Ray*, lemming::aim::assists::RaycastHit*, float, int, int)’} to ‘lemming::aim::runtime::RaycastFn’ {aka ‘bool (*)(const long unsigned int*, const lemming::aim::runtime::Ray*, lemming::aim::assists::RaycastHit*, float, int, int)’} [-fpermissive]
+   20 |  rt::g_bounds=bounds;rt::g_entityId=+[](void*,const void*){return 42;};rt::g_defaultScene=+[](const void*)->std::uint64_t{return 0;};rt::g_raycast=cast;g_visibilityReady.store(true);
+      |                                                                                                                                                    ^~~~
+      |                                                                                                                                                    |
+      |                                                                                                                                                    bool (*)(uint64_t*, lemming::aim::runtime::Ray*, lemming::aim::assists::RaycastHit*, float, int, int) {aka bool (*)(long unsigned int*, lemming::aim::runtime::Ray*, lemming::aim::assists::RaycastHit*, float, int, int)}

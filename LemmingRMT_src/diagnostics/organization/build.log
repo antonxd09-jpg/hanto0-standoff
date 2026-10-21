@@ -1,0 +1,9 @@
+[arm64-v8a] Compile++      : lemmingrmt <= imgui_impl_opengl3.cpp
+[arm64-v8a] Compile++      : lemmingrmt <= imgui_tables.cpp
+[arm64-v8a] Compile++      : lemmingrmt <= entry.cpp
+[arm64-v8a] Compile++      : lemmingrmt <= imgui_draw.cpp
+[arm64-v8a] Compile++      : lemmingrmt <= imgui_widgets.cpp
+[arm64-v8a] Compile++      : lemmingrmt <= imgui.cpp
+[arm64-v8a] SharedLibrary  : liblemmingrmt.so
+[arm64-v8a] Install        : liblemmingrmt.so => /home/leftcode/Projects/LemmingRMT/build/ndk/libs/arm64-v8a/liblemmingrmt.so
+Built: /home/leftcode/Projects/LemmingRMT/out/arm64-v8a/liblemmingrmt.so

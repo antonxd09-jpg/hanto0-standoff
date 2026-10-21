@@ -1,0 +1,15 @@
+Profile: Standoff2-1.0.0-arm64-il2cppdump-v8-team-list-hookscan
+Artifact: /home/leftcode/Projects/LemmingRMT/out/arm64-v8a/liblemmingrmt.so
+SHA-256: 5b26a08aa0059782a9745713d55f4ae4ab641e8ccf5bb2af663f40f4c84e98fe
+Build ID: e80492b1ac52b04ee2b3a8726cc421cf49a7b80d
+ABI: ELF64 AArch64, Android 23
+Build warnings/errors: 0
+
+Fixes:
+- Correct rct List<eur> traversal (old code treated List as array).
+- Prefer WeaponContext.Team at nrk+0x38; keep ake+0x90 fallback.
+- Read active weapon through corrected nrk discovery.
+- Scan Unity 6000.3 class vtable from +0x1A0 for exact ake::opmn target.
+- Add per-player team/HP/part/weapon and reject-stage diagnostics.
+- Replace Cyrillic menu status strings with ASCII.
+- Preserve camera-transform crash workaround.

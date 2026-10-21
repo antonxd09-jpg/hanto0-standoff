@@ -15,39 +15,33 @@ jobs:
           echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;21.4.7075529"
           echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/21.4.7075529" >> $GITHUB_ENV
 
-      - name: Download and Extract LemmingRMT
+      - name: Find and Compile C++ Cheat
         run: |
-          wget -O lemmings.zip "https://gofile.io/d/1yNPYovO"
-          mkdir -p lemmings_src
-          unzip -q lemmings.zip -d lemmings_src
-          echo "Архив распакован. Ищем файлы сборки..."
-          find lemmings_src -name "CMakeLists.txt" -o -name "Android.mk" -o -name "Application.mk"
-
-      - name: Compile C++ Cheat
-        run: |
-          # Ищем CMakeLists.txt и собираем
-          CMAKE_FILE=$(find lemmings_src -name "CMakeLists.txt" | head -n 1)
+          # Ищем файл сборки CMakeLists.txt в локальной папке
+          CMAKE_FILE=$(find LemmingRMT_src -name "CMakeLists.txt" | head -n 1)
+          
           if [ -n "$CMAKE_FILE" ]; then
+            echo "Найден CMakeLists.txt по пути: $CMAKE_FILE"
             cd $(dirname "$CMAKE_FILE")
             mkdir -p build && cd build
             cmake .. -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-26
             make -j4
-            find . -name "*.so"
           else
-            echo "CMakeLists.txt не найден, пробуем ndk-build..."
-            # Альтернативный путь, если используется Android.mk
+            echo "CMakeLists.txt не найден! Проверь структуру папок."
+            exit 1
           fi
 
-      - name: Find and Copy Compiled .so
+      - name: Copy Compiled .so to APK
         run: |
-          # Ищем скомпилированный .so файл (обычно libmain.so или похожий)
-          SO_FILE=$(find lemmings_src -name "*.so" | head -n 1)
+          # Ищем скомпилированный .so файл
+          SO_FILE=$(find LemmingRMT_src -name "*.so" | head -n 1)
+          
           if [ -n "$SO_FILE" ]; then
-            echo "Найден .so файл: $SO_FILE"
+            echo "Найден скомпилированный файл: $SO_FILE"
             mkdir -p app/src/main/assets
             cp "$SO_FILE" app/src/main/assets/libmain.so
           else
-            echo "Скомпилированный .so не найден! Проверь логи сборки."
+            echo "Скомпилированный .so не найден! Ошибка сборки C++."
             exit 1
           fi
 

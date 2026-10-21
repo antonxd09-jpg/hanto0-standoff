@@ -1,0 +1,4 @@
+Saved: /home/leftcode/Projects/LemmingRMT/diagnostics/organization/mock-helper/captures/capture-20261001-015742.log
+TEST-MOCK AIM DEBUG heartbeat build=v10-aim-debug
+Duration must be 1..300 seconds
+PASS root debug wrappers from /tmp using a mock only; invalid duration rejected; no device contacted

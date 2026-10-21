@@ -1,0 +1,669 @@
+#include <EGL/egl.h>
+#include <GLES2/gl2.h>
+#include "game_offsets.hpp"
+#include <android/input.h>
+#include <android/log.h>
+#include <jni.h>
+#include <dlfcn.h>
+#include <elf.h>
+#include <link.h>
+#include <sys/mman.h>
+#include <unistd.h>
+
+#include <algorithm>
+#include <atomic>
+#include <chrono>
+#include <cctype>
+#include <cstdint>
+#include <cstring>
+#include <mutex>
+#include <thread>
+#include <vector>
+
+#define LOG_TAG "LemmingRMT"
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+
+#if __SIZEOF_POINTER__ == 4
+#define LR_R_TYPE(info) ELF32_R_TYPE(info)
+#define LR_R_SYM(info) ELF32_R_SYM(info)
+#define LR_JUMP_SLOT R_ARM_JUMP_SLOT
+#define LR_GLOB_DAT R_ARM_GLOB_DAT
+#elif __SIZEOF_POINTER__ == 8
+#define LR_R_TYPE(info) ELF64_R_TYPE(info)
+#define LR_R_SYM(info) ELF64_R_SYM(info)
+#define LR_JUMP_SLOT R_AARCH64_JUMP_SLOT
+#define LR_GLOB_DAT R_AARCH64_GLOB_DAT
+#else
+#error Unsupported pointer size.
+#endif
+
+namespace {
+
+using SwapBuffersFn = EGLBoolean (*)(EGLDisplay, EGLSurface);
+using InputGetEventFn = int32_t (*)(AInputQueue*, AInputEvent**);
+
+SwapBuffersFn g_realSwapBuffers = nullptr;
+InputGetEventFn g_realInputGetEvent = nullptr;
+std::atomic<bool> g_started{false};
+std::atomic<bool> g_menuOpen{true};
+std::atomic<int> g_screenWidth{0};
+std::atomic<int> g_screenHeight{0};
+std::atomic<int> g_swapSlots{0};
+std::atomic<int> g_inputSlots{0};
+std::atomic<uintptr_t> g_unityBase{0};
+std::atomic<bool> g_offsetProfileReady{false};
+
+GLuint g_program = 0;
+GLint g_posLocation = -1;
+GLint g_screenLocation = -1;
+GLint g_colorLocation = -1;
+
+struct Vertex {
+    GLfloat x;
+    GLfloat y;
+};
+
+struct Color {
+    GLfloat r;
+    GLfloat g;
+    GLfloat b;
+    GLfloat a;
+};
+
+constexpr Color kAccent{0.36f, 0.91f, 0.58f, 1.00f};
+constexpr Color kAccentDim{0.10f, 0.31f, 0.20f, 0.98f};
+constexpr Color kPanel{0.035f, 0.043f, 0.055f, 0.96f};
+constexpr Color kPanelTop{0.055f, 0.071f, 0.090f, 0.98f};
+constexpr Color kText{0.92f, 0.95f, 0.97f, 1.00f};
+constexpr Color kMuted{0.52f, 0.59f, 0.64f, 1.00f};
+constexpr Color kDanger{0.95f, 0.31f, 0.35f, 1.00f};
+#if defined(__aarch64__)
+constexpr const char* kArchitectureLabel = "ARM64 / GLES2";
+#else
+constexpr const char* kArchitectureLabel = "ARMV7 / GLES2";
+#endif
+
+const char* kVertexShader = R"(
+attribute vec2 aPos;
+uniform vec2 uScreen;
+void main() {
+    vec2 clip = vec2((aPos.x / uScreen.x) * 2.0 - 1.0,
+                     1.0 - (aPos.y / uScreen.y) * 2.0);
+    gl_Position = vec4(clip, 0.0, 1.0);
+}
+)";
+
+const char* kFragmentShader = R"(
+precision mediump float;
+uniform vec4 uColor;
+void main() {
+    gl_FragColor = uColor;
+}
+)";
+
+GLuint compileShader(GLenum type, const char* source) {
+    GLuint shader = glCreateShader(type);
+    glShaderSource(shader, 1, &source, nullptr);
+    glCompileShader(shader);
+    GLint ok = GL_FALSE;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &ok);
+    if (!ok) {
+        char log[512]{};
+        glGetShaderInfoLog(shader, sizeof(log), nullptr, log);
+        LOGE("shader compile failed: %s", log);
+        glDeleteShader(shader);
+        return 0;
+    }
+    return shader;
+}
+
+bool ensureRenderer() {
+    if (g_program && glIsProgram(g_program) == GL_TRUE) {
+        return true;
+    }
+
+    g_program = 0;
+    const GLuint vs = compileShader(GL_VERTEX_SHADER, kVertexShader);
+    const GLuint fs = compileShader(GL_FRAGMENT_SHADER, kFragmentShader);
+    if (!vs || !fs) {
+        if (vs) glDeleteShader(vs);
+        if (fs) glDeleteShader(fs);
+        return false;
+    }
+
+    g_program = glCreateProgram();
+    glAttachShader(g_program, vs);
+    glAttachShader(g_program, fs);
+    glBindAttribLocation(g_program, 0, "aPos");
+    glLinkProgram(g_program);
+    glDeleteShader(vs);
+    glDeleteShader(fs);
+
+    GLint ok = GL_FALSE;
+    glGetProgramiv(g_program, GL_LINK_STATUS, &ok);
+    if (!ok) {
+        char log[512]{};
+        glGetProgramInfoLog(g_program, sizeof(log), nullptr, log);
+        LOGE("program link failed: %s", log);
+        glDeleteProgram(g_program);
+        g_program = 0;
+        return false;
+    }
+
+    g_posLocation = glGetAttribLocation(g_program, "aPos");
+    g_screenLocation = glGetUniformLocation(g_program, "uScreen");
+    g_colorLocation = glGetUniformLocation(g_program, "uColor");
+    return g_posLocation >= 0 && g_screenLocation >= 0 && g_colorLocation >= 0;
+}
+
+void appendRect(std::vector<Vertex>& out, float x, float y, float w, float h) {
+    out.push_back({x, y});
+    out.push_back({x + w, y});
+    out.push_back({x + w, y + h});
+    out.push_back({x, y});
+    out.push_back({x + w, y + h});
+    out.push_back({x, y + h});
+}
+
+void drawVertices(const std::vector<Vertex>& vertices, const Color& color, int width, int height) {
+    if (vertices.empty()) return;
+    glUniform2f(g_screenLocation, static_cast<float>(width), static_cast<float>(height));
+    glUniform4f(g_colorLocation, color.r, color.g, color.b, color.a);
+    glVertexAttribPointer(g_posLocation, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), vertices.data());
+    glEnableVertexAttribArray(g_posLocation);
+    glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(vertices.size()));
+}
+
+void drawRect(float x, float y, float w, float h, const Color& color, int sw, int sh) {
+    std::vector<Vertex> vertices;
+    vertices.reserve(6);
+    appendRect(vertices, x, y, w, h);
+    drawVertices(vertices, color, sw, sh);
+}
+
+const uint8_t* glyphRows(char input) {
+    static const uint8_t blank[7] = {0, 0, 0, 0, 0, 0, 0};
+    static const uint8_t alphabet[26][7] = {
+        {14,17,17,31,17,17,17}, {30,17,17,30,17,17,30},
+        {14,17,16,16,16,17,14}, {30,17,17,17,17,17,30},
+        {31,16,16,30,16,16,31}, {31,16,16,30,16,16,16},
+        {14,17,16,23,17,17,15}, {17,17,17,31,17,17,17},
+        {14,4,4,4,4,4,14},      {7,2,2,2,2,18,12},
+        {17,18,20,24,20,18,17}, {16,16,16,16,16,16,31},
+        {17,27,21,21,17,17,17}, {17,25,21,19,17,17,17},
+        {14,17,17,17,17,17,14}, {30,17,17,30,16,16,16},
+        {14,17,17,17,21,18,13}, {30,17,17,30,20,18,17},
+        {15,16,16,14,1,1,30},   {31,4,4,4,4,4,4},
+        {17,17,17,17,17,17,14}, {17,17,17,17,17,10,4},
+        {17,17,17,21,21,21,10}, {17,17,10,4,10,17,17},
+        {17,17,10,4,4,4,4},     {31,1,2,4,8,16,31}
+    };
+    static const uint8_t digits[10][7] = {
+        {14,17,19,21,25,17,14}, {4,12,4,4,4,4,14},
+        {14,17,1,2,4,8,31},     {30,1,1,14,1,1,30},
+        {2,6,10,18,31,2,2},     {31,16,16,30,1,1,30},
+        {14,16,16,30,17,17,14}, {31,1,2,4,8,8,8},
+        {14,17,17,14,17,17,14}, {14,17,17,15,1,1,14}
+    };
+    static const uint8_t dash[7] = {0,0,0,31,0,0,0};
+    static const uint8_t dot[7] = {0,0,0,0,0,12,12};
+    static const uint8_t colon[7] = {0,12,12,0,12,12,0};
+    static const uint8_t slash[7] = {1,2,2,4,8,8,16};
+    static const uint8_t openBracket[7] = {14,8,8,8,8,8,14};
+    static const uint8_t closeBracket[7] = {14,2,2,2,2,2,14};
+
+    const unsigned char u = static_cast<unsigned char>(input);
+    const char c = static_cast<char>(std::toupper(u));
+    if (c >= 'A' && c <= 'Z') return alphabet[c - 'A'];
+    if (c >= '0' && c <= '9') return digits[c - '0'];
+    if (c == '-') return dash;
+    if (c == '.') return dot;
+    if (c == ':') return colon;
+    if (c == '/') return slash;
+    if (c == '[') return openBracket;
+    if (c == ']') return closeBracket;
+    return blank;
+}
+
+void drawText(float x, float y, float scale, const char* text, const Color& color, int sw, int sh) {
+    std::vector<Vertex> vertices;
+    const size_t length = std::strlen(text);
+    vertices.reserve(length * 7 * 5 * 6);
+
+    float cursorX = x;
+    for (size_t i = 0; i < length; ++i) {
+        const char c = text[i];
+        if (c == ' ') {
+            cursorX += 6.0f * scale;
+            continue;
+        }
+        const uint8_t* rows = glyphRows(c);
+        for (int row = 0; row < 7; ++row) {
+            for (int col = 0; col < 5; ++col) {
+                if ((rows[row] & (1u << (4 - col))) != 0) {
+                    appendRect(vertices, cursorX + col * scale, y + row * scale, scale, scale);
+                }
+            }
+        }
+        cursorX += 6.0f * scale;
+    }
+    drawVertices(vertices, color, sw, sh);
+}
+
+struct GlState {
+    GLint program = 0;
+    GLint arrayBuffer = 0;
+    GLint elementBuffer = 0;
+    GLint viewport[4]{};
+    GLint blendSrcRgb = GL_ONE;
+    GLint blendDstRgb = GL_ZERO;
+    GLint blendSrcAlpha = GL_ONE;
+    GLint blendDstAlpha = GL_ZERO;
+    GLboolean blend = GL_FALSE;
+    GLboolean depth = GL_FALSE;
+    GLboolean cull = GL_FALSE;
+    GLboolean scissor = GL_FALSE;
+    GLint attribEnabled = 0;
+    GLint attribSize = 4;
+    GLint attribStride = 0;
+    GLint attribType = GL_FLOAT;
+    GLint attribNormalized = GL_FALSE;
+    GLint attribBuffer = 0;
+    void* attribPointer = nullptr;
+};
+
+void saveGlState(GlState& s) {
+    glGetIntegerv(GL_CURRENT_PROGRAM, &s.program);
+    glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &s.arrayBuffer);
+    glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &s.elementBuffer);
+    glGetIntegerv(GL_VIEWPORT, s.viewport);
+    glGetIntegerv(GL_BLEND_SRC_RGB, &s.blendSrcRgb);
+    glGetIntegerv(GL_BLEND_DST_RGB, &s.blendDstRgb);
+    glGetIntegerv(GL_BLEND_SRC_ALPHA, &s.blendSrcAlpha);
+    glGetIntegerv(GL_BLEND_DST_ALPHA, &s.blendDstAlpha);
+    s.blend = glIsEnabled(GL_BLEND);
+    s.depth = glIsEnabled(GL_DEPTH_TEST);
+    s.cull = glIsEnabled(GL_CULL_FACE);
+    s.scissor = glIsEnabled(GL_SCISSOR_TEST);
+
+    if (g_posLocation >= 0) {
+        glGetVertexAttribiv(g_posLocation, GL_VERTEX_ATTRIB_ARRAY_ENABLED, &s.attribEnabled);
+        glGetVertexAttribiv(g_posLocation, GL_VERTEX_ATTRIB_ARRAY_SIZE, &s.attribSize);
+        glGetVertexAttribiv(g_posLocation, GL_VERTEX_ATTRIB_ARRAY_STRIDE, &s.attribStride);
+        glGetVertexAttribiv(g_posLocation, GL_VERTEX_ATTRIB_ARRAY_TYPE, &s.attribType);
+        glGetVertexAttribiv(g_posLocation, GL_VERTEX_ATTRIB_ARRAY_NORMALIZED, &s.attribNormalized);
+        glGetVertexAttribiv(g_posLocation, GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING, &s.attribBuffer);
+        glGetVertexAttribPointerv(g_posLocation, GL_VERTEX_ATTRIB_ARRAY_POINTER, &s.attribPointer);
+    }
+}
+
+void restoreGlState(const GlState& s) {
+    if (g_posLocation >= 0) {
+        glBindBuffer(GL_ARRAY_BUFFER, s.attribBuffer);
+        glVertexAttribPointer(g_posLocation, s.attribSize, static_cast<GLenum>(s.attribType),
+                              static_cast<GLboolean>(s.attribNormalized), s.attribStride, s.attribPointer);
+        if (s.attribEnabled) glEnableVertexAttribArray(g_posLocation);
+        else glDisableVertexAttribArray(g_posLocation);
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, s.arrayBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s.elementBuffer);
+    glUseProgram(s.program);
+    glViewport(s.viewport[0], s.viewport[1], s.viewport[2], s.viewport[3]);
+    glBlendFuncSeparate(static_cast<GLenum>(s.blendSrcRgb), static_cast<GLenum>(s.blendDstRgb),
+                        static_cast<GLenum>(s.blendSrcAlpha), static_cast<GLenum>(s.blendDstAlpha));
+    if (s.blend) glEnable(GL_BLEND); else glDisable(GL_BLEND);
+    if (s.depth) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
+    if (s.cull) glEnable(GL_CULL_FACE); else glDisable(GL_CULL_FACE);
+    if (s.scissor) glEnable(GL_SCISSOR_TEST); else glDisable(GL_SCISSOR_TEST);
+}
+
+void drawOverlay(int width, int height) {
+    if (width < 160 || height < 120 || !ensureRenderer()) return;
+
+    GlState old{};
+    saveGlState(old);
+
+    glUseProgram(g_program);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glViewport(0, 0, width, height);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_SCISSOR_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    const float watermarkW = 196.0f;
+    drawRect(16.0f, 16.0f, watermarkW, 34.0f, kPanelTop, width, height);
+    drawRect(16.0f, 48.0f, watermarkW, 2.0f, kAccent, width, height);
+    drawRect(24.0f, 24.0f, 7.0f, 18.0f, kAccent, width, height);
+    drawText(39.0f, 25.0f, 2.0f, "LEMMINGRMT", kText, width, height);
+
+    if (g_menuOpen.load(std::memory_order_relaxed)) {
+        const float panelX = 24.0f;
+        const float panelY = 68.0f;
+        const float panelW = std::min(400.0f, static_cast<float>(width) - 48.0f);
+        const float panelH = std::min(330.0f, static_cast<float>(height) - 92.0f);
+
+        drawRect(panelX + 5.0f, panelY + 6.0f, panelW, panelH, {0,0,0,0.34f}, width, height);
+        drawRect(panelX, panelY, panelW, panelH, kPanel, width, height);
+        drawRect(panelX, panelY, panelW, 44.0f, kPanelTop, width, height);
+        drawRect(panelX, panelY + 42.0f, panelW, 2.0f, kAccent, width, height);
+        drawText(panelX + 16.0f, panelY + 15.0f, 2.0f, "INTERNAL MENU", kText, width, height);
+
+        drawRect(panelX + panelW - 42.0f, panelY + 7.0f, 32.0f, 30.0f, {0.22f,0.07f,0.08f,1.0f}, width, height);
+        drawText(panelX + panelW - 32.0f, panelY + 15.0f, 2.0f, "X", kDanger, width, height);
+
+        drawRect(panelX + 16.0f, panelY + 62.0f, panelW - 32.0f, 48.0f, kAccentDim, width, height);
+        drawRect(panelX + 16.0f, panelY + 62.0f, 5.0f, 48.0f, kAccent, width, height);
+        drawText(panelX + 34.0f, panelY + 73.0f, 2.0f, "OVERLAY ONLINE", kAccent, width, height);
+        drawText(panelX + 34.0f, panelY + 94.0f, 1.0f, "VISUAL SHELL READY", kMuted, width, height);
+
+        const bool profileReady = g_offsetProfileReady.load(std::memory_order_relaxed);
+        drawText(panelX + 18.0f, panelY + 137.0f, 2.0f,
+                 profileReady ? "DUMP64 PROFILE READY" : "DUMP64 PROFILE WAIT", profileReady ? kAccent : kDanger, width, height);
+        drawText(panelX + 18.0f, panelY + 168.0f, 1.0f, "PLAYER OFFSETS LOADED", kText, width, height);
+        drawText(panelX + 18.0f, panelY + 186.0f, 1.0f, "GUN RECOIL FIELDS LOADED", kText, width, height);
+        drawText(panelX + 18.0f, panelY + 204.0f, 1.0f, "DIRECT RVA RANGE CHECKED", kText, width, height);
+        drawText(panelX + 18.0f, panelY + 236.0f, 1.0f, "NEXT PLAYER INSTANCE RESOLVER", kMuted, width, height);
+        drawText(panelX + 18.0f, panelY + 254.0f, 1.0f, "X CLOSES MENU WATERMARK OPENS", kMuted, width, height);
+
+        drawRect(panelX + 16.0f, panelY + panelH - 23.0f, panelW - 32.0f, 1.0f, {0.15f,0.18f,0.21f,1.0f}, width, height);
+        drawText(panelX + 18.0f, panelY + panelH - 16.0f, 1.0f, kArchitectureLabel, kMuted, width, height);
+    }
+
+    restoreGlState(old);
+}
+
+bool inside(float x, float y, float left, float top, float width, float height) {
+    return x >= left && x <= left + width && y >= top && y <= top + height;
+}
+
+void handleTouch(float x, float y) {
+    const int width = g_screenWidth.load(std::memory_order_relaxed);
+    const int height = g_screenHeight.load(std::memory_order_relaxed);
+    if (width <= 0 || height <= 0) return;
+
+    if (!g_menuOpen.load(std::memory_order_relaxed)) {
+        if (inside(x, y, 16.0f, 16.0f, 196.0f, 36.0f)) {
+            g_menuOpen.store(true, std::memory_order_relaxed);
+        }
+        return;
+    }
+
+    const float panelX = 24.0f;
+    const float panelY = 68.0f;
+    const float panelW = std::min(400.0f, static_cast<float>(width) - 48.0f);
+    if (inside(x, y, panelX + panelW - 48.0f, panelY, 48.0f, 48.0f)) {
+        g_menuOpen.store(false, std::memory_order_relaxed);
+    }
+}
+
+EGLBoolean hookedSwapBuffers(EGLDisplay display, EGLSurface surface) {
+    EGLint width = 0;
+    EGLint height = 0;
+    if (surface != EGL_NO_SURFACE &&
+        eglQuerySurface(display, surface, EGL_WIDTH, &width) == EGL_TRUE &&
+        eglQuerySurface(display, surface, EGL_HEIGHT, &height) == EGL_TRUE) {
+        g_screenWidth.store(width, std::memory_order_relaxed);
+        g_screenHeight.store(height, std::memory_order_relaxed);
+        drawOverlay(width, height);
+    }
+    return g_realSwapBuffers ? g_realSwapBuffers(display, surface) : EGL_FALSE;
+}
+
+int32_t hookedInputGetEvent(AInputQueue* queue, AInputEvent** outEvent) {
+    if (!g_realInputGetEvent) return -1;
+    const int32_t result = g_realInputGetEvent(queue, outEvent);
+    if (result >= 0 && outEvent && *outEvent && AInputEvent_getType(*outEvent) == AINPUT_EVENT_TYPE_MOTION) {
+        const int32_t action = AMotionEvent_getAction(*outEvent);
+        const int32_t masked = action & AMOTION_EVENT_ACTION_MASK;
+        const size_t index = static_cast<size_t>((action & AMOTION_EVENT_ACTION_POINTER_INDEX_MASK) >>
+                                                  AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT);
+        if (masked == AMOTION_EVENT_ACTION_DOWN || masked == AMOTION_EVENT_ACTION_POINTER_DOWN) {
+            const size_t count = AMotionEvent_getPointerCount(*outEvent);
+            if (index < count) {
+                handleTouch(AMotionEvent_getX(*outEvent, index), AMotionEvent_getY(*outEvent, index));
+            }
+        }
+    }
+    return result;
+}
+
+uintptr_t makeAbsolute(uintptr_t base, uintptr_t value, uintptr_t minAddress, uintptr_t maxAddress) {
+    if (value >= minAddress && value < maxAddress) return value;
+    return base + value;
+}
+
+bool patchSlot(void** slot, void* replacement, void** original) {
+    if (!slot || !replacement) return false;
+    void* current = __atomic_load_n(slot, __ATOMIC_ACQUIRE);
+    if (current == replacement) return false;
+    if (original && !*original && current) *original = current;
+
+    const long pageSize = sysconf(_SC_PAGESIZE);
+    const uintptr_t page = reinterpret_cast<uintptr_t>(slot) & ~(static_cast<uintptr_t>(pageSize) - 1u);
+    if (mprotect(reinterpret_cast<void*>(page), static_cast<size_t>(pageSize), PROT_READ | PROT_WRITE) != 0) {
+        return false;
+    }
+    __atomic_store_n(slot, replacement, __ATOMIC_RELEASE);
+    __builtin___clear_cache(reinterpret_cast<char*>(slot), reinterpret_cast<char*>(slot) + sizeof(void*));
+    mprotect(reinterpret_cast<void*>(page), static_cast<size_t>(pageSize), PROT_READ);
+    return true;
+}
+
+struct HookTargets {
+    const char* name;
+    void* replacement;
+    void** original;
+    std::atomic<int>* slotCount;
+};
+
+template <typename Relocation>
+bool patchRelocations(uintptr_t base,
+                      const Relocation* relocs,
+                      size_t count,
+                      const ElfW(Sym)* symbols,
+                      const char* strings,
+                      const HookTargets* targets,
+                      size_t targetCount) {
+    bool changed = false;
+    for (size_t i = 0; i < count; ++i) {
+        const Relocation& rel = relocs[i];
+        const unsigned type = LR_R_TYPE(rel.r_info);
+        if (type != LR_JUMP_SLOT && type != LR_GLOB_DAT) continue;
+        const unsigned symIndex = LR_R_SYM(rel.r_info);
+        const char* symbolName = strings + symbols[symIndex].st_name;
+        for (size_t t = 0; t < targetCount; ++t) {
+            if (std::strcmp(symbolName, targets[t].name) != 0) continue;
+            auto** slot = reinterpret_cast<void**>(base + static_cast<uintptr_t>(rel.r_offset));
+            if (patchSlot(slot, targets[t].replacement, targets[t].original)) {
+                targets[t].slotCount->fetch_add(1, std::memory_order_relaxed);
+                changed = true;
+            }
+        }
+    }
+    return changed;
+}
+
+int hookModule(dl_phdr_info* info, size_t, void*) {
+    const char* moduleName = info->dlpi_name ? info->dlpi_name : "";
+    if (!std::strstr(moduleName, "libunity.so") &&
+        !std::strstr(moduleName, "libil2cpp.so") &&
+        !std::strstr(moduleName, "libmain.so")) {
+        return 0;
+    }
+
+    const uintptr_t base = static_cast<uintptr_t>(info->dlpi_addr);
+    uintptr_t minAddress = UINTPTR_MAX;
+    uintptr_t maxAddress = 0;
+    const ElfW(Dyn)* dynamic = nullptr;
+
+    for (ElfW(Half) i = 0; i < info->dlpi_phnum; ++i) {
+        const ElfW(Phdr)& ph = info->dlpi_phdr[i];
+        if (ph.p_type == PT_LOAD) {
+            minAddress = std::min(minAddress, base + static_cast<uintptr_t>(ph.p_vaddr));
+            maxAddress = std::max(maxAddress, base + static_cast<uintptr_t>(ph.p_vaddr + ph.p_memsz));
+        } else if (ph.p_type == PT_DYNAMIC) {
+            dynamic = reinterpret_cast<const ElfW(Dyn)*>(base + ph.p_vaddr);
+        }
+    }
+    if (!dynamic || minAddress == UINTPTR_MAX) return 0;
+
+    if (std::strstr(moduleName, "libunity.so")) {
+        g_unityBase.store(base, std::memory_order_release);
+#if defined(__aarch64__)
+        const uintptr_t probe = base + lemming::offsets::method_rva::kWeaponryOnPreInitialize;
+        g_offsetProfileReady.store(probe >= minAddress && probe < maxAddress, std::memory_order_release);
+#else
+        g_offsetProfileReady.store(false, std::memory_order_release);
+#endif
+    }
+
+    const ElfW(Sym)* symbols = nullptr;
+    const char* strings = nullptr;
+    const void* pltRelocations = nullptr;
+    const ElfW(Rel)* regularRel = nullptr;
+    const ElfW(Rela)* regularRela = nullptr;
+    uintptr_t pltRelType = 0;
+    size_t pltRelSize = 0;
+    size_t regularRelSize = 0;
+    size_t regularRelaSize = 0;
+
+    for (const ElfW(Dyn)* d = dynamic; d->d_tag != DT_NULL; ++d) {
+        const uintptr_t value = static_cast<uintptr_t>(d->d_un.d_ptr);
+        switch (d->d_tag) {
+            case DT_SYMTAB:
+                symbols = reinterpret_cast<const ElfW(Sym)*>(makeAbsolute(base, value, minAddress, maxAddress));
+                break;
+            case DT_STRTAB:
+                strings = reinterpret_cast<const char*>(makeAbsolute(base, value, minAddress, maxAddress));
+                break;
+            case DT_JMPREL:
+                pltRelocations = reinterpret_cast<const void*>(makeAbsolute(base, value, minAddress, maxAddress));
+                break;
+            case DT_PLTRELSZ:
+                pltRelSize = static_cast<size_t>(d->d_un.d_val);
+                break;
+            case DT_PLTREL:
+                pltRelType = static_cast<uintptr_t>(d->d_un.d_val);
+                break;
+            case DT_REL:
+                regularRel = reinterpret_cast<const ElfW(Rel)*>(makeAbsolute(base, value, minAddress, maxAddress));
+                break;
+            case DT_RELSZ:
+                regularRelSize = static_cast<size_t>(d->d_un.d_val);
+                break;
+            case DT_RELA:
+                regularRela = reinterpret_cast<const ElfW(Rela)*>(makeAbsolute(base, value, minAddress, maxAddress));
+                break;
+            case DT_RELASZ:
+                regularRelaSize = static_cast<size_t>(d->d_un.d_val);
+                break;
+            default:
+                break;
+        }
+    }
+    if (!symbols || !strings) return 0;
+
+    HookTargets targets[] = {
+        {"eglSwapBuffers", reinterpret_cast<void*>(hookedSwapBuffers), reinterpret_cast<void**>(&g_realSwapBuffers), &g_swapSlots},
+        {"AInputQueue_getEvent", reinterpret_cast<void*>(hookedInputGetEvent), reinterpret_cast<void**>(&g_realInputGetEvent), &g_inputSlots},
+    };
+
+    if (pltRelocations && pltRelSize) {
+        if (pltRelType == DT_REL) {
+            const auto* relocs = reinterpret_cast<const ElfW(Rel)*>(pltRelocations);
+            patchRelocations(base, relocs, pltRelSize / sizeof(ElfW(Rel)), symbols, strings, targets, 2);
+        } else if (pltRelType == DT_RELA) {
+            const auto* relocs = reinterpret_cast<const ElfW(Rela)*>(pltRelocations);
+            patchRelocations(base, relocs, pltRelSize / sizeof(ElfW(Rela)), symbols, strings, targets, 2);
+        }
+    }
+    if (regularRel && regularRelSize) {
+        patchRelocations(base, regularRel, regularRelSize / sizeof(ElfW(Rel)), symbols, strings, targets, 2);
+    }
+    if (regularRela && regularRelaSize) {
+        patchRelocations(base, regularRela, regularRelaSize / sizeof(ElfW(Rela)), symbols, strings, targets, 2);
+    }
+    return 0;
+}
+
+void resolveOriginals() {
+    void* egl = dlopen("libEGL.so", RTLD_NOW | RTLD_LOCAL);
+    if (egl) g_realSwapBuffers = reinterpret_cast<SwapBuffersFn>(dlsym(egl, "eglSwapBuffers"));
+    void* android = dlopen("libandroid.so", RTLD_NOW | RTLD_LOCAL);
+    if (android) g_realInputGetEvent = reinterpret_cast<InputGetEventFn>(dlsym(android, "AInputQueue_getEvent"));
+}
+
+void hookWorker() {
+    resolveOriginals();
+    int lastSwap = -1;
+    int lastInput = -1;
+    uintptr_t lastUnityBase = 0;
+    bool lastProfileReady = false;
+    for (;;) {
+        dl_iterate_phdr(hookModule, nullptr);
+        const int swaps = g_swapSlots.load(std::memory_order_relaxed);
+        const int inputs = g_inputSlots.load(std::memory_order_relaxed);
+        if (swaps != lastSwap || inputs != lastInput) {
+            LOGI("hook status: swap=%d input=%d", swaps, inputs);
+            lastSwap = swaps;
+            lastInput = inputs;
+        }
+        const uintptr_t unityBase = g_unityBase.load(std::memory_order_acquire);
+        const bool profileReady = g_offsetProfileReady.load(std::memory_order_acquire);
+        if (unityBase != lastUnityBase || profileReady != lastProfileReady) {
+            LOGI("dump64 profile: base=%p ready=%d source=%s", reinterpret_cast<void*>(unityBase),
+                 profileReady ? 1 : 0, lemming::offsets::kProfileName);
+            lastUnityBase = unityBase;
+            lastProfileReady = profileReady;
+        }
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+    }
+}
+
+void start() {
+    bool expected = false;
+    if (!g_started.compare_exchange_strong(expected, true)) return;
+    std::thread(hookWorker).detach();
+    LOGI("bootstrap started");
+}
+
+} // namespace
+
+extern "C" __attribute__((visibility("default"))) void LemmingRMT_ToggleMenu() {
+    g_menuOpen.store(!g_menuOpen.load(std::memory_order_relaxed), std::memory_order_relaxed);
+}
+
+extern "C" __attribute__((visibility("default"))) void LemmingRMT_SetMenuOpen(int open) {
+    g_menuOpen.store(open != 0, std::memory_order_relaxed);
+}
+
+extern "C" __attribute__((visibility("default"))) int LemmingRMT_IsMenuOpen() {
+    return g_menuOpen.load(std::memory_order_relaxed) ? 1 : 0;
+}
+
+extern "C" __attribute__((visibility("default"))) uintptr_t LemmingRMT_GetUnityBase() {
+    return g_unityBase.load(std::memory_order_acquire);
+}
+
+extern "C" __attribute__((visibility("default"))) uintptr_t LemmingRMT_ResolveUnityRva(uintptr_t rva) {
+    const uintptr_t base = g_unityBase.load(std::memory_order_acquire);
+    return base ? base + rva : 0;
+}
+
+extern "C" __attribute__((visibility("default"))) int LemmingRMT_IsOffsetProfileReady() {
+    return g_offsetProfileReady.load(std::memory_order_acquire) ? 1 : 0;
+}
+
+extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM*, void*) {
+    start();
+    return JNI_VERSION_1_6;
+}
+
+__attribute__((constructor)) static void LemmingRMT_OnLoad() {
+    start();
+}

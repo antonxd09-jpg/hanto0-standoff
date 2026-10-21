@@ -1,0 +1,7 @@
+PASS structure: 26 local includes resolved, build sources/licenses/reserved modules and compatibility links present
+PASS aim math, multipoints, multi-select, FOV/range/priority/lock, config guards, stale/team/world/dead filters, stack-span checks and original-call passthrough
+PASS diagnostic formatting, callback counters, disabled/runtime guards and original-call passthrough
+PASS Aim pages, independent modes/masks, clicks, multipoints, six viewports and no scrollbars
+PASS GLES3 offscreen rendering and GL_NO_ERROR
+PASS larger menu and rails, Rage/Config navigation, movable ESP Editor, style switching, no scrollbars, finite vertices and six viewport sizes
+Tests completed. Logs: /home/leftcode/Projects/LemmingRMT/diagnostics/tests/20261001-015438-56489

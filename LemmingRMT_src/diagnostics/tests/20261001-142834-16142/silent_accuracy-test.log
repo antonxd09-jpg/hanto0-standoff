@@ -1,0 +1,1 @@
+PASS refreshed head center, large/NaN lead bounds, 360/FOV/range checks, exact selected-collider visibility (not chest/clear ray), bone/native/stale rejection; no old snapshot age added twice

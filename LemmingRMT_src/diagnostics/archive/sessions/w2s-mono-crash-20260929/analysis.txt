@@ -1,0 +1,7 @@
+Profile: Standoff2-1.0.0-arm64-il2cppdump-v8-w2s-mono-eye
+Crash time: 2026-09-29 23:30:08 +03:00
+Thread: UnityGfxDeviceW
+Signal: SIGSEGV / SEGV_MAPERR
+Confirmed stack: libunity+0x55493A8 <- +0x554A898 <- +0x5A8AE9C <- +0x5A85F70 <- +0x536527C <- internal project()
+Cause: direct Camera.WorldToScreenPoint_Injected invoked from UnityGfxDeviceW enters a non-thread-safe camera cache refresh path. Eye=2 exposed this path. This is not a player-list or team failure.
+Fix: no direct WorldToScreen/Component_GetTransform calls. Read cached native Camera matrices at +0x70/+0xB0 and project locally.

@@ -1,0 +1,92 @@
+
+/home/leftcode/Projects/1.0.0 dump x64/extracted/libunity.so:	file format elf64-littleaarch64
+
+Disassembly of section .text:
+
+00000000056714d8 <UnityShutdown>:
+ aafa468: f81c0ffe     	str	x30, [sp, #-0x40]!
+ aafa46c: a9015ff8     	stp	x24, x23, [sp, #0x10]
+ aafa470: a90257f6     	stp	x22, x21, [sp, #0x20]
+ aafa474: a9034ff4     	stp	x20, x19, [sp, #0x30]
+ aafa478: b000d4f7     	adrp	x23, 0xc597000
+ aafa47c: b0009d78     	adrp	x24, 0xbea7000
+ aafa480: b0009e16     	adrp	x22, 0xbebb000
+ aafa484: 39687ee8     	ldrb	w8, [x23, #0xa1f]
+ aafa488: f940cb18     	ldr	x24, [x24, #0x190]
+ aafa48c: f94732d6     	ldr	x22, [x22, #0xe60]
+ aafa490: aa0303f3     	mov	x19, x3
+ aafa494: aa0203f5     	mov	x21, x2
+ aafa498: aa0103f4     	mov	x20, x1
+ aafa49c: 37000128     	tbnz	w8, #0x0, 0xaafa4c0 <UnityShutdown+0x5488fe8>
+ aafa4a0: b0009d60     	adrp	x0, 0xbea7000
+ aafa4a4: f940c800     	ldr	x0, [x0, #0x190]
+ aafa4a8: 96e1ae09     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ aafa4ac: b0009e00     	adrp	x0, 0xbebb000
+ aafa4b0: f9473000     	ldr	x0, [x0, #0xe60]
+ aafa4b4: 96e1ae06     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ aafa4b8: 52800028     	mov	w8, #0x1                // =1
+ aafa4bc: 39287ee8     	strb	w8, [x23, #0xa1f]
+ aafa4c0: f9400301     	ldr	x1, [x24]
+ aafa4c4: aa1503e0     	mov	x0, x21
+ aafa4c8: 96edc6c4     	bl	0x666bfd8 <UnityShutdown+0xffab00>
+ aafa4cc: aa0003e2     	mov	x2, x0
+ aafa4d0: f94002c3     	ldr	x3, [x22]
+ aafa4d4: 92401e61     	and	x1, x19, #0xff
+ aafa4d8: aa1403e0     	mov	x0, x20
+ aafa4dc: a9434ff4     	ldp	x20, x19, [sp, #0x30]
+ aafa4e0: a94257f6     	ldp	x22, x21, [sp, #0x20]
+ aafa4e4: a9415ff8     	ldp	x24, x23, [sp, #0x10]
+ aafa4e8: f84407fe     	ldr	x30, [sp], #0x40
+ aafa4ec: 178f7bc5     	b	0x8ed9400 <UnityShutdown+0x3867f28>
+ aafa4f0: 52800ce0     	mov	w0, #0x67               // =103
+ aafa4f4: d65f03c0     	ret
+ aafa4f8: a9bb6ffe     	stp	x30, x27, [sp, #-0x50]!
+ aafa4fc: a90167fa     	stp	x26, x25, [sp, #0x10]
+ aafa500: a9025ff8     	stp	x24, x23, [sp, #0x20]
+ aafa504: a90357f6     	stp	x22, x21, [sp, #0x30]
+ aafa508: a9044ff4     	stp	x20, x19, [sp, #0x40]
+ aafa50c: b000d4f6     	adrp	x22, 0xc597000
+ aafa510: 90009995     	adrp	x21, 0xbe2a000
+ aafa514: aa0203f3     	mov	x19, x2
+ aafa518: 396882c8     	ldrb	w8, [x22, #0xa20]
+ aafa51c: f944deb5     	ldr	x21, [x21, #0x9b8]
+ aafa520: aa0103f4     	mov	x20, x1
+ aafa524: 37000428     	tbnz	w8, #0x0, 0xaafa5a8 <UnityShutdown+0x54890d0>
+ aafa528: d0009fc0     	adrp	x0, 0xbef4000
+ aafa52c: f9424800     	ldr	x0, [x0, #0x490]
+ aafa530: 96e1ade7     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ aafa534: 9000a000     	adrp	x0, 0xbefa000
+ aafa538: f9466400     	ldr	x0, [x0, #0xcc8]
+ aafa53c: 96e1ade4     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ aafa540: f0009fa0     	adrp	x0, 0xbef1000
+ aafa544: f9451800     	ldr	x0, [x0, #0xa30]
+ aafa548: 96e1ade1     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ aafa54c: 90009980     	adrp	x0, 0xbe2a000
+ aafa550: f944dc00     	ldr	x0, [x0, #0x9b8]
+ aafa554: 96e1adde     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ aafa558: b0009ac0     	adrp	x0, 0xbe53000
+ aafa55c: f9433800     	ldr	x0, [x0, #0x670]
+ aafa560: 96e1addb     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ aafa564: 90009980     	adrp	x0, 0xbe2a000
+ aafa568: f9450000     	ldr	x0, [x0, #0xa00]
+ aafa56c: 96e1add8     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ aafa570: b0009ac0     	adrp	x0, 0xbe53000
+ aafa574: f9441000     	ldr	x0, [x0, #0x820]
+ aafa578: 96e1add5     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ aafa57c: 90009980     	adrp	x0, 0xbe2a000
+ aafa580: f947a400     	ldr	x0, [x0, #0xf48]
+ aafa584: 96e1add2     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ aafa588: f0009ac0     	adrp	x0, 0xbe55000
+ aafa58c: f940e800     	ldr	x0, [x0, #0x1d0]
+ aafa590: 96e1adcf     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ aafa594: d0009ae0     	adrp	x0, 0xbe58000
+ aafa598: f9438000     	ldr	x0, [x0, #0x700]
+ aafa59c: 96e1adcc     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ aafa5a0: 52800028     	mov	w8, #0x1                // =1
+ aafa5a4: 392882c8     	strb	w8, [x22, #0xa20]
+ aafa5a8: d0009fdb     	adrp	x27, 0xbef4000
+ aafa5ac: b000a048     	adrp	x8, 0xbf03000
+ aafa5b0: 90009996     	adrp	x22, 0xbe2a000
+ aafa5b4: f9424b7b     	ldr	x27, [x27, #0x490]
+ aafa5b8: f9414508     	ldr	x8, [x8, #0x288]
+ aafa5bc: 9000a01a     	adrp	x26, 0xbefa000

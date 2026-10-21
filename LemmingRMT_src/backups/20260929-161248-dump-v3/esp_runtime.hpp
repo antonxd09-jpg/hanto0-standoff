@@ -1,0 +1,730 @@
+#pragma once
+
+#include "game_offsets.hpp"
+
+#include <algorithm>
+#include <array>
+#include <atomic>
+#include <chrono>
+#include <cmath>
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
+#include <dlfcn.h>
+#include <string>
+#include <vector>
+
+#include <android/log.h>
+
+namespace lemming::esp {
+
+inline constexpr const char* kLogTag = "LemmingRMT";
+
+struct ScreenBox {
+    float left;
+    float top;
+    float right;
+    float bottom;
+    bool enemy;
+};
+
+struct Vec3 {
+    float x;
+    float y;
+    float z;
+};
+
+struct Quaternion {
+    float x;
+    float y;
+    float z;
+    float w;
+};
+
+enum class Status : int {
+    WaitingForUnity = 0,
+    UnsupportedArchitecture,
+    ApiUnavailable,
+    TypeInfoUnavailable,
+    IcallUnavailable,
+    ScanningPlayers,
+    WaitingForMatch,
+    Active
+};
+
+inline std::atomic<int> g_status{static_cast<int>(Status::WaitingForUnity)};
+inline std::atomic<int> g_playerCount{0};
+inline std::atomic<std::uint64_t> g_initAttempts{0};
+inline std::atomic<std::uint64_t> g_scanCycles{0};
+inline std::atomic<std::uint64_t> g_scannedBytes{0};
+inline std::atomic<int> g_candidateCount{0};
+inline std::atomic<int> g_projectedCount{0};
+
+inline const char* statusTextFor(Status value) {
+    switch (value) {
+        case Status::WaitingForUnity: return "Ожидание libunity";
+        case Status::UnsupportedArchitecture: return "ESP поддерживает только ARM64";
+        case Status::ApiUnavailable: return "IL2CPP API не найден";
+        case Status::TypeInfoUnavailable: return "TypeInfo игрока ещё не готов";
+        case Status::IcallUnavailable: return "Unity ICall не найден";
+        case Status::ScanningPlayers: return "Поиск объектов игроков";
+        case Status::WaitingForMatch: return "Ожидание матча";
+        case Status::Active: return "Базовый ESP активен";
+    }
+    return "ESP: неизвестное состояние";
+}
+
+inline const char* statusText() {
+    return statusTextFor(static_cast<Status>(g_status.load(std::memory_order_relaxed)));
+}
+
+inline void setStatus(Status value, const char* detail = nullptr) {
+    const int next = static_cast<int>(value);
+    const int previous = g_status.exchange(next, std::memory_order_relaxed);
+    if (previous != next) {
+        __android_log_print(ANDROID_LOG_INFO, kLogTag, "ESP status: %s%s%s",
+                            statusTextFor(value), detail ? " | " : "", detail ? detail : "");
+    }
+}
+
+inline int playerCount() {
+    return g_playerCount.load(std::memory_order_relaxed);
+}
+
+namespace detail {
+
+constexpr std::size_t kPtr = sizeof(void*);
+
+struct MapRange {
+    std::uintptr_t begin;
+    std::uintptr_t end;
+    bool readable;
+    bool writable;
+    bool scanEligible;
+};
+
+inline std::vector<MapRange> g_maps;
+inline std::chrono::steady_clock::time_point g_lastMapRefresh{};
+inline std::uint64_t g_mapGeneration = 0;
+
+inline void refreshMaps(bool force = false) {
+    const auto now = std::chrono::steady_clock::now();
+    if (!force && !g_maps.empty() && now - g_lastMapRefresh < std::chrono::seconds(2)) return;
+
+    std::vector<MapRange> next;
+    if (FILE* file = std::fopen("/proc/self/maps", "r")) {
+        char line[768];
+        while (std::fgets(line, sizeof(line), file)) {
+            unsigned long long begin = 0;
+            unsigned long long end = 0;
+            char perms[5]{};
+            if (std::sscanf(line, "%llx-%llx %4s", &begin, &end, perms) != 3 || begin >= end) continue;
+            const bool readable = perms[0] == 'r';
+            const bool writable = perms[1] == 'w';
+            const bool isPrivate = perms[3] == 'p';
+            const bool fileBacked = std::strchr(line, '/') != nullptr;
+            const bool stack = std::strstr(line, "[stack") != nullptr;
+            const bool device = std::strstr(line, "/dev/") != nullptr;
+            const auto size = static_cast<std::uint64_t>(end - begin);
+            const bool eligible = readable && writable && isPrivate && !fileBacked && !stack && !device &&
+                                  size >= 0x1000 && size <= (512ull * 1024ull * 1024ull);
+            next.push_back({static_cast<std::uintptr_t>(begin), static_cast<std::uintptr_t>(end),
+                            readable, writable, eligible});
+        }
+        std::fclose(file);
+    }
+    if (!next.empty()) {
+        g_maps.swap(next);
+        ++g_mapGeneration;
+    }
+    g_lastMapRefresh = now;
+}
+
+inline bool readable(const void* pointer, std::size_t bytes = 1) {
+    if (!pointer || bytes == 0) return false;
+    const auto address = reinterpret_cast<std::uintptr_t>(pointer);
+    if (address < 0x10000 || address + bytes < address) return false;
+    for (const auto& range : g_maps) {
+        if (range.readable && address >= range.begin && address + bytes <= range.end) return true;
+    }
+    return false;
+}
+
+template <typename T>
+inline bool readValue(const void* address, T& value) {
+    if (!readable(address, sizeof(T))) return false;
+    std::memcpy(&value, address, sizeof(T));
+    return true;
+}
+
+inline void* readObject(const void* address) {
+    void* value = nullptr;
+    if (!readValue(address, value) || !readable(value, kPtr)) return nullptr;
+    return value;
+}
+
+struct Api {
+    using DomainGet = void* (*)();
+    using DomainAssemblyOpen = void* (*)(void*, const char*);
+    using AssemblyGetImage = void* (*)(void*);
+    using ClassFromName = void* (*)(void*, const char*, const char*);
+    using ClassGetFields = void* (*)(void*, void**);
+    using ClassGetName = const char* (*)(void*);
+    using ClassGetParent = void* (*)(void*);
+    using FieldGetOffset = std::size_t (*)(void*);
+    using FieldGetType = void* (*)(void*);
+    using TypeGetName = char* (*)(void*);
+    using Free = void (*)(void*);
+    using ResolveIcall = void* (*)(const char*);
+    using ThreadAttach = void* (*)(void*);
+
+    DomainGet domainGet{};
+    DomainAssemblyOpen domainAssemblyOpen{};
+    AssemblyGetImage assemblyGetImage{};
+    ClassFromName classFromName{};
+    ClassGetFields classGetFields{};
+    ClassGetName classGetName{};
+    ClassGetParent classGetParent{};
+    FieldGetOffset fieldGetOffset{};
+    FieldGetType fieldGetType{};
+    TypeGetName typeGetName{};
+    Free freeFn{};
+    ResolveIcall resolveIcall{};
+    ThreadAttach threadAttach{};
+};
+
+struct Runtime {
+    std::uintptr_t unityBase{};
+    bool ready{};
+    Api api{};
+    void* domain{};
+    void* playerClass{};
+    void* transformsClass{};
+    void* modelClass{};
+
+    using CameraMainFn = std::uintptr_t (*)();
+    using WorldToScreenFn = void (*)(std::uintptr_t, const Vec3*, int, Vec3*);
+    using TransformPositionFn = void (*)(std::uintptr_t, Vec3*);
+    using TransformPositionRotationFn = void (*)(std::uintptr_t, Vec3*, Quaternion*);
+    using ComponentTransformFn = std::uintptr_t (*)(std::uintptr_t);
+
+    CameraMainFn cameraMain{};
+    WorldToScreenFn worldToScreen{};
+    TransformPositionFn transformPosition{};
+    TransformPositionRotationFn transformPositionRotation{};
+    ComponentTransformFn componentTransform{};
+};
+
+inline Runtime g_runtime;
+inline std::chrono::steady_clock::time_point g_lastRetry{};
+inline std::chrono::steady_clock::time_point g_lastFrame{};
+inline std::chrono::steady_clock::time_point g_lastFrameLog{};
+
+template <typename T>
+inline T resolveSymbol(void* unity, const char* name) {
+    if (unity) {
+        if (void* value = dlsym(unity, name)) return reinterpret_cast<T>(value);
+    }
+    if (void* value = dlsym(RTLD_DEFAULT, name)) return reinterpret_cast<T>(value);
+    return nullptr;
+}
+
+template <typename T>
+inline T resolveApi(void* unity, const char* name, std::uintptr_t base, std::uintptr_t rva) {
+    if (T symbol = resolveSymbol<T>(unity, name)) return symbol;
+#if defined(__aarch64__)
+    if (base && rva >= offsets::elf::kTextBegin && rva < offsets::elf::kTextEnd) {
+        return reinterpret_cast<T>(base + rva);
+    }
+#else
+    (void)base;
+    (void)rva;
+#endif
+    return nullptr;
+}
+
+template <typename T>
+inline T resolveIcallAny(std::initializer_list<const char*> names) {
+    if (!g_runtime.api.resolveIcall) return nullptr;
+    for (const char* name : names) {
+        if (void* result = g_runtime.api.resolveIcall(name)) return reinterpret_cast<T>(result);
+    }
+    return nullptr;
+}
+
+inline void* objectClass(void* object) {
+    return object ? readObject(object) : nullptr;
+}
+
+inline const char* className(void* klass) {
+    if (!klass || !g_runtime.api.classGetName || !readable(klass, 0x20)) return nullptr;
+    return g_runtime.api.classGetName(klass);
+}
+
+inline bool nameEquals(const char* value, const char* expected) {
+    return value && expected && std::strcmp(value, expected) == 0;
+}
+
+inline bool nameContains(const char* value, const char* token) {
+    return value && token && std::strstr(value, token) != nullptr;
+}
+
+inline void* findClass(const std::vector<const char*>& assemblies, const char* namespaze, const char* name) {
+    for (const char* assemblyName : assemblies) {
+        void* assembly = g_runtime.api.domainAssemblyOpen(g_runtime.domain, assemblyName);
+        if (!assembly) continue;
+        void* image = g_runtime.api.assemblyGetImage(assembly);
+        if (!image) continue;
+        if (void* klass = g_runtime.api.classFromName(image, namespaze, name)) return klass;
+    }
+    return nullptr;
+}
+
+inline void* classFromSlot(std::uintptr_t rva, const char* expectedName) {
+#if !defined(__aarch64__)
+    (void)rva;
+    (void)expectedName;
+    return nullptr;
+#else
+    void* klass = readObject(reinterpret_cast<void*>(g_runtime.unityBase + rva));
+    if (!klass || !readObject(klass)) return nullptr;
+    const char* name = className(klass);
+    if (expectedName && !nameEquals(name, expectedName)) return nullptr;
+    return klass;
+#endif
+}
+
+inline bool readPosition(std::uintptr_t transform, Vec3& position) {
+    position = {};
+    if (!transform) return false;
+    if (g_runtime.transformPosition) {
+        g_runtime.transformPosition(transform, &position);
+    } else if (g_runtime.transformPositionRotation) {
+        Quaternion rotation{};
+        g_runtime.transformPositionRotation(transform, &position, &rotation);
+    } else {
+        return false;
+    }
+    return std::isfinite(position.x) && std::isfinite(position.y) && std::isfinite(position.z) &&
+           std::fabs(position.x) < 100000.0f && std::fabs(position.y) < 100000.0f &&
+           std::fabs(position.z) < 100000.0f;
+}
+
+inline bool initialize(std::uintptr_t unityBase) {
+    ++g_initAttempts;
+    refreshMaps(true);
+    g_runtime = Runtime{};
+    g_runtime.unityBase = unityBase;
+
+#if !defined(__aarch64__)
+    setStatus(Status::UnsupportedArchitecture);
+    return false;
+#else
+    if (!unityBase) {
+        setStatus(Status::WaitingForUnity);
+        return false;
+    }
+
+    void* unity = dlopen("libunity.so", RTLD_NOW | RTLD_LOCAL);
+    auto& api = g_runtime.api;
+    using namespace offsets::il2cpp_api;
+    api.domainGet = resolveApi<Api::DomainGet>(unity, "il2cpp_domain_get", unityBase, kDomainGet);
+    api.domainAssemblyOpen = resolveApi<Api::DomainAssemblyOpen>(unity, "il2cpp_domain_assembly_open", unityBase, kDomainAssemblyOpen);
+    api.assemblyGetImage = resolveApi<Api::AssemblyGetImage>(unity, "il2cpp_assembly_get_image", unityBase, kAssemblyGetImage);
+    api.classFromName = resolveApi<Api::ClassFromName>(unity, "il2cpp_class_from_name", unityBase, kClassFromName);
+    api.classGetFields = resolveApi<Api::ClassGetFields>(unity, "il2cpp_class_get_fields", unityBase, kClassGetFields);
+    api.classGetName = resolveApi<Api::ClassGetName>(unity, "il2cpp_class_get_name", unityBase, kClassGetName);
+    api.classGetParent = resolveApi<Api::ClassGetParent>(unity, "il2cpp_class_get_parent", unityBase, kClassGetParent);
+    api.fieldGetOffset = resolveApi<Api::FieldGetOffset>(unity, "il2cpp_field_get_offset", unityBase, kFieldGetOffset);
+    api.fieldGetType = resolveApi<Api::FieldGetType>(unity, "il2cpp_field_get_type", unityBase, kFieldGetType);
+    api.typeGetName = resolveApi<Api::TypeGetName>(unity, "il2cpp_type_get_name", unityBase, kTypeGetName);
+    api.freeFn = resolveApi<Api::Free>(unity, "il2cpp_free", unityBase, kFree);
+    api.resolveIcall = resolveApi<Api::ResolveIcall>(unity, "il2cpp_resolve_icall", unityBase, kResolveIcall);
+    api.threadAttach = resolveApi<Api::ThreadAttach>(unity, "il2cpp_thread_attach", unityBase, kThreadAttach);
+
+    if (!api.domainGet || !api.domainAssemblyOpen || !api.assemblyGetImage || !api.classFromName ||
+        !api.classGetFields || !api.classGetName || !api.classGetParent || !api.fieldGetOffset ||
+        !api.fieldGetType || !api.typeGetName || !api.resolveIcall || !api.threadAttach) {
+        setStatus(Status::ApiUnavailable, "required functions missing");
+        return false;
+    }
+
+    g_runtime.domain = api.domainGet();
+    if (!g_runtime.domain) {
+        setStatus(Status::ApiUnavailable, "domain is null");
+        return false;
+    }
+    api.threadAttach(g_runtime.domain);
+
+    g_runtime.playerClass = classFromSlot(offsets::typeinfo::kPlayer, "ake");
+    g_runtime.transformsClass = classFromSlot(offsets::typeinfo::kTransforms, "dwc");
+    g_runtime.modelClass = classFromSlot(offsets::typeinfo::kModel, "jgi");
+
+    if (!g_runtime.playerClass) {
+        const std::vector<const char*> images = {
+            "Axlebolt.Standoff.Game.dll", "Axlebolt.Standoff.Game",
+            "Axlebolt.Standoff.Gameplay.Player.dll", "Axlebolt.Standoff.Gameplay.Player",
+            "Assembly-CSharp.dll", "Assembly-CSharp"
+        };
+        g_runtime.playerClass = findClass(images, "", "ake");
+    }
+    if (!g_runtime.playerClass) {
+        setStatus(Status::TypeInfoUnavailable, "ake class not initialized");
+        return false;
+    }
+
+    g_runtime.cameraMain = resolveIcallAny<Runtime::CameraMainFn>({
+        "UnityEngine.Camera::get_main_Injected()", "UnityEngine.Camera::get_main_Injected"
+    });
+    g_runtime.worldToScreen = resolveIcallAny<Runtime::WorldToScreenFn>({
+        "UnityEngine.Camera::WorldToScreenPoint_Injected(System.IntPtr,UnityEngine.Vector3&,UnityEngine.Camera/MonoOrStereoscopicEye,UnityEngine.Vector3&)",
+        "UnityEngine.Camera::WorldToScreenPoint_Injected"
+    });
+    g_runtime.transformPosition = resolveIcallAny<Runtime::TransformPositionFn>({
+        "UnityEngine.Transform::get_position_Injected(System.IntPtr,UnityEngine.Vector3&)",
+        "UnityEngine.Transform::get_position_Injected"
+    });
+    g_runtime.componentTransform = resolveIcallAny<Runtime::ComponentTransformFn>({
+        "UnityEngine.Component::get_transform_Injected(System.IntPtr)",
+        "UnityEngine.Component::get_transform_Injected"
+    });
+
+    if (!g_runtime.cameraMain) {
+        g_runtime.cameraMain = reinterpret_cast<Runtime::CameraMainFn>(unityBase + offsets::unity::kCameraGetMain);
+    }
+    if (!g_runtime.worldToScreen) {
+        g_runtime.worldToScreen = reinterpret_cast<Runtime::WorldToScreenFn>(unityBase + offsets::unity::kCameraWorldToScreen);
+    }
+    if (!g_runtime.componentTransform) {
+        g_runtime.componentTransform = reinterpret_cast<Runtime::ComponentTransformFn>(unityBase + offsets::unity::kComponentGetTransform);
+    }
+    if (!g_runtime.transformPosition) {
+        g_runtime.transformPositionRotation = reinterpret_cast<Runtime::TransformPositionRotationFn>(
+            unityBase + offsets::unity::kTransformGetPositionAndRotation);
+    }
+
+    if (!g_runtime.cameraMain || !g_runtime.worldToScreen || !g_runtime.componentTransform ||
+        (!g_runtime.transformPosition && !g_runtime.transformPositionRotation)) {
+        setStatus(Status::IcallUnavailable, "camera/transform helper missing");
+        return false;
+    }
+
+    g_runtime.ready = true;
+    setStatus(Status::ScanningPlayers);
+    __android_log_print(ANDROID_LOG_INFO, kLogTag,
+                        "ESP resolver ready: base=%p playerClass=%p transforms=%p model=%p",
+                        reinterpret_cast<void*>(unityBase), g_runtime.playerClass,
+                        g_runtime.transformsClass, g_runtime.modelClass);
+    return true;
+#endif
+}
+
+inline bool classMatches(void* object, void* expected) {
+    if (!object || !expected) return false;
+    void* klass = objectClass(object);
+    for (std::size_t depth = 0; klass && depth < 12; ++depth) {
+        if (klass == expected) return true;
+        klass = g_runtime.api.classGetParent(klass);
+    }
+    return false;
+}
+
+inline std::string fieldTypeName(void* field) {
+    if (!field) return {};
+    void* type = g_runtime.api.fieldGetType(field);
+    if (!type) return {};
+    char* raw = g_runtime.api.typeGetName(type);
+    if (!raw) return {};
+    std::string result(raw);
+    if (g_runtime.api.freeFn) g_runtime.api.freeFn(raw);
+    return result;
+}
+
+inline bool followReferenceType(const std::string& typeName) {
+    static constexpr std::array<const char*, 16> tokens = {
+        "dwc", "jgi", "jsx", "pdd", "ake", "Player", "Character", "Binding",
+        "View", "Visual", "Controller", "Presenter", "Transform", "Model", "Rig", "Avatar"
+    };
+    for (const char* token : tokens) {
+        if (typeName.find(token) != std::string::npos) return true;
+    }
+    return false;
+}
+
+inline bool unityComponent(void* object) {
+    void* klass = objectClass(object);
+    for (std::size_t depth = 0; klass && depth < 16; ++depth) {
+        const char* name = className(klass);
+        if (nameEquals(name, "Component") || nameEquals(name, "Behaviour") ||
+            nameEquals(name, "MonoBehaviour") || nameEquals(name, "Transform")) return true;
+        klass = g_runtime.api.classGetParent(klass);
+    }
+    return false;
+}
+
+inline std::uintptr_t transformFromManaged(void* object, int depth,
+                                           std::array<void*, 12>& visited,
+                                           std::size_t& visitedCount) {
+    if (!object || depth > 4 || visitedCount >= visited.size()) return 0;
+    if (std::find(visited.begin(), visited.begin() + static_cast<std::ptrdiff_t>(visitedCount), object) !=
+        visited.begin() + static_cast<std::ptrdiff_t>(visitedCount)) return 0;
+    visited[visitedCount++] = object;
+
+    void* klass = objectClass(object);
+    const char* ownName = className(klass);
+    if (nameEquals(ownName, "Transform")) {
+        void* native = readObject(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(object) + 2 * kPtr));
+        return reinterpret_cast<std::uintptr_t>(native);
+    }
+    if (unityComponent(object)) {
+        void* native = readObject(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(object) + 2 * kPtr));
+        if (native) {
+            if (std::uintptr_t transform = g_runtime.componentTransform(reinterpret_cast<std::uintptr_t>(native))) {
+                return transform;
+            }
+        }
+    }
+
+    for (void* cursor = klass; cursor && depth <= 4; cursor = g_runtime.api.classGetParent(cursor)) {
+        void* iterator = nullptr;
+        for (std::size_t fieldIndex = 0; fieldIndex < 192; ++fieldIndex) {
+            void* field = g_runtime.api.classGetFields(cursor, &iterator);
+            if (!field) break;
+            const std::size_t offset = g_runtime.api.fieldGetOffset(field);
+            if (offset < 2 * kPtr || offset > 0x900) continue;
+            const std::string typeName = fieldTypeName(field);
+            if (typeName.empty()) continue;
+            void* child = readObject(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(object) + offset));
+            if (!child || !objectClass(child)) continue;
+
+            if (typeName.find("UnityEngine.Transform") != std::string::npos ||
+                nameEquals(className(objectClass(child)), "Transform")) {
+                void* native = readObject(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(child) + 2 * kPtr));
+                if (native) return reinterpret_cast<std::uintptr_t>(native);
+            }
+
+            const bool knownPart = objectClass(child) == g_runtime.transformsClass ||
+                                   objectClass(child) == g_runtime.modelClass;
+            if (depth < 4 && (knownPart || followReferenceType(typeName))) {
+                if (std::uintptr_t nested = transformFromManaged(child, depth + 1, visited, visitedCount)) {
+                    return nested;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+inline std::uintptr_t transformFromManaged(void* object) {
+    std::array<void*, 12> visited{};
+    std::size_t count = 0;
+    return transformFromManaged(object, 0, visited, count);
+}
+
+inline std::size_t g_scanRangeIndex = 0;
+inline std::uintptr_t g_scanAddress = 0;
+inline std::uint64_t g_scanMapGeneration = 0;
+inline std::vector<void*> g_scanStaging;
+inline std::vector<void*> g_playerObjects;
+inline std::chrono::steady_clock::time_point g_scanPauseUntil{};
+
+inline void resetScan() {
+    g_scanRangeIndex = 0;
+    g_scanAddress = 0;
+    g_scanStaging.clear();
+    g_scanMapGeneration = g_mapGeneration;
+}
+
+inline bool likelyObjectAt(std::uintptr_t address, void* expectedClass, const MapRange& range) {
+    if (address + 2 * kPtr > range.end) return false;
+    std::uintptr_t klass = 0;
+    std::uintptr_t monitor = 0;
+    std::memcpy(&klass, reinterpret_cast<const void*>(address), kPtr);
+    if (klass != reinterpret_cast<std::uintptr_t>(expectedClass)) return false;
+    std::memcpy(&monitor, reinterpret_cast<const void*>(address + kPtr), kPtr);
+    return monitor == 0 || readable(reinterpret_cast<void*>(monitor), kPtr);
+}
+
+inline void completeScanCycle() {
+    std::sort(g_scanStaging.begin(), g_scanStaging.end());
+    g_scanStaging.erase(std::unique(g_scanStaging.begin(), g_scanStaging.end()), g_scanStaging.end());
+    if (g_scanStaging.size() > 128) g_scanStaging.resize(128);
+    g_playerObjects = g_scanStaging;
+    g_candidateCount.store(static_cast<int>(g_playerObjects.size()), std::memory_order_relaxed);
+    const auto cycle = g_scanCycles.fetch_add(1, std::memory_order_relaxed) + 1;
+    __android_log_print(ANDROID_LOG_INFO, kLogTag,
+                        "ESP heap scan complete: cycle=%llu candidates=%zu totalMiB=%.1f",
+                        static_cast<unsigned long long>(cycle), g_playerObjects.size(),
+                        static_cast<double>(g_scannedBytes.load(std::memory_order_relaxed)) / 1048576.0);
+    g_scanPauseUntil = std::chrono::steady_clock::now() + std::chrono::seconds(2);
+    resetScan();
+}
+
+inline void scanPlayersStep(std::size_t budgetBytes = 1024 * 1024) {
+    if (!g_runtime.playerClass || g_maps.empty()) return;
+    const auto now = std::chrono::steady_clock::now();
+    if (now < g_scanPauseUntil) return;
+    if (g_scanMapGeneration != g_mapGeneration) resetScan();
+
+    std::size_t consumed = 0;
+    while (consumed < budgetBytes && g_scanRangeIndex < g_maps.size()) {
+        const MapRange& range = g_maps[g_scanRangeIndex];
+        if (!range.scanEligible) {
+            ++g_scanRangeIndex;
+            g_scanAddress = 0;
+            continue;
+        }
+
+        std::uintptr_t cursor = g_scanAddress ? g_scanAddress : (range.begin + (kPtr - 1)) & ~(kPtr - 1);
+        if (cursor < range.begin) cursor = range.begin;
+        const std::size_t remainingBudget = budgetBytes - consumed;
+        const std::uintptr_t chunkEnd = std::min(range.end, cursor + remainingBudget);
+        const std::uintptr_t safeEnd = chunkEnd > 2 * kPtr ? chunkEnd - 2 * kPtr : cursor;
+
+        for (; cursor <= safeEnd; cursor += kPtr) {
+            if (likelyObjectAt(cursor, g_runtime.playerClass, range)) {
+                void* candidate = reinterpret_cast<void*>(cursor);
+                if (std::find(g_scanStaging.begin(), g_scanStaging.end(), candidate) == g_scanStaging.end()) {
+                    g_scanStaging.push_back(candidate);
+                    if (g_scanStaging.size() >= 128) break;
+                }
+            }
+        }
+
+        const std::size_t scanned = chunkEnd > g_scanAddress ?
+            static_cast<std::size_t>(chunkEnd - (g_scanAddress ? g_scanAddress : range.begin)) : 0;
+        consumed += scanned;
+        g_scannedBytes.fetch_add(scanned, std::memory_order_relaxed);
+
+        if (chunkEnd >= range.end || g_scanStaging.size() >= 128) {
+            ++g_scanRangeIndex;
+            g_scanAddress = 0;
+        } else {
+            g_scanAddress = chunkEnd;
+        }
+    }
+
+    if (g_scanRangeIndex >= g_maps.size()) completeScanCycle();
+}
+
+inline float distanceSquared(const Vec3& a, const Vec3& b) {
+    const float x = a.x - b.x;
+    const float y = a.y - b.y;
+    const float z = a.z - b.z;
+    return x * x + y * y + z * z;
+}
+
+inline bool project(std::uintptr_t camera, const Vec3& world, int width, int height, Vec3& screen) {
+    screen = {};
+    g_runtime.worldToScreen(camera, &world, 0, &screen);
+    if (!std::isfinite(screen.x) || !std::isfinite(screen.y) || !std::isfinite(screen.z) || screen.z <= 0.05f) {
+        return false;
+    }
+    screen.y = static_cast<float>(height) - screen.y;
+    return screen.x > -static_cast<float>(width) && screen.x < static_cast<float>(width) * 2.0f &&
+           screen.y > -static_cast<float>(height) && screen.y < static_cast<float>(height) * 2.0f;
+}
+
+inline bool produceBoxes(int width, int height, std::vector<ScreenBox>& boxes) {
+    boxes.clear();
+    scanPlayersStep();
+
+    if (g_playerObjects.empty()) {
+        g_playerCount.store(0, std::memory_order_relaxed);
+        g_projectedCount.store(0, std::memory_order_relaxed);
+        setStatus(g_scanCycles.load(std::memory_order_relaxed) ? Status::WaitingForMatch : Status::ScanningPlayers);
+        return true;
+    }
+
+    const std::uintptr_t camera = g_runtime.cameraMain();
+    if (!camera) {
+        setStatus(Status::WaitingForMatch, "main camera is null");
+        return true;
+    }
+
+    Vec3 cameraPosition{};
+    bool haveCameraPosition = false;
+    if (const std::uintptr_t cameraTransform = g_runtime.componentTransform(camera)) {
+        haveCameraPosition = readPosition(cameraTransform, cameraPosition);
+    }
+
+    int validPlayers = 0;
+    for (void* player : g_playerObjects) {
+        if (!classMatches(player, g_runtime.playerClass)) continue;
+        const std::uintptr_t transform = transformFromManaged(player);
+        if (!transform) continue;
+
+        Vec3 feet{};
+        if (!readPosition(transform, feet)) continue;
+        if (haveCameraPosition && distanceSquared(cameraPosition, feet) < 6.25f) continue;
+
+        const Vec3 head{feet.x, feet.y + offsets::managed::kFallbackPlayerHeight, feet.z};
+        Vec3 feetScreen{};
+        Vec3 headScreen{};
+        if (!project(camera, feet, width, height, feetScreen) ||
+            !project(camera, head, width, height, headScreen)) continue;
+
+        const float boxHeight = std::fabs(feetScreen.y - headScreen.y);
+        if (boxHeight < 8.0f || boxHeight > static_cast<float>(height) * 1.5f) continue;
+        const float boxWidth = boxHeight * 0.48f;
+        const float centerX = (feetScreen.x + headScreen.x) * 0.5f;
+        boxes.push_back({centerX - boxWidth * 0.5f, std::min(feetScreen.y, headScreen.y),
+                         centerX + boxWidth * 0.5f, std::max(feetScreen.y, headScreen.y), false});
+        ++validPlayers;
+        if (boxes.size() >= 64) break;
+    }
+
+    g_playerCount.store(validPlayers, std::memory_order_relaxed);
+    g_projectedCount.store(static_cast<int>(boxes.size()), std::memory_order_relaxed);
+    setStatus(boxes.empty() ? Status::WaitingForMatch : Status::Active);
+
+    const auto now = std::chrono::steady_clock::now();
+    if (now - g_lastFrameLog >= std::chrono::seconds(5)) {
+        g_lastFrameLog = now;
+        __android_log_print(ANDROID_LOG_INFO, kLogTag,
+                            "ESP frame: cached=%zu valid=%d projected=%zu camera=%p",
+                            g_playerObjects.size(), validPlayers, boxes.size(), reinterpret_cast<void*>(camera));
+    }
+    return true;
+}
+
+}  // namespace detail
+
+inline bool update(std::uintptr_t unityBase, int width, int height, std::vector<ScreenBox>& boxes) {
+    using namespace std::chrono;
+    const auto now = steady_clock::now();
+    detail::refreshMaps();
+
+    if (!detail::g_runtime.ready || detail::g_runtime.unityBase != unityBase) {
+        if (now - detail::g_lastRetry < seconds(1)) return false;
+        detail::g_lastRetry = now;
+        if (!detail::initialize(unityBase)) return false;
+    }
+
+    static thread_local bool attached = false;
+    if (!attached) {
+        detail::g_runtime.api.threadAttach(detail::g_runtime.domain);
+        attached = true;
+    }
+    if (now - detail::g_lastFrame < milliseconds(33)) return true;
+    detail::g_lastFrame = now;
+    return detail::produceBoxes(width, height, boxes);
+}
+
+inline bool ready() {
+    return detail::g_runtime.ready;
+}
+
+inline void logDiagnostics(const char* reason = "manual") {
+    __android_log_print(ANDROID_LOG_INFO, kLogTag,
+                        "ESP diagnostics[%s]: status=%s ready=%d init=%llu scans=%llu scannedMiB=%.1f candidates=%d players=%d projected=%d playerClass=%p",
+                        reason ? reason : "manual", statusText(), ready() ? 1 : 0,
+                        static_cast<unsigned long long>(g_initAttempts.load(std::memory_order_relaxed)),
+                        static_cast<unsigned long long>(g_scanCycles.load(std::memory_order_relaxed)),
+                        static_cast<double>(g_scannedBytes.load(std::memory_order_relaxed)) / 1048576.0,
+                        g_candidateCount.load(std::memory_order_relaxed),
+                        g_playerCount.load(std::memory_order_relaxed),
+                        g_projectedCount.load(std::memory_order_relaxed), detail::g_runtime.playerClass);
+}
+
+}  // namespace lemming::esp

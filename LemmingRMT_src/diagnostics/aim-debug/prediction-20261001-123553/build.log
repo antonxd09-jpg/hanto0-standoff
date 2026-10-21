@@ -1,0 +1,10 @@
+[arm64-v8a] Compile++      : lemmingrmt <= entry.cpp
+In file included from jni/src/core/entry.cpp:5:
+jni/src/features/aim/runtime.hpp:53:338: error: no matching function for call to 'visibilityAccept'
+   53 |  for(const auto& a:g_actors)if(reinterpret_cast<std::uintptr_t>(a.player)==target.player){auto point=a.motion.lead(target.point,now,s.predictionMs,angleMode?s.smoothing:0,s.prediction);auto delta=sub(point,origin);float n=length(delta);if(!finite(point)||!std::isfinite(n)||n<.2f||n>s.maxDistance)return target.point;if(s.visibleCheck&&!visibilityAccept(origin,point,const_cast<Actor*>(&a)))return target.point;return point;}
+      |                                                                                                                                                                                                                                                                                                                                                  ^~~~~~~~~~~~~~~~
+jni/src/features/aim/assist_runtime.hpp:25:13: note: candidate function not viable: requires 4 arguments, but 3 were provided
+   25 | inline bool visibilityAccept(void* context,std::uintptr_t player,Vec3 origin,Vec3 point){
+      |             ^                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+make: *** [/home/leftcode/Projects/android-ndk-r30-linux/android-ndk-r30/build/core/build-binary.mk:422: /home/leftcode/Projects/LemmingRMT/build/ndk/obj/local/arm64-v8a/objs/lemmingrmt/src/core/entry.o] Error 1

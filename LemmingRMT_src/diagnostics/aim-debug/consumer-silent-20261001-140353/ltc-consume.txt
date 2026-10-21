@@ -1,0 +1,334 @@
+
+/home/leftcode/Projects/1.0.0 dump x64/extracted/libunity.so:	file format elf64-littleaarch64
+
+Disassembly of section .text:
+
+00000000056714d8 <UnityShutdown>:
+ 948b758: d10143ff     	sub	sp, sp, #0x50
+ 948b75c: 6d0223e9     	stp	d9, d8, [sp, #0x20]
+ 948b760: a90357fe     	stp	x30, x21, [sp, #0x30]
+ 948b764: a9044ff4     	stp	x20, x19, [sp, #0x40]
+ 948b768: 1e204028     	fmov	s8, s1
+ 948b76c: 1e204009     	fmov	s9, s0
+ 948b770: 90018815     	adrp	x21, 0xc58b000
+ 948b774: 39697ea8     	ldrb	w8, [x21, #0xa5f]
+ 948b778: aa0103f4     	mov	x20, x1
+ 948b77c: aa0003f3     	mov	x19, x0
+ 948b780: 370000c8     	tbnz	w8, #0x0, 0x948b798 <UnityShutdown+0x3e1a2c0>
+ 948b784: f0016bc0     	adrp	x0, 0xc206000
+ 948b788: 91354000     	add	x0, x0, #0xd50
+ 948b78c: 973b6950     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b790: 52800028     	mov	w8, #0x1                // =1
+ 948b794: 39297ea8     	strb	w8, [x21, #0xa5f]
+ 948b798: 910023e0     	add	x0, sp, #0x8
+ 948b79c: aa1303e1     	mov	x1, x19
+ 948b7a0: a9017fff     	stp	xzr, xzr, [sp, #0x10]
+ 948b7a4: 910023f5     	add	x21, sp, #0x8
+ 948b7a8: f90007f3     	str	x19, [sp, #0x8]
+ 948b7ac: 973b692f     	bl	0x6365c68 <UnityShutdown+0xcf4790>
+ 948b7b0: 910022a0     	add	x0, x21, #0x8
+ 948b7b4: aa1403e1     	mov	x1, x20
+ 948b7b8: f9000bf4     	str	x20, [sp, #0x10]
+ 948b7bc: 973b692b     	bl	0x6365c68 <UnityShutdown+0xcf4790>
+ 948b7c0: f9400be8     	ldr	x8, [sp, #0x10]
+ 948b7c4: 2d0323e9     	stp	s9, s8, [sp, #0x18]
+ 948b7c8: b4000688     	cbz	x8, 0x948b898 <UnityShutdown+0x3e1a3c0>
+ 948b7cc: b9401100     	ldr	w0, [x8, #0x10]
+ 948b7d0: aa1f03e1     	mov	x1, xzr
+ 948b7d4: 974d6fa9     	bl	0x67e7678 <UnityShutdown+0x11761a0>
+ 948b7d8: 3940a268     	ldrb	w8, [x19, #0x28]
+ 948b7dc: 340000a8     	cbz	w8, 0x948b7f0 <UnityShutdown+0x3e1a318>
+ 948b7e0: 910023e1     	add	x1, sp, #0x8
+ 948b7e4: aa1303e0     	mov	x0, x19
+ 948b7e8: 9400002d     	bl	0x948b89c <UnityShutdown+0x3e1a3c4>
+ 948b7ec: 14000022     	b	0x948b874 <UnityShutdown+0x3e1a39c>
+ 948b7f0: f9402a75     	ldr	x21, [x19, #0x50]
+ 948b7f4: b4000535     	cbz	x21, 0x948b898 <UnityShutdown+0x3e1a3c0>
+ 948b7f8: f9402274     	ldr	x20, [x19, #0x40]
+ 948b7fc: b40004f4     	cbz	x20, 0x948b898 <UnityShutdown+0x3e1a3c0>
+ 948b800: d0014e4a     	adrp	x10, 0xbe55000
+ 948b804: f9400288     	ldr	x8, [x20]
+ 948b808: f9468d4a     	ldr	x10, [x10, #0xd18]
+ 948b80c: 7940cd09     	ldrh	w9, [x8, #0x66]
+ 948b810: f9400141     	ldr	x1, [x10]
+ 948b814: b4000129     	cbz	x9, 0x948b838 <UnityShutdown+0x3e1a360>
+ 948b818: f940250a     	ldr	x10, [x8, #0x48]
+ 948b81c: 9100214a     	add	x10, x10, #0x8
+ 948b820: f85f814b     	ldur	x11, [x10, #-0x8]
+ 948b824: eb01017f     	cmp	x11, x1
+ 948b828: 54000100     	b.eq	0x948b848 <UnityShutdown+0x3e1a370>
+ 948b82c: f1000529     	subs	x9, x9, #0x1
+ 948b830: 9100414a     	add	x10, x10, #0x10
+ 948b834: 54ffff61     	b.ne	0x948b820 <UnityShutdown+0x3e1a348>
+ 948b838: aa1403e0     	mov	x0, x20
+ 948b83c: 52800022     	mov	w2, #0x1                // =1
+ 948b840: 947992db     	bl	0xb2f03ac <UnityShutdown+0x5c7eed4>
+ 948b844: 14000005     	b	0x948b858 <UnityShutdown+0x3e1a380>
+ 948b848: b9400149     	ldr	w9, [x10]
+ 948b84c: 11000529     	add	w9, w9, #0x1
+ 948b850: 8b29d108     	add	x8, x8, w9, sxtw #4
+ 948b854: 91068100     	add	x0, x8, #0x1a0
+ 948b858: a9400808     	ldp	x8, x2, [x0]
+ 948b85c: 9100c2a1     	add	x1, x21, #0x30
+ 948b860: aa1403e0     	mov	x0, x20
+ 948b864: d63f0100     	blr	x8
+ 948b868: f9400be1     	ldr	x1, [sp, #0x10]
+ 948b86c: aa1303e0     	mov	x0, x19
+ 948b870: 940002c6     	bl	0x948c388 <UnityShutdown+0x3e1aeb0>
+ 948b874: f9402a68     	ldr	x8, [x19, #0x50]
+ 948b878: b4000108     	cbz	x8, 0x948b898 <UnityShutdown+0x3e1a3c0>
+ 948b87c: a9444ff4     	ldp	x20, x19, [sp, #0x40]
+ 948b880: 52800029     	mov	w9, #0x1                // =1
+ 948b884: a94357fe     	ldp	x30, x21, [sp, #0x30]
+ 948b888: 39030109     	strb	w9, [x8, #0xc0]
+ 948b88c: 6d4223e9     	ldp	d9, d8, [sp, #0x20]
+ 948b890: 910143ff     	add	sp, sp, #0x50
+ 948b894: d65f03c0     	ret
+ 948b898: 973b69b6     	bl	0x6365f70 <UnityShutdown+0xcf4a98>
+ 948b89c: d10783ff     	sub	sp, sp, #0x1e0
+ 948b8a0: f900c3fd     	str	x29, [sp, #0x180]
+ 948b8a4: a9196ffe     	stp	x30, x27, [sp, #0x190]
+ 948b8a8: a91a67fa     	stp	x26, x25, [sp, #0x1a0]
+ 948b8ac: a91b5ff8     	stp	x24, x23, [sp, #0x1b0]
+ 948b8b0: a91c57f6     	stp	x22, x21, [sp, #0x1c0]
+ 948b8b4: a91d4ff4     	stp	x20, x19, [sp, #0x1d0]
+ 948b8b8: 90018815     	adrp	x21, 0xc58b000
+ 948b8bc: aa0103f4     	mov	x20, x1
+ 948b8c0: aa0003f3     	mov	x19, x0
+ 948b8c4: 396a62a8     	ldrb	w8, [x21, #0xa98]
+ 948b8c8: 910283fa     	add	x26, sp, #0xa0
+ 948b8cc: 37000d88     	tbnz	w8, #0x0, 0x948ba7c <UnityShutdown+0x3e1a5a4>
+ 948b8d0: 90014ec0     	adrp	x0, 0xbe63000
+ 948b8d4: f9412c00     	ldr	x0, [x0, #0x258]
+ 948b8d8: 973b68fd     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b8dc: 90014ec0     	adrp	x0, 0xbe63000
+ 948b8e0: f9416800     	ldr	x0, [x0, #0x2d0]
+ 948b8e4: 973b68fa     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b8e8: d0014d00     	adrp	x0, 0xbe2d000
+ 948b8ec: f9448800     	ldr	x0, [x0, #0x910]
+ 948b8f0: 973b68f7     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b8f4: d00150a0     	adrp	x0, 0xbea1000
+ 948b8f8: f9454c00     	ldr	x0, [x0, #0xa98]
+ 948b8fc: 973b68f4     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b900: b0014d40     	adrp	x0, 0xbe34000
+ 948b904: f9450800     	ldr	x0, [x0, #0xa10]
+ 948b908: 973b68f1     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b90c: d0014de0     	adrp	x0, 0xbe49000
+ 948b910: f945a000     	ldr	x0, [x0, #0xb40]
+ 948b914: 973b68ee     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b918: d00150e0     	adrp	x0, 0xbea9000
+ 948b91c: f9464000     	ldr	x0, [x0, #0xc80]
+ 948b920: 973b68eb     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b924: d00150e0     	adrp	x0, 0xbea9000
+ 948b928: f946c000     	ldr	x0, [x0, #0xd80]
+ 948b92c: 973b68e8     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b930: d00150e0     	adrp	x0, 0xbea9000
+ 948b934: f946e000     	ldr	x0, [x0, #0xdc0]
+ 948b938: 973b68e5     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b93c: d00150e0     	adrp	x0, 0xbea9000
+ 948b940: f946f000     	ldr	x0, [x0, #0xde0]
+ 948b944: 973b68e2     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b948: 90014e00     	adrp	x0, 0xbe4b000
+ 948b94c: f945bc00     	ldr	x0, [x0, #0xb78]
+ 948b950: 973b68df     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b954: 90015000     	adrp	x0, 0xbe8b000
+ 948b958: f9405000     	ldr	x0, [x0, #0xa0]
+ 948b95c: 973b68dc     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b960: 90015000     	adrp	x0, 0xbe8b000
+ 948b964: f9405400     	ldr	x0, [x0, #0xa8]
+ 948b968: 973b68d9     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b96c: f00151c0     	adrp	x0, 0xbec6000
+ 948b970: f9443c00     	ldr	x0, [x0, #0x878]
+ 948b974: 973b68d6     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b978: d0014ea0     	adrp	x0, 0xbe61000
+ 948b97c: f9408000     	ldr	x0, [x0, #0x100]
+ 948b980: 973b68d3     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b984: 90015200     	adrp	x0, 0xbecb000
+ 948b988: f947d400     	ldr	x0, [x0, #0xfa8]
+ 948b98c: 973b68d0     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b990: d00152c0     	adrp	x0, 0xbee5000
+ 948b994: f944c000     	ldr	x0, [x0, #0x980]
+ 948b998: 973b68cd     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b99c: b0015220     	adrp	x0, 0xbed0000
+ 948b9a0: f9441400     	ldr	x0, [x0, #0x828]
+ 948b9a4: 973b68ca     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b9a8: b0015340     	adrp	x0, 0xbef4000
+ 948b9ac: f9469c00     	ldr	x0, [x0, #0xd38]
+ 948b9b0: 973b68c7     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b9b4: d0015220     	adrp	x0, 0xbed1000
+ 948b9b8: f9420c00     	ldr	x0, [x0, #0x418]
+ 948b9bc: 973b68c4     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b9c0: b0015200     	adrp	x0, 0xbecc000
+ 948b9c4: f9404c00     	ldr	x0, [x0, #0x98]
+ 948b9c8: 973b68c1     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b9cc: 90015200     	adrp	x0, 0xbecb000
+ 948b9d0: f947c400     	ldr	x0, [x0, #0xf88]
+ 948b9d4: 973b68be     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b9d8: d00152a0     	adrp	x0, 0xbee1000
+ 948b9dc: f9445800     	ldr	x0, [x0, #0x8b0]
+ 948b9e0: 973b68bb     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b9e4: b0015220     	adrp	x0, 0xbed0000
+ 948b9e8: f9456c00     	ldr	x0, [x0, #0xad8]
+ 948b9ec: 973b68b8     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b9f0: b0015340     	adrp	x0, 0xbef4000
+ 948b9f4: f9469800     	ldr	x0, [x0, #0xd30]
+ 948b9f8: 973b68b5     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948b9fc: 90015200     	adrp	x0, 0xbecb000
+ 948ba00: f9443c00     	ldr	x0, [x0, #0x878]
+ 948ba04: 973b68b2     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948ba08: b0015220     	adrp	x0, 0xbed0000
+ 948ba0c: f9451400     	ldr	x0, [x0, #0xa28]
+ 948ba10: 973b68af     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948ba14: b0015220     	adrp	x0, 0xbed0000
+ 948ba18: f9444400     	ldr	x0, [x0, #0x888]
+ 948ba1c: 973b68ac     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948ba20: 900153a0     	adrp	x0, 0xbeff000
+ 948ba24: f947b800     	ldr	x0, [x0, #0xf70]
+ 948ba28: 973b68a9     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948ba2c: b0015380     	adrp	x0, 0xbefc000
+ 948ba30: f940f800     	ldr	x0, [x0, #0x1f0]
+ 948ba34: 973b68a6     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948ba38: 90014e40     	adrp	x0, 0xbe53000
+ 948ba3c: f947dc00     	ldr	x0, [x0, #0xfb8]
+ 948ba40: 973b68a3     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948ba44: b0014e40     	adrp	x0, 0xbe54000
+ 948ba48: f9427400     	ldr	x0, [x0, #0x4e8]
+ 948ba4c: 973b68a0     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948ba50: d0015160     	adrp	x0, 0xbeb9000
+ 948ba54: f947a400     	ldr	x0, [x0, #0xf48]
+ 948ba58: 973b689d     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948ba5c: d0014e40     	adrp	x0, 0xbe55000
+ 948ba60: f941c000     	ldr	x0, [x0, #0x380]
+ 948ba64: 973b689a     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948ba68: d0014e40     	adrp	x0, 0xbe55000
+ 948ba6c: f9468c00     	ldr	x0, [x0, #0xd18]
+ 948ba70: 973b6897     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 948ba74: 52800028     	mov	w8, #0x1                // =1
+ 948ba78: 392a62a8     	strb	w8, [x21, #0xa98]
+ 948ba7c: 6f00e400     	movi	v0.2d, #0000000000000000
+ 948ba80: f9402a68     	ldr	x8, [x19, #0x50]
+ 948ba84: a9167fff     	stp	xzr, xzr, [sp, #0x160]
+ 948ba88: f900bbff     	str	xzr, [sp, #0x170]
+ 948ba8c: a9137fff     	stp	xzr, xzr, [sp, #0x130]
+ 948ba90: f90093ff     	str	xzr, [sp, #0x120]
+ 948ba94: ad020340     	stp	q0, q0, [x26, #0x40]
+ 948ba98: ad030340     	stp	q0, q0, [x26, #0x60]
+ 948ba9c: ad050340     	stp	q0, q0, [x26, #0xa0]
+ 948baa0: 3d800f40     	str	q0, [x26, #0x30]
+ 948baa4: a90c7fff     	stp	xzr, xzr, [sp, #0xc0]
+ 948baa8: 3902f3ff     	strb	wzr, [sp, #0xbc]
+ 948baac: a90a7fff     	stp	xzr, xzr, [sp, #0xa0]
+ 948bab0: b4003d28     	cbz	x8, 0x948c254 <UnityShutdown+0x3e1ad7c>
+ 948bab4: f9403d0a     	ldr	x10, [x8, #0x78]
+ 948bab8: b4003cea     	cbz	x10, 0x948c254 <UnityShutdown+0x3e1ad7c>
+ 948babc: f9403276     	ldr	x22, [x19, #0x60]
+ 948bac0: b4003cb6     	cbz	x22, 0x948c254 <UnityShutdown+0x3e1ad7c>
+ 948bac4: 90014e4b     	adrp	x11, 0xbe53000
+ 948bac8: f94002c8     	ldr	x8, [x22]
+ 948bacc: d0014d17     	adrp	x23, 0xbe2d000
+ 948bad0: f947dd6b     	ldr	x11, [x11, #0xfb8]
+ 948bad4: f9448af7     	ldr	x23, [x23, #0x910]
+ 948bad8: f9403155     	ldr	x21, [x10, #0x60]
+ 948badc: 7940cd09     	ldrh	w9, [x8, #0x66]
+ 948bae0: f9400161     	ldr	x1, [x11]
+ 948bae4: b4000129     	cbz	x9, 0x948bb08 <UnityShutdown+0x3e1a630>
+ 948bae8: f940250a     	ldr	x10, [x8, #0x48]
+ 948baec: 9100214a     	add	x10, x10, #0x8
+ 948baf0: f85f814b     	ldur	x11, [x10, #-0x8]
+ 948baf4: eb01017f     	cmp	x11, x1
+ 948baf8: 54000100     	b.eq	0x948bb18 <UnityShutdown+0x3e1a640>
+ 948bafc: f1000529     	subs	x9, x9, #0x1
+ 948bb00: 9100414a     	add	x10, x10, #0x10
+ 948bb04: 54ffff61     	b.ne	0x948baf0 <UnityShutdown+0x3e1a618>
+ 948bb08: aa1603e0     	mov	x0, x22
+ 948bb0c: 52800022     	mov	w2, #0x1                // =1
+ 948bb10: 94799227     	bl	0xb2f03ac <UnityShutdown+0x5c7eed4>
+ 948bb14: 14000005     	b	0x948bb28 <UnityShutdown+0x3e1a650>
+ 948bb18: b9400149     	ldr	w9, [x10]
+ 948bb1c: 11000529     	add	w9, w9, #0x1
+ 948bb20: 8b29d108     	add	x8, x8, w9, sxtw #4
+ 948bb24: 91068100     	add	x0, x8, #0x1a0
+ 948bb28: 90014ed8     	adrp	x24, 0xbe63000
+ 948bb2c: f9416b18     	ldr	x24, [x24, #0x2d0]
+ 948bb30: a9400408     	ldp	x8, x1, [x0]
+ 948bb34: aa1603e0     	mov	x0, x22
+ 948bb38: d63f0100     	blr	x8
+ 948bb3c: 910223e8     	add	x8, sp, #0x88
+ 948bb40: aa1f03e1     	mov	x1, xzr
+ 948bb44: 97fff15f     	bl	0x94880c0 <UnityShutdown+0x3e16be8>
+ 948bb48: f94002e0     	ldr	x0, [x23]
+ 948bb4c: 3cc883e0     	ldur	q0, [sp, #0x88]
+ 948bb50: f9404fe8     	ldr	x8, [sp, #0x98]
+ 948bb54: b9418c09     	ldr	w9, [x0, #0x18c]
+ 948bb58: 3d803340     	str	q0, [x26, #0xc0]
+ 948bb5c: f900bbe8     	str	x8, [sp, #0x170]
+ 948bb60: 35000049     	cbnz	w9, 0x948bb68 <UnityShutdown+0x3e1a690>
+ 948bb64: 973b68ba     	bl	0x6365e4c <UnityShutdown+0xcf4974>
+ 948bb68: f9400316     	ldr	x22, [x24]
+ 948bb6c: f94036c0     	ldr	x0, [x22, #0x68]
+ 948bb70: 39464008     	ldrb	w8, [x0, #0x190]
+ 948bb74: 37100048     	tbnz	w8, #0x2, 0x948bb7c <UnityShutdown+0x3e1a6a4>
+ 948bb78: 947991ca     	bl	0xb2f02a0 <UnityShutdown+0x5c7edc8>
+ 948bb7c: f9403c08     	ldr	x8, [x0, #0x78]
+ 948bb80: f9400500     	ldr	x0, [x8, #0x8]
+ 948bb84: 39464008     	ldrb	w8, [x0, #0x190]
+ 948bb88: 37100048     	tbnz	w8, #0x2, 0x948bb90 <UnityShutdown+0x3e1a6b8>
+ 948bb8c: 947991c5     	bl	0xb2f02a0 <UnityShutdown+0x5c7edc8>
+ 948bb90: b9418c08     	ldr	w8, [x0, #0x18c]
+ 948bb94: 35000048     	cbnz	w8, 0x948bb9c <UnityShutdown+0x3e1a6c4>
+ 948bb98: 973b68ad     	bl	0x6365e4c <UnityShutdown+0xcf4974>
+ 948bb9c: f94036c0     	ldr	x0, [x22, #0x68]
+ 948bba0: 39464008     	ldrb	w8, [x0, #0x190]
+ 948bba4: 37100048     	tbnz	w8, #0x2, 0x948bbac <UnityShutdown+0x3e1a6d4>
+ 948bba8: 947991be     	bl	0xb2f02a0 <UnityShutdown+0x5c7edc8>
+ 948bbac: f9403c08     	ldr	x8, [x0, #0x78]
+ 948bbb0: d0015176     	adrp	x22, 0xbeb9000
+ 948bbb4: f9400500     	ldr	x0, [x8, #0x8]
+ 948bbb8: 39464008     	ldrb	w8, [x0, #0x190]
+ 948bbbc: f947a6d6     	ldr	x22, [x22, #0xf48]
+ 948bbc0: 37100048     	tbnz	w8, #0x2, 0x948bbc8 <UnityShutdown+0x3e1a6f0>
+ 948bbc4: 947991b7     	bl	0xb2f02a0 <UnityShutdown+0x5c7edc8>
+ 948bbc8: f9402008     	ldr	x8, [x0, #0x40]
+ 948bbcc: f94002c3     	ldr	x3, [x22]
+ 948bbd0: 9104c3e2     	add	x2, sp, #0x130
+ 948bbd4: 52800801     	mov	w1, #0x40               // =64
+ 948bbd8: f9400100     	ldr	x0, [x8]
+ 948bbdc: 910063e8     	add	x8, sp, #0x18
+ 948bbe0: 97e8b069     	bl	0x8eb7d84 <UnityShutdown+0x38468ac>
+ 948bbe4: 3cc183e0     	ldur	q0, [sp, #0x18]
+ 948bbe8: 3cc283e1     	ldur	q1, [sp, #0x28]
+ 948bbec: 910503e8     	add	x8, sp, #0x140
+ 948bbf0: f9400e76     	ldr	x22, [x19, #0x18]
+ 948bbf4: a908a3ff     	stp	xzr, x8, [sp, #0x88]
+ 948bbf8: ad050740     	stp	q0, q1, [x26, #0xa0]
+ 948bbfc: b40032f6     	cbz	x22, 0x948c258 <UnityShutdown+0x3e1ad80>
+ 948bc00: b0014e5b     	adrp	x27, 0xbe54000
+ 948bc04: f94002c8     	ldr	x8, [x22]
+ 948bc08: f942777b     	ldr	x27, [x27, #0x4e8]
+ 948bc0c: 7940cd09     	ldrh	w9, [x8, #0x66]
+ 948bc10: f9400361     	ldr	x1, [x27]
+ 948bc14: b4000129     	cbz	x9, 0x948bc38 <UnityShutdown+0x3e1a760>
+ 948bc18: f940250a     	ldr	x10, [x8, #0x48]
+ 948bc1c: 9100214a     	add	x10, x10, #0x8
+ 948bc20: f85f814b     	ldur	x11, [x10, #-0x8]
+ 948bc24: eb01017f     	cmp	x11, x1
+ 948bc28: 54000100     	b.eq	0x948bc48 <UnityShutdown+0x3e1a770>
+ 948bc2c: f1000529     	subs	x9, x9, #0x1
+ 948bc30: 9100414a     	add	x10, x10, #0x10
+ 948bc34: 54ffff61     	b.ne	0x948bc20 <UnityShutdown+0x3e1a748>
+ 948bc38: aa1603e0     	mov	x0, x22
+ 948bc3c: 52800022     	mov	w2, #0x1                // =1
+ 948bc40: 947991db     	bl	0xb2f03ac <UnityShutdown+0x5c7eed4>
+ 948bc44: 14000005     	b	0x948bc58 <UnityShutdown+0x3e1a780>
+ 948bc48: b9400149     	ldr	w9, [x10]
+ 948bc4c: 11000529     	add	w9, w9, #0x1
+ 948bc50: 8b29d108     	add	x8, x8, w9, sxtw #4
+ 948bc54: 91068100     	add	x0, x8, #0x1a0
+ 948bc58: a9400408     	ldp	x8, x1, [x0]
+ 948bc5c: aa1603e0     	mov	x0, x22
+ 948bc60: d63f0100     	blr	x8
+ 948bc64: d0014de8     	adrp	x8, 0xbe49000
+ 948bc68: aa0003f6     	mov	x22, x0
+ 948bc6c: f945a108     	ldr	x8, [x8, #0xb40]
+ 948bc70: f9400100     	ldr	x0, [x8]
+ 948bc74: b9418c08     	ldr	w8, [x0, #0x18c]

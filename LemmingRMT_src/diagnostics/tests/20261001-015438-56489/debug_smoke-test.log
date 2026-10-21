@@ -1,0 +1,7 @@
+AIM DEBUG heartbeat build=v10-aim-debug pid=56523 enabled[angle=1 silent=0] menu=1 pause=1 attackOnly=1 bodyMask[05,05] fov[8.00,8.00] range[150.0,150.0] threadTid=0 base=(nil)
+AIM DEBUG callbacks player=2 main=0 inactive=1 runtimeNotReady=1 wrongThread=0 validation=0 failed=0 normal=1 silent=1
+AIM DEBUG hooks angle=0 attempts=0 reason=not-attempted silent=0 attempts=0 reason=not-attempted run[angle=wrong-thread silent=disabled] applications[0,0]
+AIM DEBUG capture calls=0 skip[local=0 snapshot=0 world=0 array=0 pose=0] hitboxes=0 reject[class=0 bone=0 collider=0 native=0 virtual=0 bounds=0 rootDistance=0] boneRange[9999,-1] stored[actors=0 volumes=0] fresh[0,0]
+AIM DEBUG local mask=000 expected=fff rawLocal=0 hp=0 team=0 attackRaw=-1 expectedAttack=1
+AIM DEBUG selection calls=0 actors=0 fresh=0 live=0 volumes=0 bodyReject=0 points=0 rangeReject=0 fovReject=0 accepted=0 nearest[angle=180.000 distance=0.000]
+PASS diagnostic formatting, callback counters, disabled/runtime guards and original-call passthrough

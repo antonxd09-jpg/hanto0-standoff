@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+case "$1" in
+ get-state) printf 'device\n' ;;
+ logcat) printf 'TEST-MOCK AIM DEBUG heartbeat build=v10-aim-debug\n' ;;
+ *) exit 2 ;;
+esac

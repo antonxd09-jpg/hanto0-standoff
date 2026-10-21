@@ -1,0 +1,15 @@
+{
+  "loaded_profile": "v15-local-input-init",
+  "confirmed_failure": "input-component-missing",
+  "shared_timer_fix_observed_working": true,
+  "input_callback_received": false,
+  "input_lookup_reads_valid_containers": true,
+  "latest_heartbeat": "10-01 13:21:09.417 26618 29068 I LemmingRMT: AIM DEBUG heartbeat build=v15-local-input-init pid=26618 enabled[angle=1 silent=0] menu=0 pause=1 attackOnly=0 bodyMask[01,05] fov[180.00,8.00] range[500.0,150.0] threadTid=26804 base=0x72ebe36000",
+  "latest_automation": "10-01 13:21:09.417 26618 29068 I LemmingRMT: AIM DEBUG automation enabled=1 back=1 scope=1 hook=0 installAttempts=206 installReason=input-component-missing stage=Idle reason=0 input=0 rays=0 requests=0 observedShots=0 restores=0 scopePulses=0 timeouts=0 (shots != damage)",
+  "latest_component_search": "10-01 13:21:12.034 26618 26804 I LemmingRMT: AIM DEBUG input component search arrays=6 dictionary=1 entries=31 objects=101 foreign=0",
+  "actual_input_component_host_unresolved": true,
+  "native_source_note": "uys tick selects a NetObject through its sxh filter at +0x38, tracks an 8-byte NetObjectId at +0x4c, and owns a separate command at +0x40; player-attached component ownership has not been established",
+  "new_code_applied": false,
+  "game_restarted": false,
+  "module_reloaded": false
+}

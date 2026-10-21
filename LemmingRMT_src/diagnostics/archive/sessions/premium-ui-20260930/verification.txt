@@ -1,0 +1,15 @@
+profile: Standoff2-1.0.0-arm64-il2cppdump-v8-premium-ui
+abi: arm64-v8a
+bytes: 805216
+sha256: fe02ffe732da96e98d617e7dcfa47619761dd1fa97eba871e76950f50a8e0e30
+device_sha256: fe02ffe732da96e98d617e7dcfa47619761dd1fa97eba871e76950f50a8e0e30
+build_exit: 0
+warnings: 0
+errors: 0
+ui_test: PASS: input, tabs, picker, 6 sizes, EGL/GLES3 offscreen
+skeleton_test: PASS ASan+UBSan memory/math/expiry/world/thread
+present_regression: PASS ASan+UBSan
+skeleton_default: off, user opt-in
+runtime_validation: New SO copied only; injection and live skeleton verification NOT performed
+backup: /home/leftcode/Projects/LemmingRMT/backups/20260930-182729-before-premium-ui
+sources: {'main.cpp': '4ed0832654b0bca682e34c8d398c5907a6ceeb65d2a7e7896342b92b525705b1', 'esp_runtime.hpp': '2d2f4535855448108fb9b93ff865e4163963b652b0d6a232f2a31ce9131bb7a1', 'skeleton_runtime.hpp': 'b794295fccc6752bd587f8267f6ffe579aa324c086d21e3015fe6e8f81805d29', 'ui_premium.hpp': 'b8aefd01c5cdf6f730019e898d94903a5839efdfb2f319cbe2217706aa71ad0b', 'game_offsets.hpp': '2b2ac8024455f45585e7890f46ffbb31f42e4f7c951d01127b87757abe5049cd', 'lucide_vectors.hpp': '1654326064eec71cdbbb9a5927216b6b421e65fc3df30748aecbf361ac489b52'}

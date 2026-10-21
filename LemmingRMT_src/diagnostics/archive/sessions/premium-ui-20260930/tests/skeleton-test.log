@@ -1,0 +1,1 @@
+PASS real TRS translation/rotation/non-uniform scale composition, cycles, bounds, NaN, quaternion, invalid managed/native/class pointers, expiry/world identity and wrong-thread rejection; no Unity getter calls

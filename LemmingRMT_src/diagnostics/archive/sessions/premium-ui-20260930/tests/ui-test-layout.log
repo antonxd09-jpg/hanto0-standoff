@@ -1,0 +1,5 @@
+LAYOUT viewport=2340,1080 main=820,245 size=700,590 scale=1
+LAYOUT viewport=1920,1080 main=610,245 size=700,590 scale=1
+LAYOUT viewport=1600,900 main=508,204 size=583,491 scale=0.833333
+LAYOUT viewport=1280,720 main=406,163 size=466,393 scale=0.666667
+ui_test: diagnostics/premium-ui-20260930/tests/ui_test.cpp:34: void checkLayout(): Assertion `std::fabs(w->Pos.x+w->Size.x/2-ImGui::GetIO().DisplaySize.x/2)<1' failed.

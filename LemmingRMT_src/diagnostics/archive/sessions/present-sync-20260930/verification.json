@@ -1,0 +1,16 @@
+{
+  "profile": "Standoff2-1.0.0-arm64-il2cppdump-v8-present-sync",
+  "build_exit": 0,
+  "warnings": 0,
+  "errors": 0,
+  "sha256": "6aa3a512327d530415e1c5af9cf436b00e022702a14f9ff9fdaf633f4d20b6b0",
+  "build_id": "d578eadff4bdb1e03983b5d1176eef68f38fb551",
+  "architecture": "ELF64 AArch64",
+  "tests": "PASS, ASan+UBSan; synthetic late-camera, identity/lease checks, memory and projection regressions",
+  "screen_projection": "each present; old 33ms cache removed",
+  "camera_source": "presentation-time safe native cache copy; not proven GPU-pass VP",
+  "phone_file": "/sdcard/Download/liblemmingrmt-v8-present-sync.so",
+  "device_hash_matches": true,
+  "runtime_test": "NEW BUILD NOT LOADED; previous build still running",
+  "backup": "/home/leftcode/Projects/LemmingRMT/backups/20260930-180240-before-present-sync"
+}

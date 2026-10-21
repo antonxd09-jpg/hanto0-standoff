@@ -1,0 +1,3 @@
+List of devices attached
+R5CY72SQHPB            device usb:3-4 product:a26xxx model:SM_A266B device:a26x transport_id:3
+

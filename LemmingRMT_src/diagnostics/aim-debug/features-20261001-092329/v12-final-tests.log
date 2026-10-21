@@ -1,0 +1,10 @@
+PASS structure: 34 local includes resolved, build sources/licenses/reserved modules and compatibility links present
+PASS aim math, multipoints, multi-select, FOV/range/priority/lock, config guards, stale/team/world/dead filters, stack-span checks and original-call passthrough
+PASS diagnostic formatting, callback counters, disabled/runtime guards and original-call passthrough
+PASS exact native camera-slot validation with non-plaintext metadata, BL limits/opcodes, 4K/16K/64K free-gap search beyond old hints, and real non-clobbering near allocation
+PASS projection FOV/aspect/zoom/invalid inputs, recoil axes/strength/delta/reset, per-point visibility fallback, native ABI/first owned collider/thread guards/query budget
+PASS Aim pages, independent modes/masks, clicks, multipoints, six viewports and no scrollbars
+PASS FOV ellipse/full-viewport draw helper with menu closed, ESP disabled, finite vertices and GL_NO_ERROR (synthetic projection)
+PASS GLES3 offscreen rendering and GL_NO_ERROR
+PASS larger menu and rails, Rage/Config navigation, movable ESP Editor, style switching, no scrollbars, finite vertices and six viewport sizes
+Tests completed. Logs: /home/leftcode/Projects/LemmingRMT/diagnostics/tests/20261001-095020-6167

@@ -1,0 +1,8 @@
+User confirmed visible ESP on previous native-camera-cache build.
+ADB showed active hook/pose/camera captures and enemy projection.
+Source root cause for obvious screen drift: 33ms update throttle with reused pixel boxes.
+Changes: each-present projection, presentation-time safe matrix refresh, no old boxes
+on failures, native identity/generation-header guard, two identical matrix copies.
+No unsafe native camera or transform methods on render.
+This is a synchronization improvement, not conversion into Unity scene objects.
+Full GPU-pass matrix agreement still needs live visual validation.

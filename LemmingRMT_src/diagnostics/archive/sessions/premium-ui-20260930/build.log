@@ -1,0 +1,8 @@
+[arm64-v8a] Compile++      : lemmingrmt <= main.cpp
+jni/main.cpp:296:6: warning: unused function 'inside' [-Wunused-function]
+  296 | bool inside(float x, float y, float left, float top, float width, float height) {
+      |      ^~~~~~
+1 warning generated.
+[arm64-v8a] SharedLibrary  : liblemmingrmt.so
+[arm64-v8a] Install        : liblemmingrmt.so => libs/arm64-v8a/liblemmingrmt.so
+Built: /home/leftcode/Projects/LemmingRMT/out/arm64-v8a/liblemmingrmt.so

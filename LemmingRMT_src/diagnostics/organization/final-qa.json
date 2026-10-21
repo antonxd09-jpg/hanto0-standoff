@@ -1,0 +1,13 @@
+{
+  "result": "PASS",
+  "output": "out/arm64-v8a/liblemmingrmt.so",
+  "bytes": 946576,
+  "sha256": "46a188bbfd30c4f84c8a481d357d945bb5ed97f7afba9b19f2af042e44110dee",
+  "runtime_source_bodies_verified": 11,
+  "original_files_sha256_verified": 724,
+  "backup": "/home/leftcode/Projects/LemmingRMT/backups/20261001-014809-before-project-organization",
+  "test_run": "/home/leftcode/Projects/LemmingRMT/diagnostics/tests/20261001-015438-56489",
+  "helper_test": "mock ADB only, alternate working directory",
+  "phone_touched": false,
+  "aim_live_status": "not tested or fixed by directory organization"
+}

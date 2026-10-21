@@ -1,0 +1,1 @@
+ui_test: diagnostics/premium-ui-20260930/tests/ui_test.cpp:34: void checkLayout(): Assertion `std::fabs(w->Pos.x+w->Size.x/2-ImGui::GetIO().DisplaySize.x/2)<1' failed.

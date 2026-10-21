@@ -1,0 +1,4 @@
+PASS structure: 28 local includes resolved, build sources/licenses/reserved modules and compatibility links present
+PASS aim math, multipoints, multi-select, FOV/range/priority/lock, config guards, stale/team/world/dead filters, stack-span checks and original-call passthrough
+PASS diagnostic formatting, callback counters, disabled/runtime guards and original-call passthrough
+PASS exact native camera-slot validation with non-plaintext metadata, BL limits/opcodes, 4K/16K/64K free-gap search beyond old hints, and real non-clobbering near allocation

@@ -1,0 +1,36 @@
+
+/home/leftcode/Projects/1.0.0 dump x64/extracted/libunity.so:	file format elf64-littleaarch64
+
+Disassembly of section .text:
+
+00000000056714d8 <UnityShutdown>:
+ 949ecd8: a9be57fe     	stp	x30, x21, [sp, #-0x20]!
+ 949ecdc: a9014ff4     	stp	x20, x19, [sp, #0x10]
+ 949ece0: b0018773     	adrp	x19, 0xc58b000
+ 949ece4: aa0003f4     	mov	x20, x0
+ 949ece8: 396b4e68     	ldrb	w8, [x19, #0xad3]
+ 949ecec: 370000c8     	tbnz	w8, #0x0, 0x949ed04 <UnityShutdown+0x3e2d82c>
+ 949ecf0: 90016b40     	adrp	x0, 0xc206000
+ 949ecf4: 910c2000     	add	x0, x0, #0x308
+ 949ecf8: 973b1bf5     	bl	0x6365ccc <UnityShutdown+0xcf47f4>
+ 949ecfc: 52800028     	mov	w8, #0x1                // =1
+ 949ed00: 392b4e68     	strb	w8, [x19, #0xad3]
+ 949ed04: f9402a88     	ldr	x8, [x20, #0x50]
+ 949ed08: b40003a8     	cbz	x8, 0x949ed7c <UnityShutdown+0x3e2d8a4>
+ 949ed0c: f9403d08     	ldr	x8, [x8, #0x78]
+ 949ed10: b4000368     	cbz	x8, 0x949ed7c <UnityShutdown+0x3e2d8a4>
+ 949ed14: 90016b55     	adrp	x21, 0xc206000
+ 949ed18: 910c22b5     	add	x21, x21, #0x308
+ 949ed1c: f9403100     	ldr	x0, [x8, #0x60]
+ 949ed20: f94002a1     	ldr	x1, [x21]
+ 949ed24: 973b1c4b     	bl	0x6365e50 <UnityShutdown+0xcf4978>
+ 949ed28: f9402e94     	ldr	x20, [x20, #0x58]
+ 949ed2c: b4000240     	cbz	x0, 0x949ed74 <UnityShutdown+0x3e2d89c>
+ 949ed30: f9400008     	ldr	x8, [x0]
+ 949ed34: f94002a1     	ldr	x1, [x21]
+ 949ed38: aa0003f3     	mov	x19, x0
+ 949ed3c: 7940cd09     	ldrh	w9, [x8, #0x66]
+ 949ed40: b4000129     	cbz	x9, 0x949ed64 <UnityShutdown+0x3e2d88c>
+ 949ed44: f940250a     	ldr	x10, [x8, #0x48]
+ 949ed48: 9100214a     	add	x10, x10, #0x8
+ 949ed4c: f85f814b     	ldur	x11, [x10, #-0x8]

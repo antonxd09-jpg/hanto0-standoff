@@ -1,0 +1,2994 @@
+{
+  ".gitignore": {
+    "size": 22,
+    "sha256": "55d68d36e111d5974616b0d1c143d2f09abdcd4be3d55ebd9654774cf904888b"
+  },
+  "README.md": {
+    "size": 6738,
+    "sha256": "9837a38abcce90c3efe5c1df1a905f7c0d84ee9c0b339f63de5beff8778e9de0"
+  },
+  "build.sh": {
+    "size": 930,
+    "sha256": "44c85a83ed533ee515565a7e7e683e1729e43d6bcde20ddd8b82f88d19ebdefa"
+  },
+  "adb_logs.sh": {
+    "size": 2235,
+    "sha256": "5e05a75493ce5b1415e3e47ef9fad79292f28cb0010feed4ca30f48b7b174f7a"
+  },
+  "aim_debug.sh": {
+    "size": 1473,
+    "sha256": "adf2dc790fe9a47a1ab94e70cdbd13b360059faa581d13d683d54072ed5137dc"
+  },
+  "jni/Android.mk": {
+    "size": 574,
+    "sha256": "b071bf030d3de8ea38d7bbbd54eef2d57b385563e070ed5b279c0523f9f1d666"
+  },
+  "jni/Application.mk": {
+    "size": 118,
+    "sha256": "609b2239a9f36aa4805bec9015923c2c19b9d388c29f58e0091507dd378f355e"
+  },
+  "jni/main.cpp.before_dump64.bak": {
+    "size": 24460,
+    "sha256": "ebfbb1e253acea09269177aa21afeed3d32f69a9cd93c7becdad51b9149bfd97"
+  },
+  "jni/main.cpp.before_gles3_fix.bak": {
+    "size": 26617,
+    "sha256": "ce5daf7ff72079d8b1185a527bf1b22319e4ec65b680bc6a6196e250b490f60d"
+  },
+  "jni/Android.mk.before_gles3_fix.bak": {
+    "size": 329,
+    "sha256": "d5e29df81ce7308740dafbad6f239e51b662117a1e2faefbb3ed9b65317f972d"
+  },
+  "jni/main.cpp.before_java_input_fix.bak": {
+    "size": 30854,
+    "sha256": "a05530870387a9cb2bb710df99d82c33242fe481daf836d3b3d9bbfcfb919d57"
+  },
+  "jni/main.cpp.before_imgui.bak": {
+    "size": 40239,
+    "sha256": "bad809033696b12d17ae6566b1038e3f5234440cad4651b976eb58872ae362ab"
+  },
+  "jni/Android.mk.before_imgui.bak": {
+    "size": 329,
+    "sha256": "49fef58b0974dbca7a20fead28bf12af35fe474fe0b396d77fb0816ac094e1e5"
+  },
+  "jni/main.cpp": {
+    "size": 42135,
+    "sha256": "48e980306f44bd12b6f9c8474056ff1674b0aa9e12c6dee0ba5c55764b60b213"
+  },
+  "jni/esp_runtime.hpp": {
+    "size": 96423,
+    "sha256": "b84f6f341bc0c7a02e55177ad9ff8370c2acad71a78c5ca13d20dcf1bc0b8c8e"
+  },
+  "jni/game_offsets.hpp": {
+    "size": 13945,
+    "sha256": "2b4648b1cbcfcb345ea5b4a7dbcc98adca499df40dceb8085b23760eb117b8ea"
+  },
+  "jni/lucide_vectors.hpp": {
+    "size": 34418,
+    "sha256": "1654326064eec71cdbbb9a5927216b6b421e65fc3df30748aecbf361ac489b52"
+  },
+  "jni/ui_premium.hpp": {
+    "size": 23342,
+    "sha256": "0e52eaef78413301bed0a437e08ef1d7cf07149cec77794b23e44178d2bc9773"
+  },
+  "jni/aim_offsets.hpp": {
+    "size": 795,
+    "sha256": "71715481a50b31d350ccd593cc33df522020ab4b80e03bfc55f7275118b6a3de"
+  },
+  "jni/aim_core.hpp": {
+    "size": 5507,
+    "sha256": "42a2742da2e02c954f09336c2a04c349420314d3e2fa396e4e2949f821aa5634"
+  },
+  "jni/aim_runtime.hpp": {
+    "size": 19206,
+    "sha256": "4474e2e562998e45a24257690c292508619f143b5989838392ab6236c1c56ced"
+  },
+  "jni/aim_ui.hpp": {
+    "size": 4295,
+    "sha256": "4a035dbc2818fda96eac14b9aa71c4230c1bf7ce6b0af57f2585ae6fc67dac51"
+  },
+  "jni/aim_debug.hpp": {
+    "size": 6144,
+    "sha256": "1770de89260fe3bdd64189021617d63d73a4cff7c64b759810df0f476902d183"
+  },
+  "docs/Standoff2_1.0.0_ARM64_first_offsets_from_dump.txt": {
+    "size": 9170,
+    "sha256": "5ac69ea849c8f33c7bbae0137278a377ed6ad0655c228a818b755cda75b6098d"
+  },
+  "docs/ADB_DEBUG.md": {
+    "size": 4954,
+    "sha256": "0c77945ee89cb4343808662f38476db7a3bcd6e4edcffb6b2a41b585587b2a8c"
+  },
+  "docs/AIM_OFFSETS_1.0.0_ARM64.md": {
+    "size": 4357,
+    "sha256": "4e58e7bb1145e1806799f0a9015a4f38bda15a225d691378e08c5255ab69e395"
+  },
+  "docs/AIM_DEBUG.md": {
+    "size": 4785,
+    "sha256": "a2c6076857d369f0846d26ab7ae93db3bea01cbd59b9bc0ef69777dd4db714af"
+  },
+  "diagnostics/crash-buffer.txt": {
+    "size": 21854,
+    "sha256": "7cf20bc4207c24794e283c08f3178b8db29292d8c3d88e08f007c2d56dfaa391"
+  },
+  "diagnostics/devices.txt": {
+    "size": 121,
+    "sha256": "318c171a4a0cd824c744c901e038308af66b556c2dfbb737f669417009fa45a1"
+  },
+  "diagnostics/exit-info.txt": {
+    "size": 10512,
+    "sha256": "2e24f9338f4dc7f48911e395787dfc8be8c164431392e59203fdc2f72d16b218"
+  },
+  "diagnostics/logcat-full.txt": {
+    "size": 74933944,
+    "sha256": "7650577965244dca352a3a585a5cebe42e55a98fb2441bfe9002658401b70f03"
+  },
+  "diagnostics/team-select-crash-analysis-20260929.txt": {
+    "size": 679,
+    "sha256": "28dc0b66853c0f5aca8e1f261b0db56f096027b1a55b34cfa8394b28f7f2f4b6"
+  },
+  "diagnostics/esp-team-list-hookscan-20260929.txt": {
+    "size": 753,
+    "sha256": "9add64a5bb36c9a37bf86ac543ea9ee836d3e1324916df43694a18205c3979f6"
+  },
+  "diagnostics/latest-menu-layout-backup.txt": {
+    "size": 43,
+    "sha256": "679eef4980f4e6ec2fb8a36cf7afc61d2dd7e71f6955402948fb92c605b23222"
+  },
+  "diagnostics/menu-layout-build.log": {
+    "size": 252,
+    "sha256": "16b4fba35db800c521929f59338ef8fde396656b495fdd279d9d04d11c359df2"
+  },
+  "diagnostics/menu-layout-build.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/menu-layout.ppm": {
+    "size": 7581617,
+    "sha256": "7fde2109a86f72de6743128ddff179fffcce23ae49f0d4f30d5ab6214d3720b9"
+  },
+  "diagnostics/menu-layout.png": {
+    "size": 61401,
+    "sha256": "7e55d50bfe875c1e35dcdb669ad1e6cc55280531d3773b6ae84cd2c7a9180a99"
+  },
+  "diagnostics/menu-layout.png.b64": {
+    "size": 81868,
+    "sha256": "10105f3957fb696c7f75c44f58b4b2b2676d7a5b8a33e6d36b1a133c1d5ce744"
+  },
+  "diagnostics/latest-large-esp-editor-backup.txt": {
+    "size": 48,
+    "sha256": "d9499564cce8a8bd9bac421baa2e0645f68f57cbdc68aa4c9cb0ea8496259b23"
+  },
+  "diagnostics/large-esp-editor-build.log": {
+    "size": 154,
+    "sha256": "39205f5b0375ab6b35226d5fe83038d6f8cc51b52f60e5b06d02e3a383696198"
+  },
+  "diagnostics/large-esp-editor-build.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/large-menu.ppm": {
+    "size": 7581617,
+    "sha256": "7a4d54536b629d44832ababdce2d43795ee67f6e87e13e206d3a9f711d659739"
+  },
+  "diagnostics/esp-editor.ppm": {
+    "size": 7581617,
+    "sha256": "9ba7989df05e6d87c30ae00fd5f3cee750628c4456c8b55e1b45efa324167611"
+  },
+  "diagnostics/large-menu-preview.jpg": {
+    "size": 38796,
+    "sha256": "f82509ae5463e29257938ba594c307b0999b8d1fa5801225c83c6f9861e1ada1"
+  },
+  "diagnostics/esp-editor-preview.jpg": {
+    "size": 67173,
+    "sha256": "c80cdce2d261f1645eb91b104ffc0f8a1fb77b6cdd515b57818132025517249d"
+  },
+  "diagnostics/large-menu-preview.jpg.b64": {
+    "size": 51728,
+    "sha256": "da8d272993af96e8f7f052c6a72e1eae3dd9f9712e815c101e365687deacfdf9"
+  },
+  "diagnostics/esp-editor-preview.jpg.b64": {
+    "size": 89564,
+    "sha256": "82f0fb9676085f6904d172313afc58dd082d2427547a071d65e00cc100bf702d"
+  },
+  "diagnostics/ui-final-contact.jpg": {
+    "size": 88191,
+    "sha256": "97c1223a80caf9d5540dc36cce24b175dfcacf6aa82c1e920ccc95e9031084ed"
+  },
+  "diagnostics/latest-aim-backup.txt": {
+    "size": 83,
+    "sha256": "2f294217eb0c1136e7ad2aae5632fa750ab01d9ff9923780d0725ef903b062d2"
+  },
+  "diagnostics/aim-build.pid": {
+    "size": 6,
+    "sha256": "20c21ed2686fdc9a356c48a687ef21e13b479099ab9afac616d9a7438cb4ee8c"
+  },
+  "diagnostics/aim-build.log": {
+    "size": 252,
+    "sha256": "16b4fba35db800c521929f59338ef8fde396656b495fdd279d9d04d11c359df2"
+  },
+  "diagnostics/aim-ui-compile.pid": {
+    "size": 6,
+    "sha256": "cb29c0e44b597c817a3494fca31ec3f136f67e97b2eb22e212394dd43c992942"
+  },
+  "diagnostics/aim-ui-compile.log": {
+    "size": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diagnostics/aim-build.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/aim-ui-compile.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/aim-ui-test.pid": {
+    "size": 6,
+    "sha256": "c6e19c2ba211810eb094fccbc58631d2d0a8e005db2db4c2f15883e191718780"
+  },
+  "diagnostics/aim-ui-test.log": {
+    "size": 2159,
+    "sha256": "9eeb086d4f6e32963a68d96ecf844e4917c48d5754ab2cc8f788b76c7032bcc1"
+  },
+  "diagnostics/aim-menu.ppm": {
+    "size": 7581617,
+    "sha256": "7a4d54536b629d44832ababdce2d43795ee67f6e87e13e206d3a9f711d659739"
+  },
+  "diagnostics/aim-esp-editor.ppm": {
+    "size": 7581617,
+    "sha256": "9ba7989df05e6d87c30ae00fd5f3cee750628c4456c8b55e1b45efa324167611"
+  },
+  "diagnostics/aim-angles.ppm": {
+    "size": 7581617,
+    "sha256": "d3cad9cddddd58c0aae76de6dab00ab4227865fb04d9c28ff1c50d36cd5424f4"
+  },
+  "diagnostics/aim-silent.ppm": {
+    "size": 7581617,
+    "sha256": "434d0901585116f1fcdfbcde9b252ffb8a269469de7eeaaf2a337c820690db8e"
+  },
+  "diagnostics/aim-targeting.ppm": {
+    "size": 7581617,
+    "sha256": "2304b088bb000e56813fe7019ec2b1529e56f192ae6f15a828e6625880eb7701"
+  },
+  "diagnostics/aim-multipoints.ppm": {
+    "size": 7581617,
+    "sha256": "ee26d4dc547f09098dbeb2d1f1b85f53c8114fd6a1446f9c27e3da481e81ff56"
+  },
+  "diagnostics/aim-ui-test.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/aim_test.cpp": {
+    "size": 4697,
+    "sha256": "13887d9a6c23fbe2a2b37d9f40b2ff7cded1e811c62db7c6aec230312b92a47d"
+  },
+  "diagnostics/aim-unit-compile.log": {
+    "size": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diagnostics/aim-unit-compile.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/aim-unit-test.log": {
+    "size": 161,
+    "sha256": "e38f9861db1094a570e0128869bd4b0c4f3456ac77e2826307079c041a90a3ad"
+  },
+  "diagnostics/aim-unit-test.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/aim_test": {
+    "size": 166832,
+    "sha256": "cb7531a0585aa3ba781a962efef0c1303b6d5807c78b82711e2d288f6e435ac2"
+  },
+  "diagnostics/aim-contact.png": {
+    "size": 82339,
+    "sha256": "a156d469577e22cdb8eef185117020fe4d2b968641fe6e0c775d5c4fb443a5a5"
+  },
+  "diagnostics/aim-final-qa.txt": {
+    "size": 1190,
+    "sha256": "bed3a02b2103943caba20ba8c40550e2deac02c7157c219f5315570401ddde0e"
+  },
+  "diagnostics/latest-aim-debug-backup.txt": {
+    "size": 76,
+    "sha256": "4bdb95718af87b90bcacfac006448d898c61455755f0566b162b669b6e5933cd"
+  },
+  "diagnostics/organize_project.py": {
+    "size": 10051,
+    "sha256": "e8ed6cd967610e3dd5b4c7d1372dfea62a96c0ef602fa5818f7f38134b33c4d8"
+  },
+  "dump 1.0.0/dump.cs": {
+    "size": 48222014,
+    "sha256": "0c1c10058f7593ed8fd6fab830f35c2834ab9a35799052af4893c75e5ecdf651"
+  },
+  "dump 1.0.0/il2cpp.h": {
+    "size": 36732655,
+    "sha256": "a2dbacf5969f298e2c241638453cdd7d9fb6fb8b167decb032bb829ff024dcf3"
+  },
+  "dump 1.0.0/script.json": {
+    "size": 74664900,
+    "sha256": "57c952704158ee14d531280c5fdd2b627677f733bf342ae11bd872430c477b04"
+  },
+  "dump 1.0.0/stringliteral.json": {
+    "size": 2340107,
+    "sha256": "ecfd3170c8a95e6294c37f1e56c0bdb0a25a86415e0ad9b509d2953a6f0e0ccc"
+  },
+  "dump 1.0.0/DummyDll/AdjustOaid.Android.dll": {
+    "size": 2048,
+    "sha256": "b9bfbf7c8c0e06175a97fae87f7f80b2fbd2b3e688efee079fa68e39ce510f7b"
+  },
+  "dump 1.0.0/DummyDll/AdjustSdk.Scripts.dll": {
+    "size": 30720,
+    "sha256": "83da4da6637026e85416810c9ff458c262955d3b9bf43e0e979cacd247083a07"
+  },
+  "dump 1.0.0/DummyDll/Agones.dll": {
+    "size": 15360,
+    "sha256": "0c6af00319ce0067728bf280a8c74ab362b0ec6712407515fac36a90e18574f4"
+  },
+  "dump 1.0.0/DummyDll/AndroidRuntimePermissions.Runtime.dll": {
+    "size": 4608,
+    "sha256": "98edf433131b00d769f21bfb1a209d684ac47179080eb7a110e0a5bfd55f47cf"
+  },
+  "dump 1.0.0/DummyDll/AppMetrica.dll": {
+    "size": 33280,
+    "sha256": "dfd95528f0354ca3499bc694e59e6bd7e59c34f90cce81daadd715741652132f"
+  },
+  "dump 1.0.0/DummyDll/Assembly-CSharp.dll": {
+    "size": 157184,
+    "sha256": "2efb9e1c68771d91cbccdcfbb4cfea5407a8209f2c89ea36e020614bd3d7c053"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Activities.dll": {
+    "size": 31232,
+    "sha256": "e5a4d00332f559fde4b381fff1026e0fbc1190a09baae949a54ba8836c21f2b0"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.AStar.Builder.Runtime.dll": {
+    "size": 3072,
+    "sha256": "c3374648529511bd760eb64487f28adfcb5928b696624c57f0c036212dca627e"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.AStar.Runtime.dll": {
+    "size": 14336,
+    "sha256": "eddf7c1b97686b4e5dcd2f688ab2422988b28ba7aca618d3eff6f7ed112dbcb8"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Ballistics.GrenadeLogic.dll": {
+    "size": 3072,
+    "sha256": "62c422e58e19305815011b6b7d97c895dd07cd381eb2197ae53ebd0d0b2a20d0"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Ballistics.GrenadePractice.dll": {
+    "size": 13824,
+    "sha256": "39bf7c71a5d6736b5c1fd6c969e76e3b79e6ef8ca179462050e789144ed5fcdf"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Ballistics.Simulation.dll": {
+    "size": 17408,
+    "sha256": "63ffb1a12c73c1163f2bd244b5ab5b7ccb949abd8cb0fb7653b7ae275c3225fd"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Decals.Runtime.dll": {
+    "size": 11776,
+    "sha256": "e088b915b16a4731eadb291f1a90ec53984f0fc72e92548c80ad2af305c51289"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.FpsMetrics.dll": {
+    "size": 6656,
+    "sha256": "c4d6ec681414a2d7188b148a7b392d8ac26a2b566ba6e2bc4075c963f49fcd38"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.FpsOverlay.dll": {
+    "size": 6656,
+    "sha256": "db012a827ac4fa3b82c1986f1948f5b9090fbc2e52a3f4745126ab81bad148bb"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.FPSTracking.Runtime.dll": {
+    "size": 2560,
+    "sha256": "b7fb8b3ab6f0bd3c57deb12658e4a48454f64573d405b035f2823f60882edf19"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Gameplay.Effects.BombDetonation.dll": {
+    "size": 4096,
+    "sha256": "688263edcd7f865d1d8acfbb49f545f19e5427071cbe0b7747234a4818b6a9b4"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Gameplay.Effects.CharacterEffects.dll": {
+    "size": 10752,
+    "sha256": "c941b60d623b618301d6234b8bdbb22aa8a2e17323bee88e96418c34a29f0617"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Gameplay.Effects.GameplayAccentSounds.dll": {
+    "size": 7680,
+    "sha256": "59c3fb0ce9a91e7e502f67d4b2363d816157abb201b80e69d4cde235618b6b50"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Gameplay.Effects.Graffiti.dll": {
+    "size": 24064,
+    "sha256": "a5a58243876fdd5d9eae4f2641a22bc979ecb33622e133673a17217262c2b2a0"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Gameplay.Effects.MolotovExtraVisuals.dll": {
+    "size": 7168,
+    "sha256": "156f1bfb20446e59379d4225cc01b49d974fea1722cb0f200400c19aeee1b87c"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Integrations.GDPR.dll": {
+    "size": 3584,
+    "sha256": "873cb9d087df02c1f27d469031c8d0f2c4bd6320845bef1b6538e4f030279502"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Integrations.Intercom.Android.dll": {
+    "size": 4608,
+    "sha256": "33301dfcec28cd610af5f9507c195ff837915f4b2257d7c05acd946cc2867c96"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Integrations.Intercom.dll": {
+    "size": 5120,
+    "sha256": "0d6127db3a45f2d81c613f30082dacddce8d690aae1109b00290ba127c4c9dc2"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Integrations.QRCode.dll": {
+    "size": 2048,
+    "sha256": "317c8a79487cda28218f318cfde676b49e1aa1c2634960c8831bf2a2068bc890"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Integrations.SignInWithApple.dll": {
+    "size": 3584,
+    "sha256": "e66ab7bc97a2d6f0d347e159d61f64e87956757dfd3bcacee24774fd3dd6211d"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Integrations.TWA.dll": {
+    "size": 2560,
+    "sha256": "8cddfe41e2278beea2a07b2b065986a504375ad5fdff334947117a1108a814ca"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Integrations.Utils.Runtime.dll": {
+    "size": 2048,
+    "sha256": "e6208c95dbb20392748f939469aefdb2d625f41d9ecfd3b242af32d1cbc9c5bc"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Linq4Span.dll": {
+    "size": 5632,
+    "sha256": "3e4f1025ea8be4172d8ed5b119020849c0b89a5195eb6491756252b5e2e3dc41"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Logging.dll": {
+    "size": 22528,
+    "sha256": "cd6c5a22a89200c4457df455ad37efcfbe0f380b9257f915b19e716933d37a49"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Logging.Unity.dll": {
+    "size": 4608,
+    "sha256": "4d87e44241479aad3ffda40cb368a053c917bee1ce5a9b94b17d5f26fdd6b085"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Merger.Runtime.dll": {
+    "size": 2560,
+    "sha256": "55d28264dcb3d42af26f496f8d43a4fab0db0d8c761c4cf814cb29121819e115"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.NetCode.Serialization.dll": {
+    "size": 19456,
+    "sha256": "3f0fa1120a0d211c41e4afd6d66dc5ca1f488cba8b626c4cdf668b27d0cd3343"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.NetCode.Transport.Enet.dll": {
+    "size": 9216,
+    "sha256": "29f343252755547cb5bceb0f7c3e001b839dff4f6d319dafc184c354783a2629"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Obstruction.dll": {
+    "size": 6144,
+    "sha256": "fddf06bdbad1482e274bd695c7bc2ee43c4577f407d680a250a480274f9b8eea"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Profiling.dll": {
+    "size": 4096,
+    "sha256": "906cba86675336ed5bb8411811500cf32fefa04304838d52ab7569a09ad0d837"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Profiling.Unity.dll": {
+    "size": 2048,
+    "sha256": "9dc34a62b0caea2440bd72cb259d09513f1cc58acd511c7ec6b153c398defcf5"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.RuntimeGizmos.dll": {
+    "size": 7168,
+    "sha256": "c3a9e8246db3a7235ffb97b624e1dd0bf3749ac232b28ed8f2af52bc47455344"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Animation.dll": {
+    "size": 6656,
+    "sha256": "7b391fde39c5fa3da6b7d8aa77bace97cbafdd896aa133ff129a41a46516c351"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.AnimationViewer.dll": {
+    "size": 2048,
+    "sha256": "d9a21638c6431cbd29ee61d4e98ae8f3d5f51664632edde2f98c10b7b00446dc"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Content.Definitions.dll": {
+    "size": 25600,
+    "sha256": "0190bed2c05ed18f83c34a5371f51788b747b50fa30b3b7bb5e9583996291450"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Content.Providers.dll": {
+    "size": 22528,
+    "sha256": "e441bbc18e920faf7a166ebc78ff964b33cd520a111ca18f2fc231cb1f8aab21"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Culling.dll": {
+    "size": 5120,
+    "sha256": "17902fef98f68f7fc1cb83cd234020d1d77ef08d3db73d426f69e9848abb08a8"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.CustomParamters.dll": {
+    "size": 4608,
+    "sha256": "d4b58a3b95f6809d1c8400e96e777f46544cbce5bf7e3bb5876ee059d8698104"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Debugging.dll": {
+    "size": 41472,
+    "sha256": "4608c0f6d3977626c9cf1f5c08848efa8fa69065c7bd7704feb02597986f43e9"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.DLC.dll": {
+    "size": 4096,
+    "sha256": "f6644d22c3bd6b7ac4753d5918f5dae9964ecec608516c86a145dba8e395f8e4"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Game.dll": {
+    "size": 27648,
+    "sha256": "32533678882446d904c0cd93e0184d986015bd922dd3b75eccda112662fa7819"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameCamera.dll": {
+    "size": 8704,
+    "sha256": "023e4a995c28224c7e9400e9aea08c94f0c9400819c5d87ebac7eef62a2ce49d"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameChat.dll": {
+    "size": 8192,
+    "sha256": "7537463b3b90fb49c9f777ff982891e25a2e2900b63dc31d5c970dadc82e87a1"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameMode.Abstractions.dll": {
+    "size": 14336,
+    "sha256": "0a7d52f9083a067077704b5dd30a2c0766149397958de36fdef5f57c9142b870"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameMode.BaseCombat.dll": {
+    "size": 6656,
+    "sha256": "c697dea842f9dfe3a2d30cd0a75524ade11acd16f9b1521e5ed57bb632a62cef"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameMode.Deathmtach.dll": {
+    "size": 5120,
+    "sha256": "d78686bcd1bbfc6b40a520f0c6ab8f38a38ecb0d07c2d7e49268902060c6ecba"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameMode.Defuse.Abstraction.dll": {
+    "size": 3584,
+    "sha256": "8e3b6883a69882838768047c644db25320c452879189f264630d770543bc405d"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameMode.Defuse.dll": {
+    "size": 16384,
+    "sha256": "c1059cb86c9632f5fe167c186ff06c7e2c162991237706e93cc859ff1d2690d1"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameMode.Defuse.Installers.dll": {
+    "size": 6144,
+    "sha256": "bb01895b34c86dcd65fcba7d75ac1f36acc15dfddbe3c1da4c2966b6d82e17bf"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameMode.dll": {
+    "size": 51200,
+    "sha256": "9126f37342028a23304d4372589e49f2c0574a92b81d4ff0fd2ee414529eaef1"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameMode.Duel.Abstraction.dll": {
+    "size": 3072,
+    "sha256": "52fba0dcfbc6b7c5939fc188a8cdaf4810dc2f82c87f7805beb8eb021b9dab2e"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameMode.Duel.dll": {
+    "size": 11264,
+    "sha256": "edc0fb7aea17b17acc4dd0632e2edef8b71425c0f0406a4cf694ca8b0a0f9e3e"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameMode.Duel.Installers.dll": {
+    "size": 5120,
+    "sha256": "4375fdb7d24621bdb623282b2704f3772a1bea4023552a525910522976bac561"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameMode.RankedDefuse.Abstraction.dll": {
+    "size": 2560,
+    "sha256": "08a16dcb04cbfd666eda3cb420c9b02a6f15d2cf057d6855c0e8756ab8bb57cc"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameMode.RankedDefuse.dll": {
+    "size": 9728,
+    "sha256": "0750617d7c379f00feffc6656eee29d2e35eee9e33f9cbae4d61da447e75e3f8"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameMode.RankedDefuse.Installers.dll": {
+    "size": 4608,
+    "sha256": "efff7a9bd316e7889000060976c5036f9919239311fef16cff4acb0971a64e4f"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameMode.RankedDuel.Abstraction.dll": {
+    "size": 2560,
+    "sha256": "51eda8ffc72dcf3f7e21442e625fce748a948cbeea6d109148fe67d8a0dc14f4"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameMode.RankedDuel.dll": {
+    "size": 9216,
+    "sha256": "af3f45cde01e8929db0a6c8ddc04018cab0b5dd1fbecf2fe90d740dc490f13e4"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameMode.RankedDuel.Installers.dll": {
+    "size": 4608,
+    "sha256": "d32b6e38aa7d074e63aebc29f79d951aa29e783ddd3741b3e8b7c0bafc5e4204"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameMode.ResultRound.dll": {
+    "size": 8192,
+    "sha256": "7d9c46dd76b758092274c2723fdb0798fdc8db832772289d2b995b1661226912"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameMode.TeamDeathmatch.dll": {
+    "size": 9216,
+    "sha256": "e85b57e60254c8b866429fb0a3b6dd34041934676f8ed83f67fad7a1bd129007"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameMode.TeamDeathmatch.Installers.dll": {
+    "size": 5120,
+    "sha256": "6f0eadcd4467001b96993be4b2ba8b8950dd2a64b73c2348baff1c046819dc99"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameMode.Training.dll": {
+    "size": 50176,
+    "sha256": "fcd135469d39368468d0b1e2d3fa759ea795fc5f016ee286aca9a7beaa1d1d8d"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GameMode.Training.Installers.dll": {
+    "size": 5632,
+    "sha256": "1ff67c7c6d1af4041aa066e5876ee0d72aca4cc455dd2a64c46f78cb585291f4"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Abstractions.dll": {
+    "size": 4608,
+    "sha256": "b6f56f968dbeed6028e43c5460ff0ed21dcc4c288cd045417da7372e775097c0"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Bomb.dll": {
+    "size": 19456,
+    "sha256": "a07f1d5175f6f28553e1532bc163d08dadcab59495bd231d61e3d1f466f944e7"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Components.dll": {
+    "size": 9728,
+    "sha256": "c4ccb623d61c369485385a6327b676d0fdc3cf439a640b7eb7ace72c496bbc8f"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Drop.dll": {
+    "size": 16384,
+    "sha256": "08c87422211b4ec51b52a9dbc4c178271558cd6af317649614940b452091b6a1"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Drop.ItemMarkers.dll": {
+    "size": 5120,
+    "sha256": "ccb702bdfead8b7a9b17f926308d8552004cb964e191bd3550795ad66af12166"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Effects.dll": {
+    "size": 27136,
+    "sha256": "b9932445645c5d582f5056af16ed2c1949562124a1fdc89dc8af299ab5a12dea"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Effects.MapEffects.dll": {
+    "size": 6144,
+    "sha256": "b8d5ab9a83c910eead8c042d7f1f513144ceee6d9bf9487642a1a310047dbe62"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Events.dll": {
+    "size": 6656,
+    "sha256": "76c69c451f58881038185c335fbcb76846f699c773af3bd0a9863b2087cf06fc"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Features.BombIndicator.dll": {
+    "size": 6656,
+    "sha256": "2c5be82d9e21cd6e69c1aa3a6a6d93932bb2e2a0fbdad8ad7369c20f905f412a"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Features.CameraShake.dll": {
+    "size": 3584,
+    "sha256": "09c70f204f9073d331fbcf6c1efaee37b85ee3a3d4ed0a0ddbc0282e3d33d51a"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Features.Character.dll": {
+    "size": 4096,
+    "sha256": "bd6a1182c4c1893fe4bf66bff56b1a7f4ea8edd3b5ebb7cc4afadade6eabf490"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Features.Damage.dll": {
+    "size": 8192,
+    "sha256": "8e5aa69bc7df1ff69ceb4318918d82f652f4a0a5fc440b9e560c3cae3de1fabc"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Features.GameChallenges.dll": {
+    "size": 18944,
+    "sha256": "71e6878765ca685327a9c1111d574e01e60479ef92534e77ce355ed188bc1fe4"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Features.GameStateMachine.dll": {
+    "size": 7168,
+    "sha256": "c2f13765f5063c13694242799d9fa302c03b987e16f92b8706b8e756c35c2027"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Features.GrenadeTracer.dll": {
+    "size": 5632,
+    "sha256": "ddefe8cc3ce509505189069d997bea7d808c79880bc3bf1e864d5a47f1f7e7d6"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Features.GyroscopeSupport.dll": {
+    "size": 3072,
+    "sha256": "d2a2ddf8584bdaf3594f6938f073ced6976239d5a7ea48ee013ad8a4ca23ab4f"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Features.Molly.dll": {
+    "size": 7680,
+    "sha256": "143dd932eb9b00f87960881bdc7006b8e6c4503d5991b06892146308a3863c42"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Features.NextGameSearch.dll": {
+    "size": 8192,
+    "sha256": "bd77734a55af39c820bce99d14cd86ed7c18cb01f1c69713bc08adcdff2c6326"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Features.NextMapVoting.dll": {
+    "size": 8704,
+    "sha256": "e7c8cab7aff6f996372ecd0d00f1af2b0b47f8946e858b7b82fd937abe06b406"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Features.OutOfBoundsMap.dll": {
+    "size": 4096,
+    "sha256": "f51bfe015af3b13283bad1ce358a68be7f9c147a6199d86f642e2d24c6a42842"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Features.PlayerAnimation.dll": {
+    "size": 30208,
+    "sha256": "21acfc40a50e8f4cafecfbbe60dbc06191bb2e5d960e87efd7a515c772029916"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Features.SpectatorOutline.dll": {
+    "size": 5632,
+    "sha256": "d7cc2c0e1c98eee5836f7df45aa40585e6c9ff5b4cbd069e6f8f3d232fff7283"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Features.StatTrack.dll": {
+    "size": 9216,
+    "sha256": "369f708de7ed14ffb5aca27df1c984396188a3711ecf9b50ffb409c94ff9639a"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Features.StatTrackAbstractions.dll": {
+    "size": 2560,
+    "sha256": "2cbc9b7320a34d2e66603522ebf47bbcd7c27b7eef3336d1f8feeeae5ef7a3a8"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Features.Voting.dll": {
+    "size": 14336,
+    "sha256": "2dac0422f5837d1f742458dc11b0bc23fea7837eab463d716beb21f99eaf0ebf"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Features.Weaponry.dll": {
+    "size": 45568,
+    "sha256": "c37699375ee1b7af2ec050cee8644de48f4c69db57648e9c8280af8ceddd99ca"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Grenades.dll": {
+    "size": 35840,
+    "sha256": "935d89f8d1b26b6664d9747b019e50627b3deb452a527e34b290ea286970df57"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.HitBoxes.dll": {
+    "size": 4096,
+    "sha256": "172f5723941bcdb6aecfb22133a9de40e2a34aecdfde53e9a87f7ab616d86a23"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.InspectInHands.dll": {
+    "size": 7680,
+    "sha256": "13a10314d3355c41bbd9a92fc21ad0cf05ee9ba79196de832f593637cc82063e"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Markers.dll": {
+    "size": 5632,
+    "sha256": "bfefe76244532fdbdd9c971e5d0776841d0fed46f0c49d0dd79eafd5ba0907c5"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Player.dll": {
+    "size": 87552,
+    "sha256": "d76f1d0d55a4fd64b112b17e52401070e551a476367780657e50894a974b83bd"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.PositionMarkers.dll": {
+    "size": 15360,
+    "sha256": "0fc1b11863252accdee6a2a7922ef8949b5ef12d04ea744d250d907afa30f9a7"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.RadarRender.dll": {
+    "size": 9216,
+    "sha256": "4e7f76f16fdd8dc819649182a89872304314c0139e670002e0362e8ddf125337"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Ragdoll.dll": {
+    "size": 18432,
+    "sha256": "79becb9de80aed6f0e2961402f9049749b162b6380b2e4497ade53b2961787fe"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.TeamColor.dll": {
+    "size": 3072,
+    "sha256": "3a0f68be255d8875c5e141a86446ef87a03d456aef4f4f491ba967fa3ec08006"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.Teams.dll": {
+    "size": 2560,
+    "sha256": "cf94427084a05bb0d5b2a42993806e733906d413a9d38960dd38eb5a0fc90e18"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Gameplay.WeaponMeta.dll": {
+    "size": 8192,
+    "sha256": "b1d64e14572d78a98a9fec6990322654baaca8241b99210bdc2da07bedec0874"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GraffitiPicker.dll": {
+    "size": 6656,
+    "sha256": "eec2ea47764cbb069c3468b38ea46535f142047639e76dfc281f80e2f1d48688"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.GraffitiPreview.dll": {
+    "size": 4608,
+    "sha256": "8160aee6484898b8b2500e170f128eedb70f52fab899f00cb837201aa3ae956d"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Infrasctucture.dll": {
+    "size": 15872,
+    "sha256": "f7c084a193cf12ffafd8cbebaed53ae3297eb79ae77b2d29efd67c07ea980aca"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Inputs.dll": {
+    "size": 7168,
+    "sha256": "05fbbba7ac9898e3bc43c36b64c1b30eb9302240d360e1fdd299e61ff05f707a"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.InputSimulator.dll": {
+    "size": 4096,
+    "sha256": "0470b3128b04047f6ff2517086ff21f237019c733a93a227ca457ffc098bb156"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Level.dll": {
+    "size": 20992,
+    "sha256": "ebf391ae779730bb50c0a8cbe5a7f8eb532d5d1de7dab909c218abecff6e740c"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.MetaServices.dll": {
+    "size": 10752,
+    "sha256": "1eea36adcaffdfc9dfc79b632107a5ff36c23176ee3b0aa72f0904f54ebe8105"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.MetaServices.Fallback.dll": {
+    "size": 5632,
+    "sha256": "477080056a09b164087b4e6c278f9d983b3e69fed2904060b7ee30ca568440da"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Metrics.Client.dll": {
+    "size": 16896,
+    "sha256": "2c2c907d954e038c767efdaa480285a1e9d55be9f3bd6b66852319e33ba051d6"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Metrics.dll": {
+    "size": 10240,
+    "sha256": "9bab8c7fb0c9edff52e0e45e387507317e7cbc2469059dca6b547becc419345e"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.NetCode.dll": {
+    "size": 25600,
+    "sha256": "648156eb9c6d6e2ee35c5ab51a1affa8a5dac0d31353dd4dc0c75f6d84516dbf"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Primitives.dll": {
+    "size": 5632,
+    "sha256": "8978ca39e7f911f6bf40c116500640d31494948757df8492943db6bf666101dd"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Replay.Capture.dll": {
+    "size": 5120,
+    "sha256": "28f12feebaefb5fce0b6611c86eac73e4049ac55d118112d728d59d7114e1d18"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Replay.Shared.dll": {
+    "size": 3584,
+    "sha256": "8cde052c27c807b78d60faea3a9ccc0825a93a077640cd00ca0e39af06b21044"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Replay.Watch.dll": {
+    "size": 4608,
+    "sha256": "f93838be1dc4e72f01091ec3ae52c1a439b0c3d37179bb80251f3572d77dc04e"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.ServerPlugins.CommonPlugin.dll": {
+    "size": 5120,
+    "sha256": "cc1e9052827251c870593867c063d4ce94f979d6c7e5ff7741ecb3c9e1f04c4c"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.ServerPlugins.PluginSupport.Abstractions.dll": {
+    "size": 4096,
+    "sha256": "2b6651560dc40290162e18b229446832283e55e5bd05e0ea699f8bb400393583"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.ServerPlugins.PluginSupport.dll": {
+    "size": 7168,
+    "sha256": "b25b2b395e950ae3c80d27e75a5967f23544016251191939cadd9a1dff0fd29c"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Settings.dll": {
+    "size": 10752,
+    "sha256": "3079801ac05165164809d5c102e98bcc3190b76538de5303d8c792ef5a25f1c8"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Shared.dll": {
+    "size": 4608,
+    "sha256": "cb7ab4426425b997e5b3162ca9fa1b991552f944cefe14c7cecc96baf3702684"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Sound.dll": {
+    "size": 8704,
+    "sha256": "298c8401dbea215db73a39149d0d21dbe037b577fce7312c4c25acb7d11106a5"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Startup.dll": {
+    "size": 12800,
+    "sha256": "f1f97cf23db2f403bb3c73dbd17e7dc3f611e62d2f1169e1d20ee79a84b9a7e7"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.UI.dll": {
+    "size": 20992,
+    "sha256": "abf215d61175258aa99c998cf9c7a6f14dd0352b407bb313610d9c9cee279325"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.UI.GameTesting.dll": {
+    "size": 11776,
+    "sha256": "83823cff2d32f1453ae5df1a4c26d69010812cb08bc26f0fb7cc03b1ef803faf"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.UI.HUD.dll": {
+    "size": 166400,
+    "sha256": "7aa340a773f8f1367c391676bdf44409279b14d33bb0bc8dbe8e466a259a2175"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.UI.ReplayTesting.dll": {
+    "size": 4096,
+    "sha256": "a07fb3e64bf69b127e02efaf8f9919d2c5b46ba23994acd64cee676162e18a1c"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.Utilities.dll": {
+    "size": 12288,
+    "sha256": "5f253a4a868d0cc67a89a46495e5c289680eece629616e8aca426402290824ba"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.WeaponShop.Availability.dll": {
+    "size": 3072,
+    "sha256": "fe0eea620f5962bbbe957b8545be1574ed4ab0f6e436ed4daeed4c129c31c73d"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.WeaponShop.Controls.dll": {
+    "size": 4096,
+    "sha256": "f9c661951c5adb669b924d4f0f88a7378522b59f289801c129ab138386af02e6"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.WeaponShop.dll": {
+    "size": 26624,
+    "sha256": "144dfad9580d3713758335826b29f57ccea199b185d5d7f2611052a975db9c5b"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.WeaponShop.Panels.dll": {
+    "size": 3072,
+    "sha256": "36c442feb485d1663ad886f79f26128433cfb39331667edb84f865b2094ff536"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff.WeaponShop.UI.dll": {
+    "size": 30720,
+    "sha256": "1e945c1156287fdd75bff8bf6366a84adec3faaa11d9665a8dd22214a9a5ffa9"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff2.DLCSupport.Providers.StreamingAssets.Runtime.dll": {
+    "size": 4608,
+    "sha256": "3ce4947551856872e0ecbebeaeed506eb549f027a80888126fd814ffb80786a6"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff2.DLCSupport.Runtime.dll": {
+    "size": 16384,
+    "sha256": "c753ea64e29d9450c3e10ba002dab1d20d51650fad26f44fee834081b7c89643"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff2.GameLink.dll": {
+    "size": 62464,
+    "sha256": "adfd2b3520ae8579f5ba8f64833091af970955b65aaafa6ff4d375d537f24503"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff2.Sdk.Runtime.dll": {
+    "size": 8704,
+    "sha256": "2de7e3c31627977821d8ad895cf19c9ea6554e4989e1e6e2128e5431cff9b123"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Standoff2.Settings.dll": {
+    "size": 6656,
+    "sha256": "0600cc8a3081b4aa48e280bd34c577eab11befd155b72d1da1140c6b100cf2cc"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.Toast.dll": {
+    "size": 4608,
+    "sha256": "b53b19f96d7ca58f9fc2ef8ab4f44e1f7a15b119fd1a5feb5d4aadfe6eca1b98"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.UI.HUD.MVP.Installers.dll": {
+    "size": 24064,
+    "sha256": "884c8e99959a83b9716a964bede62c5bda71dc4930dab3c726d4d6d585d7b841"
+  },
+  "dump 1.0.0/DummyDll/Axlebolt.WorldBrowser.Attributes.dll": {
+    "size": 2560,
+    "sha256": "9d5ed414b0dcbb8157e61d56de572d211d3039dc3bdb0f8e4d2c1c0d83cf6776"
+  },
+  "dump 1.0.0/DummyDll/Bolt.Api.dll": {
+    "size": 686080,
+    "sha256": "deb9a82914bf8287cf5130a19e63c7c5ec518ec9c329b00f6278d02d77296a83"
+  },
+  "dump 1.0.0/DummyDll/Bolt.dll": {
+    "size": 336384,
+    "sha256": "c7d03249873471373f1ac1272b770eeb16c09ad2f674db7ef40dfadabc17dee0"
+  },
+  "dump 1.0.0/DummyDll/Bolt.Matchmaking.dll": {
+    "size": 6656,
+    "sha256": "35ec31f29ab0f3e159a0d8d6a9c032ce2118175221908ce8c728acb9a95409ed"
+  },
+  "dump 1.0.0/DummyDll/BoltMatchmaking.dll": {
+    "size": 11776,
+    "sha256": "9044524c8ecbbb131a20279ab0f64f731049fd1650b8c86036de6a862bb13abe"
+  },
+  "dump 1.0.0/DummyDll/Coffee.UIParticle.dll": {
+    "size": 12800,
+    "sha256": "e87785e1373e387df7afb77ecce2dfc812439e7f4ee45e79324fd0b963a0e3bf"
+  },
+  "dump 1.0.0/DummyDll/Coffee.UIParticle.R.dll": {
+    "size": 2048,
+    "sha256": "c88e4851673dae3fd393f7903ab250201b9183ba7e7763d3fdc82f9bc4a7ef31"
+  },
+  "dump 1.0.0/DummyDll/com.olegknyazev.softmask.dll": {
+    "size": 12288,
+    "sha256": "97f52580459c08b2fb9fe6b3e4a79deb34d5b1365f9bb360a2aedb7cfe7757d6"
+  },
+  "dump 1.0.0/DummyDll/Facebook.Unity.Android.dll": {
+    "size": 2048,
+    "sha256": "cdbb5a2e398e4a20d9bfa028721321bf8dfd24177193c9097989474ba4fa4ed6"
+  },
+  "dump 1.0.0/DummyDll/Facebook.Unity.dll": {
+    "size": 57344,
+    "sha256": "6b55d55d04849ab6fc3efea1f436afa9d512be300e34adfe5b20cecb0c9621ac"
+  },
+  "dump 1.0.0/DummyDll/Facebook.Unity.Settings.dll": {
+    "size": 4608,
+    "sha256": "699e5df1b90bea66bb26c926bda83fc23005a401fa91c010fcd02733d75d6e5b"
+  },
+  "dump 1.0.0/DummyDll/Firebase.Analytics.dll": {
+    "size": 7168,
+    "sha256": "91c6c8215c79546a2b0307bd859133377b31609d561df71f32d731ff857f0d9c"
+  },
+  "dump 1.0.0/DummyDll/Firebase.App.dll": {
+    "size": 17920,
+    "sha256": "3261da8e6913b450902989ec5b2b80a69c3d20deecd2d0cb9d9b75dc99fbdbdc"
+  },
+  "dump 1.0.0/DummyDll/Firebase.Crashlytics.dll": {
+    "size": 10240,
+    "sha256": "cfe18aaf341826da9611b6273573ddd919e1fa930956eefdfbaf41dfee0874ca"
+  },
+  "dump 1.0.0/DummyDll/Firebase.Messaging.dll": {
+    "size": 11776,
+    "sha256": "5877d47d1d6dbeccb93a6554dff391590d9dea8763ded622e676ff6cc8deb05d"
+  },
+  "dump 1.0.0/DummyDll/Firebase.Platform.dll": {
+    "size": 9216,
+    "sha256": "baab8b07c11f1d6cfe07eb58d9a30afd32076793b4bf8c5da169150cb97290a7"
+  },
+  "dump 1.0.0/DummyDll/Firebase.RemoteConfig.dll": {
+    "size": 8704,
+    "sha256": "d53135f5088f8372531b63684bda37496aeaca9b4109b41db6fe2c47a62176d9"
+  },
+  "dump 1.0.0/DummyDll/Flurl.dll": {
+    "size": 9216,
+    "sha256": "1331cf3e0dbea3ee43c1ac9b7beaeea1d0c72a0cc553efa869ff8021c9f2fec4"
+  },
+  "dump 1.0.0/DummyDll/FMODUnity.dll": {
+    "size": 40448,
+    "sha256": "9f0799af0903e3567817dd6c009a94554c737a9c15d806acf6fb09dc8b158367"
+  },
+  "dump 1.0.0/DummyDll/Google.Apis.Auth.dll": {
+    "size": 38400,
+    "sha256": "2cfa8e63f6855eee6ada985b98d48cd7c10bad372a81f9fa84951ed528beb23f"
+  },
+  "dump 1.0.0/DummyDll/Google.Apis.Core.dll": {
+    "size": 20480,
+    "sha256": "bbedde2029b5c73fcc84c96e8dd6f2882eac861a0f3fee6426dcb245f809e4af"
+  },
+  "dump 1.0.0/DummyDll/Google.Apis.dll": {
+    "size": 13824,
+    "sha256": "c657be52f4bb4c58f9f6d5da3666583e01539847ff95e21892f7a62d8fe43104"
+  },
+  "dump 1.0.0/DummyDll/Google.Apis.Drive.v3.dll": {
+    "size": 4608,
+    "sha256": "8b6db08b0477facc8f82b69dba70273b2554d34cc4e2c89ab26530fd36a9c0b1"
+  },
+  "dump 1.0.0/DummyDll/Google.Play.Common.dll": {
+    "size": 5120,
+    "sha256": "75a31f8ec86422a5e6c0fa1bc56cfdd2997153e5cc14d2cd89d109808661f530"
+  },
+  "dump 1.0.0/DummyDll/Google.Play.Core.dll": {
+    "size": 4096,
+    "sha256": "e06b94998be9e61751a1aecc3b60cd9a8da91697fafed2e953460534e29fe2c0"
+  },
+  "dump 1.0.0/DummyDll/Google.Play.Games.dll": {
+    "size": 11776,
+    "sha256": "14ac314f3b9b334f5862f87e5f75243d4ea6d4fc2f6c29d0909a0e3646af9229"
+  },
+  "dump 1.0.0/DummyDll/Google.Play.Integrity.dll": {
+    "size": 4608,
+    "sha256": "9309425199b75745983e900e0c46a7519bd740f724380e0d53f25c7802986b59"
+  },
+  "dump 1.0.0/DummyDll/Google.Protobuf.dll": {
+    "size": 100352,
+    "sha256": "9e43b3d01fbcafb61e7d1d3793beb3a7e184d15f661f554f7d75f1c77b8de388"
+  },
+  "dump 1.0.0/DummyDll/GoogleSignIn.dll": {
+    "size": 6656,
+    "sha256": "04dcb4ec27d347783082377d151ffdd6e53aa389a6ed2f1f1d59d7f279c69c25"
+  },
+  "dump 1.0.0/DummyDll/IngameDebugConsole.Runtime.dll": {
+    "size": 18432,
+    "sha256": "c47a58d111e9bda7c1ddfee9731cc445fbc97ad07d87a05a09bf8d8ef59fa21a"
+  },
+  "dump 1.0.0/DummyDll/JetBrains.Lifetimes.dll": {
+    "size": 27648,
+    "sha256": "31b13ee49b0313cfb9ab0e23b28b26291acb1913807637eb415b475f726af060"
+  },
+  "dump 1.0.0/DummyDll/K4os.Compression.LZ4.dll": {
+    "size": 15360,
+    "sha256": "39c9a52a1506e12a85daeba45ecafe24d9aa0182ff1023a8f89549cfe52eb541"
+  },
+  "dump 1.0.0/DummyDll/K4os.Compression.LZ4.Streams.dll": {
+    "size": 9728,
+    "sha256": "fcc11ffed3592ed5f20fc03fc17691937ed377996ba8f5e8658fd857a0ee22d6"
+  },
+  "dump 1.0.0/DummyDll/K4os.Hash.xxHash.dll": {
+    "size": 3072,
+    "sha256": "ce7cdf9a9feed5186bc79c96d5f8e93cf7bb542e51b4ab40ca7a625e0861ae5d"
+  },
+  "dump 1.0.0/DummyDll/Microsoft.Bcl.AsyncInterfaces.dll": {
+    "size": 4608,
+    "sha256": "b62caca446350fcf77224dee2c455494f8e9c591756eaf038c4c67a1d46a6a6c"
+  },
+  "dump 1.0.0/DummyDll/Microsoft.Extensions.Configuration.Abstractions.dll": {
+    "size": 5632,
+    "sha256": "4b09daba6e662bd09231a47cabf24f8de58aaa1bcefb503e3ec3a83d2520e359"
+  },
+  "dump 1.0.0/DummyDll/Microsoft.Extensions.Configuration.Binder.dll": {
+    "size": 8704,
+    "sha256": "ecccc3e165f339d28b8c106879d86bca541cd5ae7b936c6c1cd042bd98bdd84b"
+  },
+  "dump 1.0.0/DummyDll/Microsoft.Extensions.Configuration.CommandLine.dll": {
+    "size": 4096,
+    "sha256": "5a0bc613a31b3c303f48ef98ab6ae3038992ded22164bb6d6f9fac2c40d0683c"
+  },
+  "dump 1.0.0/DummyDll/Microsoft.Extensions.Configuration.dll": {
+    "size": 6656,
+    "sha256": "860548c543a8b68eb86e15d579737ab66f53a2ec6435cbe4f3a033dd4a78e6e2"
+  },
+  "dump 1.0.0/DummyDll/Microsoft.Extensions.Configuration.EnvironmentVariables.dll": {
+    "size": 3072,
+    "sha256": "0c8571960fddfd6421ac69f828a57dbd300cd14d5d2c5a6de39c94503a37fd08"
+  },
+  "dump 1.0.0/DummyDll/Microsoft.Extensions.Configuration.FileExtensions.dll": {
+    "size": 5632,
+    "sha256": "0e53865a2cb70028a0908d78d40a83b6f3fbe1e310309212e11583d3c4ac761c"
+  },
+  "dump 1.0.0/DummyDll/Microsoft.Extensions.Configuration.Ini.dll": {
+    "size": 4096,
+    "sha256": "4603d18b4400d805302135e1de1ab5963a67a9c6566698b11f62b8909902c85e"
+  },
+  "dump 1.0.0/DummyDll/Microsoft.Extensions.FileProviders.Abstractions.dll": {
+    "size": 3584,
+    "sha256": "e84d80c1f34f0425794e048afcd6291aea60949c490b3908ff6f245ec129f24c"
+  },
+  "dump 1.0.0/DummyDll/Microsoft.Extensions.FileProviders.Physical.dll": {
+    "size": 10240,
+    "sha256": "a75b3999de74b9de0f359c07a2bc224a83e73deb58c93d961eaf2aa81bd49228"
+  },
+  "dump 1.0.0/DummyDll/Microsoft.Extensions.FileSystemGlobbing.dll": {
+    "size": 12800,
+    "sha256": "cdece6687bda785ab6b2e80bcd23cd02bdf2ac940daefa78694d90da66fb9d0b"
+  },
+  "dump 1.0.0/DummyDll/Microsoft.Extensions.Primitives.dll": {
+    "size": 8192,
+    "sha256": "bf3023f537d4b0c6372f9358067fc5e1724f7fc5d67b9b813d20158f981902a8"
+  },
+  "dump 1.0.0/DummyDll/Mono.Security.dll": {
+    "size": 39936,
+    "sha256": "f5cfc9bedce3cb0ac33f0ede190e182511c42fafaedb726d04e4e7a250426ecb"
+  },
+  "dump 1.0.0/DummyDll/mscorlib.dll": {
+    "size": 658944,
+    "sha256": "841f3d031f95349134793e4f0477325b92e5dd0edc2604cc07a3e5c3789ff8a3"
+  },
+  "dump 1.0.0/DummyDll/NativeGallery.Runtime.dll": {
+    "size": 4096,
+    "sha256": "146d024e021a2ce802d0d49b81e650019c52e6e4dae347cd7d49e5b71224f8ad"
+  },
+  "dump 1.0.0/DummyDll/NativeShare.Runtime.dll": {
+    "size": 3584,
+    "sha256": "3738af62a238f4b68773127d765d400a8d6ad9c894bf25c3ab8454ba17777405"
+  },
+  "dump 1.0.0/DummyDll/NetCode.Framework.dll": {
+    "size": 87040,
+    "sha256": "584d3e7df2d721ea34b366f314fae9aae7bab75b2a161263ed284204fee38e48"
+  },
+  "dump 1.0.0/DummyDll/NetEscapades.Configuration.Yaml.dll": {
+    "size": 3584,
+    "sha256": "17f9a9d111ea7ff3a5eb9e72715c5095bcd3f767e81dd6e0d226c0d49d889488"
+  },
+  "dump 1.0.0/DummyDll/Newtonsoft.Json.dll": {
+    "size": 114688,
+    "sha256": "275dffa9904cb7eb2e820e06c3d9c3063994126647379f1e6ac7aa37ca4965aa"
+  },
+  "dump 1.0.0/DummyDll/PrimeTween.Runtime.dll": {
+    "size": 26624,
+    "sha256": "666a92e1cd9bfd04e2f13b962c29f8584928b4e4e6fa18288112f83f49ed1a98"
+  },
+  "dump 1.0.0/DummyDll/Purchasing.Common.dll": {
+    "size": 3584,
+    "sha256": "9d7303320a36d8a0f365f0af49e85942de22a69997e3e47790edac54db9a3181"
+  },
+  "dump 1.0.0/DummyDll/RpcSupport.dll": {
+    "size": 42496,
+    "sha256": "feada6c50fbd71a3b2b1d9b806083f1823b878658ae27190c5e6c4037b78fd33"
+  },
+  "dump 1.0.0/DummyDll/SerializableDictionary.dll": {
+    "size": 5120,
+    "sha256": "6357d2e023e453ed751f6a4d21e4a485fae50fe663d36be7625010728aaa9de2"
+  },
+  "dump 1.0.0/DummyDll/Standoff2.Matchmaker.Client.dll": {
+    "size": 14848,
+    "sha256": "ca7431af9c14e61f7d4930133a8725f0fdf19d8f5afb4f2903830feea9f793c5"
+  },
+  "dump 1.0.0/DummyDll/Standoff2.Matchmaker.Contracts.dll": {
+    "size": 13824,
+    "sha256": "ea33fa6ce0d43e693fa14616adee71c1361785e46843207746611e9f9ac940b3"
+  },
+  "dump 1.0.0/DummyDll/SteamAudioFMODStudio.dll": {
+    "size": 3072,
+    "sha256": "b3ebf6130fb0fb3b0da0006a959d8f35b7e9a802ed2707d2d6604aa4af6aad3a"
+  },
+  "dump 1.0.0/DummyDll/SteamAudioUnity.dll": {
+    "size": 29696,
+    "sha256": "d08e518b252a00b03a18cb6ad3dde105f81678ea1f6de8e571dd02dfd480b129"
+  },
+  "dump 1.0.0/DummyDll/System.Core.dll": {
+    "size": 139776,
+    "sha256": "7413ca6b0c74ef16fab06692bf7f05638c66eb6b1caa78e8de32d446f182ff2c"
+  },
+  "dump 1.0.0/DummyDll/System.Data.dll": {
+    "size": 130560,
+    "sha256": "ca9c460cea3da58315847e2a77261a44693abc6df4af82f39495041dfc87ca56"
+  },
+  "dump 1.0.0/DummyDll/System.dll": {
+    "size": 269312,
+    "sha256": "497a80ebbe7c58702c2ec1f3f7674a30af892a123089676fd884f4c3224bd18c"
+  },
+  "dump 1.0.0/DummyDll/System.Drawing.dll": {
+    "size": 6656,
+    "sha256": "e30d864e452c48c9cdbc466662642a83c8007c9333520c7f422e524da76b41e5"
+  },
+  "dump 1.0.0/DummyDll/System.IO.Pipelines.dll": {
+    "size": 3072,
+    "sha256": "a2bee151b99c9f8600ff67536c45ca3e3019f2328d7cacc282d8068d6940a9e2"
+  },
+  "dump 1.0.0/DummyDll/System.Management.dll": {
+    "size": 2560,
+    "sha256": "0c45163a263ffa76358f17b1592a7fc9e968d849d8409b98fbb35def33a8a87e"
+  },
+  "dump 1.0.0/DummyDll/System.Net.Http.dll": {
+    "size": 28160,
+    "sha256": "3282a682e07cc0e2b956c7496b5fa4b2f6636db223be28b91116d6196dec93a1"
+  },
+  "dump 1.0.0/DummyDll/System.Numerics.dll": {
+    "size": 9216,
+    "sha256": "c8eb79768d2ebe09c741a7d0addc7759d7b3f7dfafcd0d369290d3ba1d00be85"
+  },
+  "dump 1.0.0/DummyDll/System.Runtime.CompilerServices.Unsafe.dll": {
+    "size": 2560,
+    "sha256": "cb8d1e40a30811591d319058bf926cff8c50546657a09bcebd84e77059276d89"
+  },
+  "dump 1.0.0/DummyDll/System.Runtime.Serialization.dll": {
+    "size": 2048,
+    "sha256": "3202cc89efb97819eaf1c3e7c5ec71a7fb3efabd983f4632213871c5935ffdeb"
+  },
+  "dump 1.0.0/DummyDll/System.Text.Encodings.Web.dll": {
+    "size": 10240,
+    "sha256": "7b61dea069da2c16ee77af8c95b4f1d826550764d21189803923e077173fc438"
+  },
+  "dump 1.0.0/DummyDll/System.Text.Json.dll": {
+    "size": 174592,
+    "sha256": "107ee65c84545fe12cf895ec4e80c5d2d8e9895f8145734a06d1ed6a5f42b180"
+  },
+  "dump 1.0.0/DummyDll/System.Xml.dll": {
+    "size": 313344,
+    "sha256": "4d79f3f33a5d34645ed7ce3fdb4837de7e0d0503db213875ec0206c33d02f45c"
+  },
+  "dump 1.0.0/DummyDll/System.Xml.Linq.dll": {
+    "size": 11776,
+    "sha256": "9bcb867b87f25f04214dc109b9ec95e512e9211ddc97299b34642ae1e66b8343"
+  },
+  "dump 1.0.0/DummyDll/Unity.AI.Navigation.dll": {
+    "size": 8704,
+    "sha256": "41d2a19ba52d7039d1adc0bde050856f1e503d4abf55ed406f6e48e32e1c00d0"
+  },
+  "dump 1.0.0/DummyDll/Unity.Burst.dll": {
+    "size": 9728,
+    "sha256": "ff6b2d113cc37008b6b068e44f132d070e8480a98b960e316c29c524cabd5f00"
+  },
+  "dump 1.0.0/DummyDll/Unity.Burst.Unsafe.dll": {
+    "size": 2048,
+    "sha256": "8553a3961b9c9713027963573d1d2694cd49b076690fc895879164b785a7b4b2"
+  },
+  "dump 1.0.0/DummyDll/Unity.Collections.dll": {
+    "size": 27136,
+    "sha256": "fab7f4ac94bcb4f1548a0fd593acff1d805f182045d91bbded8fb6944b09c36b"
+  },
+  "dump 1.0.0/DummyDll/Unity.Collections.LowLevel.ILSupport.dll": {
+    "size": 2048,
+    "sha256": "c8db853cb94391202fbb3da2dd6f8148b12a717a16d835c49805962a7f66dd71"
+  },
+  "dump 1.0.0/DummyDll/Unity.InputSystem.dll": {
+    "size": 221184,
+    "sha256": "8d35cc27c021b95d6c60513c678e9bfd8cd97fb880cd2d5999b1f511eb1cbb2e"
+  },
+  "dump 1.0.0/DummyDll/Unity.InputSystem.ForUI.dll": {
+    "size": 4608,
+    "sha256": "16032e86ae5de17183e477638ed11f9ebe468eaec16b06d543cf6a919147ca09"
+  },
+  "dump 1.0.0/DummyDll/Unity.InternalAPIEngineBridge.004.dll": {
+    "size": 2048,
+    "sha256": "38e44a7c726cdd9ce6388e83206183b817d9c6f0f9cecfd013b2dacb3084594f"
+  },
+  "dump 1.0.0/DummyDll/Unity.LevelPlay.dll": {
+    "size": 14848,
+    "sha256": "5aff24e90ad9bb59e13e135981e2001db187cc43ca2a6c417bf54f753e335b93"
+  },
+  "dump 1.0.0/DummyDll/Unity.Mathematics.dll": {
+    "size": 7680,
+    "sha256": "e33d9591ef1d44010f6ab8e6d877269939c7bc9e03dccb028e0cc2939748b515"
+  },
+  "dump 1.0.0/DummyDll/Unity.Postprocessing.Runtime.dll": {
+    "size": 36864,
+    "sha256": "0123c43c086d58e82d892f0a34fe29d25e0a9a22e6e5cfcbb0ee71e73f9d0264"
+  },
+  "dump 1.0.0/DummyDll/Unity.RenderPipelines.Core.Runtime.dll": {
+    "size": 26624,
+    "sha256": "f580e5b74c1dea73ef0f43c6093c88815448666da276ab4b28152f04ce5f1d52"
+  },
+  "dump 1.0.0/DummyDll/Unity.Services.Core.Configuration.dll": {
+    "size": 3584,
+    "sha256": "c5e50a9ec53bd9086ee1b3db215b59e912bec095e67a9c32b1e42ef65842854e"
+  },
+  "dump 1.0.0/DummyDll/Unity.Services.Core.Device.dll": {
+    "size": 3072,
+    "sha256": "592e85f28235891617387b6e64fa92d9f66dc6c957e51b3e5b81e5dcf6b4607a"
+  },
+  "dump 1.0.0/DummyDll/Unity.Services.Core.dll": {
+    "size": 4096,
+    "sha256": "d30ed3aa98172dc78f482c39137150bcf37522145f574a1caaf5ce498c0249d8"
+  },
+  "dump 1.0.0/DummyDll/Unity.Services.Core.Environments.dll": {
+    "size": 2048,
+    "sha256": "66ec52c8e795894af998deb3b46d099816b8f96e8308a62080b56c7524ad4569"
+  },
+  "dump 1.0.0/DummyDll/Unity.Services.Core.Environments.Internal.dll": {
+    "size": 2048,
+    "sha256": "192db00c35c117840294290fb1ca3beedc78feb70ad68575f8a9a330a6a808ff"
+  },
+  "dump 1.0.0/DummyDll/Unity.Services.Core.Internal.dll": {
+    "size": 14336,
+    "sha256": "504ba726ca3218c9f426e32086f4fae40bc4416b222e361ee63e83e047999953"
+  },
+  "dump 1.0.0/DummyDll/Unity.Services.Core.Registration.dll": {
+    "size": 5632,
+    "sha256": "f783cfc603732f8554126eda9e09e685958cdce20f129bf83d915c7331ac1b2c"
+  },
+  "dump 1.0.0/DummyDll/Unity.Services.Core.Scheduler.dll": {
+    "size": 3584,
+    "sha256": "a39b8a3c704459c42ba6c1a3ece25149655bc70e9eaf6ce6ab48ae3024e21472"
+  },
+  "dump 1.0.0/DummyDll/Unity.Services.Core.Telemetry.dll": {
+    "size": 2560,
+    "sha256": "0fc8e137bd47ef8a83d0b31850f29ededf4553cca0efd9ac36fc83f12ce7ffa6"
+  },
+  "dump 1.0.0/DummyDll/Unity.Services.Core.Threading.dll": {
+    "size": 2048,
+    "sha256": "4a1bae566602de5b5983d73a1ef2efb947f0a55a421a9c1e96dd06c3cd192ce3"
+  },
+  "dump 1.0.0/DummyDll/Unity.Services.Vivox.dll": {
+    "size": 110592,
+    "sha256": "e921669c98abf66c2a3f57fe7ef686ce972f85ddca116029d26b35bffbba948e"
+  },
+  "dump 1.0.0/DummyDll/Unity.TextMeshPro.dll": {
+    "size": 88064,
+    "sha256": "b8fdf4497f4166fd5d6b9bbb85cb18312fb0816c022779460d877c49271cbbbe"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.AIModule.dll": {
+    "size": 8192,
+    "sha256": "a9ebcbd6c69b271833bb3cce14bcca7084dfa185e5ba6010f5b5c0cf50622835"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.AndroidJNIModule.dll": {
+    "size": 29696,
+    "sha256": "9142a0a6ea4a7759b2fbf9f0d3ca931e5a1a79bbdf6f5c7eb54dcc6f05d0dafd"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.AnimationModule.dll": {
+    "size": 41984,
+    "sha256": "3f5a1481a4e4a21ba7a4ea7bb5dc203b1942a5f1326facdf9ee08dc96d56f0a1"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.AssetBundleModule.dll": {
+    "size": 3584,
+    "sha256": "c0184d6441a42b6ad5a13d7e77007ffd31b5a58d24146b3fda5a99c39442ea64"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.AudioModule.dll": {
+    "size": 8704,
+    "sha256": "a95be57673f534d1a48ccd43cb1ab9856755412f523a1e9389256678abe67118"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.CoreModule.dll": {
+    "size": 376832,
+    "sha256": "1e1403286e1cddd7b241cab0cd2a83c774dae4be4f90af18891f0fd3d22c4e3d"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.dll": {
+    "size": 1536,
+    "sha256": "e2c0dad829f6553290e7228fc57be0860464be83a37a94c2813fa19d2bf9f2cc"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.GameCenterModule.dll": {
+    "size": 2048,
+    "sha256": "804708acbbbf090172cb9ed4c82525dd1d3b311084af3ca6abb435bacbc98341"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.HierarchyCoreModule.dll": {
+    "size": 15872,
+    "sha256": "b7d10bb05443e43a73740e1b03b7ac07e09db678e2389f730d6f5cbfd33d1e99"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.IdentifiersModule.dll": {
+    "size": 2048,
+    "sha256": "7452a75bd03a2ba31fd56adb26d5db82697534864be609103bef9b1a48bf5ee8"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.ImageConversionModule.dll": {
+    "size": 2560,
+    "sha256": "e726247aa069c5d662780ffd80aa50cc767254208e8bf1dd2ba2992b6c034de9"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.IMGUIModule.dll": {
+    "size": 40960,
+    "sha256": "ca5e5310de599abb4dcddea74a1c319cd20694ed7c6bded177d9f937f020a29a"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.InputForUIModule.dll": {
+    "size": 14848,
+    "sha256": "325843e1ac42443d3f71bb0a849c78c2c52ed6be01eb7eadd4d843f104a17818"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.InputLegacyModule.dll": {
+    "size": 6144,
+    "sha256": "405f52dc4ab1e640bbcc898856ad2a80a993039822132105616ce9901a7d86b4"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.InputModule.dll": {
+    "size": 3584,
+    "sha256": "dc2b929aa149c84278d76e6e9af663309689227d38f809f3f0d51be34bb9b17b"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.JSONSerializeModule.dll": {
+    "size": 2560,
+    "sha256": "3a1fef70a71e473dd234a495efbbc108e1d875d8ae8925e644531076b0486110"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.MultiplayerModule.dll": {
+    "size": 2048,
+    "sha256": "7dab553412afe79a97c484ced331ca3acd1ba5d50acf271c746ec7d9183c9ea3"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.ParticleSystemModule.dll": {
+    "size": 27648,
+    "sha256": "cf7540e52ff2408dc992bfaef72bc8d21466401bc4ccf9890301c2afff83e5b6"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.PhysicsModule.dll": {
+    "size": 32256,
+    "sha256": "417aa8c001f6e4ac0c86ed35ce165be5e035331af10a36f8744c2a9d383a774b"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.PropertiesModule.dll": {
+    "size": 29696,
+    "sha256": "eb77442b794e4d9c4f5353d3c25f3d999f1f0025c935f65678089028197c23df"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.Purchasing.AppleCore.dll": {
+    "size": 2048,
+    "sha256": "a0734dc35373455aa00e7fc005614b41c5eae1282b642ad7cfca9a62516e864e"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.Purchasing.AppleMacosStub.dll": {
+    "size": 2560,
+    "sha256": "f0e62b487a0552268c3fcd08193c68dbfb233aafb1e4368808502db53a248c70"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.Purchasing.AppleStub.dll": {
+    "size": 2560,
+    "sha256": "89b352bbe285e592049744b09aa19e69ee39c96c29ed8c4d5d449fc0ee7fed5b"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.Purchasing.dll": {
+    "size": 18432,
+    "sha256": "37bed16d2dc9535a36dbe07d908487eea225456e8ff6c403c166f0088024725f"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.Purchasing.Security.dll": {
+    "size": 9728,
+    "sha256": "6d6fdfa98dc700b4e4b5532f9793111d9a62851f4397bf0ba393d6495afb70d6"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.Purchasing.SecurityCore.dll": {
+    "size": 3584,
+    "sha256": "7d0f1348fc1a74899bafe8c58f5d838d115dea94477919b2ad5cb7f3e41b81db"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.Purchasing.Stores.dll": {
+    "size": 56832,
+    "sha256": "1ba3964a4c481000b827092097ef99a21500b19e3170bcf678adab31be772bfe"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.Purchasing.WinRTCore.dll": {
+    "size": 3072,
+    "sha256": "5c2804b1a8fb882105def073074b9d0591b4b33fbe2d3efb20f92fa13f7921f1"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.Purchasing.WinRTStub.dll": {
+    "size": 2048,
+    "sha256": "54a382bb8c48b687f70da4c40374c394cce53ee0936995d253898012f1612053"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.ScreenCaptureModule.dll": {
+    "size": 2048,
+    "sha256": "74061e3b8d6279c0f2a70868b870a0b660e2c9bc86b30340a57c91e7bd34dbdc"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.SharedInternalsModule.dll": {
+    "size": 5632,
+    "sha256": "0704b0121f4d4c44c4081d32888d61a01c11c93c9ac0817173c4668e6a251fe2"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.TerrainModule.dll": {
+    "size": 5120,
+    "sha256": "f66f199eec7f2210d6aef4ca4ab9e5c7293781a9e0357b288130b46ea2e2ab46"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.TextCoreFontEngineModule.dll": {
+    "size": 14848,
+    "sha256": "453463f100ffc73198d065a37d79ec3a83cfd0813be68ab3bac3a2671a12c6e8"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.TextCoreTextEngineModule.dll": {
+    "size": 64512,
+    "sha256": "de393fff035c199d53242995b5c0dd2106c8ee192842b3def05f916793ca0838"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.TextRenderingModule.dll": {
+    "size": 9216,
+    "sha256": "ffc32b21763a9a2175c0b7ddc47d69f8979e94a2624216fd23ff1ed45e84a25d"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.UI.dll": {
+    "size": 81920,
+    "sha256": "aff27e5cc7c8b570fa25668734313f88b0e5595ce77f871bb62b5d37da6593a8"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.UIElementsModule.dll": {
+    "size": 593408,
+    "sha256": "d307dd280040f543449443db63d1e2770d32a221ae1d71a9c8856e321caa086c"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.UIModule.dll": {
+    "size": 14336,
+    "sha256": "b735305dc1a0a0be5ba45d325d5664e9afee0bc5e207deba832672e3a84e3067"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.UnityWebRequestAssetBundleModule.dll": {
+    "size": 2560,
+    "sha256": "c61a1609737ef7cc50751423f4b33e6d31c472f1a5197ef9ebc24b20cd6a1a73"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.UnityWebRequestModule.dll": {
+    "size": 11264,
+    "sha256": "a79a5a3fdc30b92137067b3ded88b90937f2b320f40d71da851a2199a0cdbf7a"
+  },
+  "dump 1.0.0/DummyDll/UnityEngine.VideoModule.dll": {
+    "size": 4096,
+    "sha256": "1cafb40ee49404b084250007b84d07d6e2a06a21d66278087f8768274671bc31"
+  },
+  "dump 1.0.0/DummyDll/Utf8StringInterpolation.dll": {
+    "size": 5120,
+    "sha256": "361297bcdd5377939862b67b6ad0c242854a93a6e75e89811496d9700c510311"
+  },
+  "dump 1.0.0/DummyDll/VContainer.dll": {
+    "size": 29696,
+    "sha256": "9effb2448f565b55890915531dc9119f1e006a7b72bbce545f545b0f3804144f"
+  },
+  "dump 1.0.0/DummyDll/WeaverDev.DebugGUI.dll": {
+    "size": 7168,
+    "sha256": "32ffac8dc012310740942d0056acf4b8834c0a8f841a7bdf8794bccc67c4ed99"
+  },
+  "dump 1.0.0/DummyDll/YamlDotNet.dll": {
+    "size": 20992,
+    "sha256": "01bec92e7665d0749b5129c9a0b4b7fe3fd6fcc46cd86d6852a2a665c33b2300"
+  },
+  "dump 1.0.0/DummyDll/ZString.dll": {
+    "size": 6656,
+    "sha256": "4cb57d6075d0f817c610d390c0574d6ddc6c250b17b29927e17775f724e429b5"
+  },
+  "dump 1.0.0/DummyDll/zxing.unity.dll": {
+    "size": 60928,
+    "sha256": "281d7490ecc37da8db8494c8ce14d31c6521320fbff5d090c32243708c7c3c23"
+  },
+  "dump 1.0.0/DummyDll/_Activities.dll": {
+    "size": 53248,
+    "sha256": "f0a9fbbeaa4cefb94ab0fa8d55fa9b14e4f6f3824b5d8672dda8e8a7ad6f6e39"
+  },
+  "dump 1.0.0/DummyDll/_Analytics.dll": {
+    "size": 17920,
+    "sha256": "f2fc2922026af144a559d033a9d2f277c58ff8feb230a9891a89936192524cf8"
+  },
+  "dump 1.0.0/DummyDll/_Bolt.dll": {
+    "size": 11776,
+    "sha256": "7f13a3f8df1c32813a499b64baea55ee12d4f1717cb29ccc1c41377d1cf28f92"
+  },
+  "dump 1.0.0/DummyDll/_Bolt.Localization.dll": {
+    "size": 3072,
+    "sha256": "ca281acc8a78e673706233a92eb2e3f2f1a1b4dd9427cbb2ae7f1bdc0a0db6d4"
+  },
+  "dump 1.0.0/DummyDll/_Bolt.Utilities.dll": {
+    "size": 2560,
+    "sha256": "e78140318de58f36eef7bb747eaf4f1ac34e0fbe595dbad15f5a5d6fb71ff126"
+  },
+  "dump 1.0.0/DummyDll/_Bootstrap.dll": {
+    "size": 20480,
+    "sha256": "27440c4980d4d8f6e875304d4c951e4daca13136802b21ef5e61f92cdcf04cf2"
+  },
+  "dump 1.0.0/DummyDll/_Collections.dll": {
+    "size": 5632,
+    "sha256": "2d28cd14382194cbea932e94e6fbfa13f15e3e080597759f45497e818fc86983"
+  },
+  "dump 1.0.0/DummyDll/_Components.Actions.dll": {
+    "size": 7680,
+    "sha256": "08b72fdcd2ae7c3335f247a552956c8842c4f15acdfb751bf33c2229f315a4cf"
+  },
+  "dump 1.0.0/DummyDll/_Components.AsyncOverlay.dll": {
+    "size": 6656,
+    "sha256": "88227d3753d0cafad80abca9aba2cbf76c497bf10b83e4c89aa03e8869623765"
+  },
+  "dump 1.0.0/DummyDll/_Components.Dialogs.dll": {
+    "size": 8192,
+    "sha256": "c1591f77a434990f98ecd9d5d34a77736c754044d1d91b62dd0beae38d1bc5d5"
+  },
+  "dump 1.0.0/DummyDll/_Components.InGameNotifications.dll": {
+    "size": 7168,
+    "sha256": "ebc48698eca9a20da578e2c6cd77b29d889566b503739217c848abb323887312"
+  },
+  "dump 1.0.0/DummyDll/_Components.Localization.dll": {
+    "size": 3584,
+    "sha256": "19a939ef351ba3d95f99a75d4b0e7682389adbc82aacaf8bb6944df228f463ad"
+  },
+  "dump 1.0.0/DummyDll/_Components.MatchSearchOverlayEffect.dll": {
+    "size": 3072,
+    "sha256": "c29944d3aec8f43c163a6527057659d71b8f3214ad1015beaf117c3062e8126d"
+  },
+  "dump 1.0.0/DummyDll/_Components.TaskExecutor.dll": {
+    "size": 4608,
+    "sha256": "a7ce3f7f88f0eb6f220efc0939dab06d2f42f6429f7ec0e6c042c859706668b5"
+  },
+  "dump 1.0.0/DummyDll/_Components.Toasts.dll": {
+    "size": 4608,
+    "sha256": "974edbc4338c0810e8dba70b830788d33b7c6688d7ee96f2ee64b5acc7af7ca8"
+  },
+  "dump 1.0.0/DummyDll/_Components.Tooltips.dll": {
+    "size": 8704,
+    "sha256": "fdfc984498d1faf6640e7a61f4245b84854a51a51a99b2d0eeaae825cd74015a"
+  },
+  "dump 1.0.0/DummyDll/_Constants.dll": {
+    "size": 2048,
+    "sha256": "7539d789992caf9f6d0f54634d144b8e548f7a2854da03f2745fb87744efa3de"
+  },
+  "dump 1.0.0/DummyDll/_Content.dll": {
+    "size": 20992,
+    "sha256": "769c1644cf494dea85ea7426cc8f26c6312880f373b9e7a9a260ac61a24197f8"
+  },
+  "dump 1.0.0/DummyDll/_Dlc.BoltContent.dll": {
+    "size": 8192,
+    "sha256": "44b2efae3215956c615ea6bb2b9900e6850558430b918ef4d8e76b468d9c76f9"
+  },
+  "dump 1.0.0/DummyDll/_Dlc.dll": {
+    "size": 5120,
+    "sha256": "b96fc448929f53b68abb31643de7beefb2de8aac77a3594adae4aaa4b199565d"
+  },
+  "dump 1.0.0/DummyDll/_Dlc.ResourcesContent.dll": {
+    "size": 7680,
+    "sha256": "25b5cafa59c3e1f404d52bb5970f716671d469d3bed94ab23d67fe31328a4bd0"
+  },
+  "dump 1.0.0/DummyDll/_Game.Background.dll": {
+    "size": 4608,
+    "sha256": "ddb64b19d7f31391a94048632006534cbcfe045c74f51a715ec29a0c5fe12cd6"
+  },
+  "dump 1.0.0/DummyDll/_Game.dll": {
+    "size": 5120,
+    "sha256": "75358b41a702d9cedb585b65a8d5d18e3d0ac50e20a9f59f560bf89295deab28"
+  },
+  "dump 1.0.0/DummyDll/_Game.GameEnding.dll": {
+    "size": 48128,
+    "sha256": "802639473ba1d7c3985beeda481670e4ba7e4f59cd60be28b7aee94cf1adb4af"
+  },
+  "dump 1.0.0/DummyDll/_Game.Legacy.dll": {
+    "size": 3072,
+    "sha256": "142c2d4aa111e86dc3c0a813ee22cd4625d726bc1262ac536f5c35ddccf6236b"
+  },
+  "dump 1.0.0/DummyDll/_Game.Pause.dll": {
+    "size": 20992,
+    "sha256": "f51dec9631e51b4af0d6f2dfd8af92e47dd1476ab9d4a8b9a91eb43403674d0c"
+  },
+  "dump 1.0.0/DummyDll/_Game.Routes.dll": {
+    "size": 2560,
+    "sha256": "8de8238df16605359deb40eea987c1e561243b6ef2e0d60f261c77ef3a69f401"
+  },
+  "dump 1.0.0/DummyDll/_Game.TeamSelect.dll": {
+    "size": 3072,
+    "sha256": "baa94e8094d0dedee9039116c3e249cc3df40aa4c88d13b1d838f9ba2b7e7c94"
+  },
+  "dump 1.0.0/DummyDll/_Game.Tutorial.dll": {
+    "size": 4608,
+    "sha256": "a179925fa412dc26808b2d793c160ce4a73637a5866174809b125a86ad0c9b44"
+  },
+  "dump 1.0.0/DummyDll/_I2.dll": {
+    "size": 55808,
+    "sha256": "e924e1251dca1b90bf63e5b4283745f0ee5e6bdaead7bf74dc974a26d3838ad9"
+  },
+  "dump 1.0.0/DummyDll/_Infrastructure.App.dll": {
+    "size": 10752,
+    "sha256": "859c2e125e86d97f5d5fd03e6cb61ef54f7c1f188fab65c31413908c8da3eac2"
+  },
+  "dump 1.0.0/DummyDll/_Infrastructure.Audio.dll": {
+    "size": 6144,
+    "sha256": "9e1b015e925eb4f5c41334bec8d3d6d74b7dce741ff062b188406f626f8999e9"
+  },
+  "dump 1.0.0/DummyDll/_Infrastructure.Cdn.dll": {
+    "size": 5120,
+    "sha256": "a57ff47f2e5bb53adfdef45234ee3c7a686149a69dc83e8a774b8c80027fefe8"
+  },
+  "dump 1.0.0/DummyDll/_Infrastructure.Cdn.UI.dll": {
+    "size": 3584,
+    "sha256": "f987cf8430f90523ee044ca1688b89771503992eb0ef6f46742f84508a0e42d2"
+  },
+  "dump 1.0.0/DummyDll/_Infrastructure.ClipboardCopy.dll": {
+    "size": 3072,
+    "sha256": "51a39def6811acc3c722cd37886c68e6fbac017d5f3da7c0ec63c24796489fc9"
+  },
+  "dump 1.0.0/DummyDll/_Infrastructure.Compiler.dll": {
+    "size": 2560,
+    "sha256": "1f888e01c407ff9412fef3e6f85fd4339965cc2533898c60e9f783a208e5d858"
+  },
+  "dump 1.0.0/DummyDll/_Infrastructure.Configs.dll": {
+    "size": 4096,
+    "sha256": "0b56f32938ffd2a663b2f150179b7757b8b4dfacd6000838f4380454c1009d48"
+  },
+  "dump 1.0.0/DummyDll/_Infrastructure.Console.dll": {
+    "size": 5120,
+    "sha256": "6af22f6abed6621881a2666f62fb09b0721293e894fe5ee70da053dcfe8f32d2"
+  },
+  "dump 1.0.0/DummyDll/_Infrastructure.Gallery.dll": {
+    "size": 4608,
+    "sha256": "988d334f2e54c1193d4bedc90bb74cb86e2c5f4b9bf0e8f5c75bc7304818e7a7"
+  },
+  "dump 1.0.0/DummyDll/_Infrastructure.Lifetimes.dll": {
+    "size": 3584,
+    "sha256": "cb4f97ef4ca8e969bd7eb50263f59a88a31098ef1351b222de13bdb40ec1aa28"
+  },
+  "dump 1.0.0/DummyDll/_Infrastructure.Logging.dll": {
+    "size": 6144,
+    "sha256": "ddba12023ab864c008a82112419210cddd805b7fb1f3173f9825e313fe0b02f8"
+  },
+  "dump 1.0.0/DummyDll/_Infrastructure.Mapping.dll": {
+    "size": 2560,
+    "sha256": "02c788f47809d249045e0ce09999e3a326e19f187701ece5f353df0ca8e1e65f"
+  },
+  "dump 1.0.0/DummyDll/_Infrastructure.MediaPermissions.dll": {
+    "size": 4096,
+    "sha256": "cb8e27e7da39306aee05a4f1d970fe29a5524cce8833a73dc0ff628909fd24bc"
+  },
+  "dump 1.0.0/DummyDll/_Infrastructure.Pipeline.dll": {
+    "size": 6656,
+    "sha256": "44b087e07defc47cb86e2081e1a64955fadf93b70f89305371cf784100919d44"
+  },
+  "dump 1.0.0/DummyDll/_Infrastructure.Relay.dll": {
+    "size": 5120,
+    "sha256": "4b69efb1c238a34f2905b1487f27d77cc26fde89f019d754d05bbf9e7db8747a"
+  },
+  "dump 1.0.0/DummyDll/_Infrastructure.SafeArea.dll": {
+    "size": 4096,
+    "sha256": "5b97f73ae6c6ee6fbc25f4336169381531217035a1c7bcfadb68252d78004857"
+  },
+  "dump 1.0.0/DummyDll/_Infrastructure.Share.dll": {
+    "size": 4096,
+    "sha256": "08e04e617b8af082bc8cfcc8bdafc6e920f1b41e2fdc73290e34059751930500"
+  },
+  "dump 1.0.0/DummyDll/_Infrastructure.Storage.dll": {
+    "size": 7168,
+    "sha256": "0d2efcebe2f6b631e127b749bb2ef0fcdc533a823b1d9eec9d6c8fe57f7f51fb"
+  },
+  "dump 1.0.0/DummyDll/_Infrastructure.Timer.dll": {
+    "size": 4608,
+    "sha256": "c7147c982fe955bb51e2648d9dacfd1472eaf2f866acaacb64f3e4897a17efe9"
+  },
+  "dump 1.0.0/DummyDll/_Inputs.dll": {
+    "size": 3584,
+    "sha256": "f439e111597903ff97ee831d88d170cdb33883963ebc27765ccfca8adb7844ed"
+  },
+  "dump 1.0.0/DummyDll/_InspectEditor.dll": {
+    "size": 8704,
+    "sha256": "5c6c3d7516c03990c0e0b3904e0eab23f4f79fc6b53bd4ff8bac76c8595f6f81"
+  },
+  "dump 1.0.0/DummyDll/_Launch.dll": {
+    "size": 3072,
+    "sha256": "eb8b27f755b835dad16712606f56647ec20161a9ba5fbf46cce00a7fa4f21152"
+  },
+  "dump 1.0.0/DummyDll/_Legacy.dll": {
+    "size": 8704,
+    "sha256": "e0aec4d71421e747207eda9bbec62ff7b40e00825512aa7ce5144b20f625067e"
+  },
+  "dump 1.0.0/DummyDll/_Main.Actions.dll": {
+    "size": 35840,
+    "sha256": "0131b9e2e77f1ee9ce5c86c30de821c6c541b109553ad1432004c40a960f448e"
+  },
+  "dump 1.0.0/DummyDll/_Main.Avatar.dll": {
+    "size": 5120,
+    "sha256": "dddcc1e8ffd5cb4a5308afd557d2d25c9b1f30a03f8f2f7920e32e9abd0d98ad"
+  },
+  "dump 1.0.0/DummyDll/_Main.Bank.dll": {
+    "size": 12800,
+    "sha256": "40aa60f293f1f283c7a776d1c86ee7c29fb4deb1ad1f65844bbf21a39d2acb5a"
+  },
+  "dump 1.0.0/DummyDll/_Main.BattlePass.dll": {
+    "size": 23552,
+    "sha256": "5df5afdb6b7a1a037ee112ed4b8b07454bd74a38e79209200eee6cf16ea1ecf4"
+  },
+  "dump 1.0.0/DummyDll/_Main.BattlePassShop.dll": {
+    "size": 25600,
+    "sha256": "536ec8b072f793287d9b743eaa7c9d42c8cad78b7e6c89ef8ea3538e3efb2b23"
+  },
+  "dump 1.0.0/DummyDll/_Main.BingoEvent.dll": {
+    "size": 13312,
+    "sha256": "7dd3f9fe249dff6f33f1d9a2b21d354fab9177a523a53dafc7f91939097c8099"
+  },
+  "dump 1.0.0/DummyDll/_Main.Camera.dll": {
+    "size": 6656,
+    "sha256": "2ca2711f112c104af2e0e3c42382702c05e3c2337e0844df0f0a2845224e1688"
+  },
+  "dump 1.0.0/DummyDll/_Main.Challenges.dll": {
+    "size": 16896,
+    "sha256": "0ffbf182ce4962a88cee673e6e96d39bc04267244344b0ad924f651dc40d7ba6"
+  },
+  "dump 1.0.0/DummyDll/_Main.CharacterLoadout.dll": {
+    "size": 8704,
+    "sha256": "040fef6a448ccfda775419e55493370f91e1bc4580281660b8c38267e6e836a8"
+  },
+  "dump 1.0.0/DummyDll/_Main.Clans.dll": {
+    "size": 32768,
+    "sha256": "9e45492bb5af397f4f2262c71142fc4efeb8e32a96009771c97166e02f062635"
+  },
+  "dump 1.0.0/DummyDll/_Main.CommanderPass.dll": {
+    "size": 16896,
+    "sha256": "1efd26108d64f779c519ff6d27f69a7f778dee653961873cbd2b34035823a521"
+  },
+  "dump 1.0.0/DummyDll/_Main.Contracts.dll": {
+    "size": 8704,
+    "sha256": "e7f49bc89b0956758e5c657759efc12a83e047785c3b3ec51445f9d1168b208a"
+  },
+  "dump 1.0.0/DummyDll/_Main.DlcDownload.dll": {
+    "size": 7168,
+    "sha256": "34a88dada47309dc9960b6cbd12f61a11e0fc00260c5c24305daad9cb3646719"
+  },
+  "dump 1.0.0/DummyDll/_Main.dll": {
+    "size": 8704,
+    "sha256": "45a05c85f80d5ac9af3b9aa5b60a7fa0501909a6e21976b94fcd694a8f4b4f3c"
+  },
+  "dump 1.0.0/DummyDll/_Main.EventInformation.dll": {
+    "size": 5120,
+    "sha256": "e15e65c36b2229765a51b2822c50692d005f641b816d7c04f5b4f3ef4b95a512"
+  },
+  "dump 1.0.0/DummyDll/_Main.EventOffers.dll": {
+    "size": 6656,
+    "sha256": "5efd3ce20113778654142484046d6c280614252cda2d882f008ae0aec3a917c1"
+  },
+  "dump 1.0.0/DummyDll/_Main.EventPass.dll": {
+    "size": 7168,
+    "sha256": "6eab04c17d32aa4b901b7a2d2789a301e6ab4441466cb70652b5070c1d00b378"
+  },
+  "dump 1.0.0/DummyDll/_Main.Events.dll": {
+    "size": 16896,
+    "sha256": "a7951cb7eb6095be1a1c59902aaeadaf0e4f272fef40f993c24552c6fc3b1890"
+  },
+  "dump 1.0.0/DummyDll/_Main.FriendCard.dll": {
+    "size": 7680,
+    "sha256": "232fc34a6759560dc498dd37c0525463fc8097bfabfb5881c9c15f93471c6c5c"
+  },
+  "dump 1.0.0/DummyDll/_Main.Friends.dll": {
+    "size": 21504,
+    "sha256": "6d8b88781f105fa643e47bd437837980ccfe6263858bedf2e70f3da6dc6adf82"
+  },
+  "dump 1.0.0/DummyDll/_Main.GameModeSelection.dll": {
+    "size": 16384,
+    "sha256": "e2fc94dc5cfdff791be742e2efe2b020ad1c15e2beea13f29f8cc5f5b1d3e0c1"
+  },
+  "dump 1.0.0/DummyDll/_Main.Inventory.dll": {
+    "size": 75264,
+    "sha256": "865a76b7e39d801a7cb7fb87367a587f20ffd75944f0bd79b4cc23e373f2c4a2"
+  },
+  "dump 1.0.0/DummyDll/_Main.ItemCard.dll": {
+    "size": 8704,
+    "sha256": "2aca7c0af6f3b85d9f0a38ce474ace548e24a1e3688e3ec0709beaf2ad548437"
+  },
+  "dump 1.0.0/DummyDll/_Main.Leaderboards.dll": {
+    "size": 3584,
+    "sha256": "abb12d2281f26d46564afa4d927aff7b6fb2636134a68aafffee2e214f2d6df2"
+  },
+  "dump 1.0.0/DummyDll/_Main.Leaderboards.Players.dll": {
+    "size": 14336,
+    "sha256": "8aa1676c845a80dc0396e757d966cb891daa0fe114878a103ddb86a81da5aa78"
+  },
+  "dump 1.0.0/DummyDll/_Main.Lobby.dll": {
+    "size": 50176,
+    "sha256": "cb814cc975fac25d2d276caf427afd0c0189578e531fe03290f4aaa53608825d"
+  },
+  "dump 1.0.0/DummyDll/_Main.LobbyUseCases.dll": {
+    "size": 10240,
+    "sha256": "6f4836e56630f713389530f2dff8c6caf2d7b02a880acb7797a3e934c38cd5ad"
+  },
+  "dump 1.0.0/DummyDll/_Main.Marketplace.dll": {
+    "size": 40960,
+    "sha256": "90a4ee8cbdd1b23d9a741ad5da67a10d27c7579bcbf4d6f32fac70b992a48e5c"
+  },
+  "dump 1.0.0/DummyDll/_Main.Matches.dll": {
+    "size": 9216,
+    "sha256": "9322b667f03d437f3a6d78dcaaaadcfa05c58d420facc29b4a104b1e66e891e2"
+  },
+  "dump 1.0.0/DummyDll/_Main.Matchmaking.dll": {
+    "size": 13824,
+    "sha256": "a51165121c78d4e352e60d5f0f9259ebb7d26146a670ef50e34426c8f8a911e3"
+  },
+  "dump 1.0.0/DummyDll/_Main.Messages.dll": {
+    "size": 26624,
+    "sha256": "c509a3b2c861e1e19dd0ca1d921244bb88d39f29419beea4886a61179e96c9ac"
+  },
+  "dump 1.0.0/DummyDll/_Main.Messages.Sounds.dll": {
+    "size": 3584,
+    "sha256": "4a2d101b8da0b3cdd06ecd6a62431443a42fc9ed05c9e932f4f89da30e832587"
+  },
+  "dump 1.0.0/DummyDll/_Main.MetaEvent.dll": {
+    "size": 34304,
+    "sha256": "39a369c13df8473679686d29f56334c58960628ad9ee29a8e0e456556b56b688"
+  },
+  "dump 1.0.0/DummyDll/_Main.Player.dll": {
+    "size": 8704,
+    "sha256": "bcdb9068c7fdb0299e2af3c27b33325b04928390f59d4f085626780b426cdfbb"
+  },
+  "dump 1.0.0/DummyDll/_Main.PlayerProgress.dll": {
+    "size": 11264,
+    "sha256": "0d98c8e197bcf24fcb2dd21355863d824beabd55cfbaec73df0f246b46af2563"
+  },
+  "dump 1.0.0/DummyDll/_Main.Profile.dll": {
+    "size": 21504,
+    "sha256": "335c5c25d87d8757280cd079601cf173dd04284c8b426b5567af8986a4d8ee84"
+  },
+  "dump 1.0.0/DummyDll/_Main.ProfileCustomization.dll": {
+    "size": 10752,
+    "sha256": "2a5c98eaf6000c63d56adc5bb7321947f048c102d0c8f7795dbfade6f739fc99"
+  },
+  "dump 1.0.0/DummyDll/_Main.Purchases.dll": {
+    "size": 5120,
+    "sha256": "823a115fd8e22fad2900994b9ef9517e5e4551565f979174bf56efafa3765075"
+  },
+  "dump 1.0.0/DummyDll/_Main.RateGame.dll": {
+    "size": 7168,
+    "sha256": "a041265b60c0965da442ded407fe5a7a2e9ffbe3a7ae43e051e56d85c45e87e9"
+  },
+  "dump 1.0.0/DummyDll/_Main.Regions.dll": {
+    "size": 6656,
+    "sha256": "3ac42834d03e1825a7ba82369c9392664934673e440f22ec8143b9109797eaaf"
+  },
+  "dump 1.0.0/DummyDll/_Main.Routes.dll": {
+    "size": 4608,
+    "sha256": "d315a850d134b1f966bfd91637519a46f6212401186be7302d228e4917afb1e1"
+  },
+  "dump 1.0.0/DummyDll/_Main.SaveEmail.dll": {
+    "size": 5120,
+    "sha256": "a7cb6d4908796bec677ff97883a18e717c7a47b2c179e1c29405819802f38339"
+  },
+  "dump 1.0.0/DummyDll/_Main.Settings.dll": {
+    "size": 74240,
+    "sha256": "4bd28c43d7aee71c4e92335c02e4c2a2f2623dbca3bd4f912eb43588db98859e"
+  },
+  "dump 1.0.0/DummyDll/_Main.Shop.dll": {
+    "size": 24064,
+    "sha256": "af1a69aa2a87f1541de9eeb3b365a625c64e1e76d43d09b725a4e13820138756"
+  },
+  "dump 1.0.0/DummyDll/_Main.Socials.dll": {
+    "size": 3584,
+    "sha256": "1eff4b3c2a9883925f301e4c4b01962cd8266c6d8c10edfe450fc1b0be276a18"
+  },
+  "dump 1.0.0/DummyDll/_Main.StarterPass.dll": {
+    "size": 12288,
+    "sha256": "f92185e89caec254a21875fc5f5ace35c7df23e41025a75574147f5e546a3d29"
+  },
+  "dump 1.0.0/DummyDll/_Main.Steps.dll": {
+    "size": 9728,
+    "sha256": "d1931e010260f9c3842d41c83543e54ee1b7713b8340d151dfc7f78b8e7f2e25"
+  },
+  "dump 1.0.0/DummyDll/_Main.Tutorial.dll": {
+    "size": 5120,
+    "sha256": "58c3c8e777f30a5511b28ab02becf60bb3f97163081b77e84da4a6b8d3377b08"
+  },
+  "dump 1.0.0/DummyDll/_Main.VoiceChat.dll": {
+    "size": 3072,
+    "sha256": "f927176b4ac43112d0981cc6becb31fff7ee9f1a8fa4f7f60bde431ff3c67202"
+  },
+  "dump 1.0.0/DummyDll/_Main.Welcome.dll": {
+    "size": 9728,
+    "sha256": "31c3e38a7a0cd721d71a50b069a8eb0553d596638ca711db8a2cac0113842503"
+  },
+  "dump 1.0.0/DummyDll/_Metrics.dll": {
+    "size": 11776,
+    "sha256": "1720ef88e1a6d6a36411a5eebfeb03d642b5f520a8271395ee2b2dc9a521e306"
+  },
+  "dump 1.0.0/DummyDll/_Preload.dll": {
+    "size": 12800,
+    "sha256": "259b2c9cbf0170cd0ba0d038a1af10915621438ce94623de62c88e82aa36fec2"
+  },
+  "dump 1.0.0/DummyDll/_Services.Account.dll": {
+    "size": 5632,
+    "sha256": "705084d976be1115bc00a37ca62de89fdc9b3a3009e02ce1856d4572060e9cf7"
+  },
+  "dump 1.0.0/DummyDll/_Services.Achievements.dll": {
+    "size": 6144,
+    "sha256": "e57064e533ea9fc385256bb506dcdc8d1a3d6c096dcf493400be459cd83b67f2"
+  },
+  "dump 1.0.0/DummyDll/_Services.Advertising.dll": {
+    "size": 3584,
+    "sha256": "ea56af36df2d82ebc7156e2f0ab09b594166bb6a77f237910adb033b1f9abca5"
+  },
+  "dump 1.0.0/DummyDll/_Services.Announcements.dll": {
+    "size": 7680,
+    "sha256": "3c3a035da22b8da83308c23075e84358f0b3bfa4c03d03000da85bd8bbd29a7b"
+  },
+  "dump 1.0.0/DummyDll/_Services.AppCheck.dll": {
+    "size": 11776,
+    "sha256": "6c46cee5386038d672769f2227d95b16d7614579eaa62200ab0a8b1472b6f02d"
+  },
+  "dump 1.0.0/DummyDll/_Services.Auth.dll": {
+    "size": 17408,
+    "sha256": "ceb288edf347868414392bdb5b1285d06fbe413ece5f961d017555a3e925f190"
+  },
+  "dump 1.0.0/DummyDll/_Services.Avatar.dll": {
+    "size": 7680,
+    "sha256": "bb412121e93206a971bbb7534defd59c61fb7325930c54ea25714817bf93ac86"
+  },
+  "dump 1.0.0/DummyDll/_Services.Banners.dll": {
+    "size": 5632,
+    "sha256": "c037aa4f35011074e279c032279aac20ea2223308c35a291db7653802b117214"
+  },
+  "dump 1.0.0/DummyDll/_Services.BattlePass.dll": {
+    "size": 10752,
+    "sha256": "1276e42c074e8bae0c1d61ea4528c0794646c54ec84e52c453a2d4601374fc4c"
+  },
+  "dump 1.0.0/DummyDll/_Services.BattlePassShop.dll": {
+    "size": 13824,
+    "sha256": "00d00c46389321fd190857735189588791b6890cc661370c13f4d5fb0e810df0"
+  },
+  "dump 1.0.0/DummyDll/_Services.BingoEvent.dll": {
+    "size": 8192,
+    "sha256": "69aacc79b376d2ba8e8dc75fdf8cd95dfde4884d49f71d4761a29feafdee9433"
+  },
+  "dump 1.0.0/DummyDll/_Services.BoardGameEvent.dll": {
+    "size": 12800,
+    "sha256": "6af4f91a7223cd7836ba93355b7fe2e8cbabbe658aefc3de35a90ae9e8c19582"
+  },
+  "dump 1.0.0/DummyDll/_Services.BuiltInInventory.dll": {
+    "size": 4096,
+    "sha256": "e7a774e151765575c42b60c7b1a4546704fb482549f75ca4838f6ad15fcd121b"
+  },
+  "dump 1.0.0/DummyDll/_Services.Challenges.dll": {
+    "size": 14336,
+    "sha256": "57847cebb25b8bcd410d6d96f397a1ba39cd120322343bbaab18d6c933b36092"
+  },
+  "dump 1.0.0/DummyDll/_Services.CharacterLoadout.dll": {
+    "size": 10240,
+    "sha256": "9871dafaae40c7b9aeee5b957e2252b0f2434ceb188e8c43fe613178e3c02765"
+  },
+  "dump 1.0.0/DummyDll/_Services.Clans.dll": {
+    "size": 22528,
+    "sha256": "ae14fe05f897d9cc50105dbdc6f53a3eb35b792d95bf59c8b3f157b698b03e1e"
+  },
+  "dump 1.0.0/DummyDll/_Services.CommanderPass.dll": {
+    "size": 10240,
+    "sha256": "b38f9efb9a79431713e8bf9c45238aa02af40a2d47a2803f229117222a659801"
+  },
+  "dump 1.0.0/DummyDll/_Services.Content.dll": {
+    "size": 3072,
+    "sha256": "f0e6acc439c34685102222134ce79137d11c6367829f2eb304ce545043f78e50"
+  },
+  "dump 1.0.0/DummyDll/_Services.Contracts.dll": {
+    "size": 13824,
+    "sha256": "2f49c4a41be8146a3efd4fcee073950749a7c545be04e9b358110aa7bd699808"
+  },
+  "dump 1.0.0/DummyDll/_Services.Country.dll": {
+    "size": 6144,
+    "sha256": "eeb974ba2fb78b158203b6bd115e456ba25ff50b93ae1c3c016415657163c39c"
+  },
+  "dump 1.0.0/DummyDll/_Services.CreatorCode.dll": {
+    "size": 4608,
+    "sha256": "8edf72e970e920ec7f7295f231e9a678e33466fb752b7e56942b50ffe1433d0e"
+  },
+  "dump 1.0.0/DummyDll/_Services.DeepLinks.dll": {
+    "size": 7168,
+    "sha256": "a1aba69c5dc591d841e16fd79186d4a2dff9340e701ec7b60861f8c57f627684"
+  },
+  "dump 1.0.0/DummyDll/_Services.DlcDownload.dll": {
+    "size": 10240,
+    "sha256": "6a23ee29c123fee58f142f7be7a2d98c2af29d814bd5d36dc102a8444bcb4881"
+  },
+  "dump 1.0.0/DummyDll/_Services.EmailValidation.dll": {
+    "size": 3072,
+    "sha256": "7057eefd5180225be70264f899de981d925870af028e69fd10bf5bc2ece42328"
+  },
+  "dump 1.0.0/DummyDll/_Services.FileSharing.dll": {
+    "size": 3584,
+    "sha256": "325e27c3ec2971c27f7a64f4d711b8f5bf2e7f7b2a66737a1b46765367f20eb7"
+  },
+  "dump 1.0.0/DummyDll/_Services.Friends.dll": {
+    "size": 9216,
+    "sha256": "71edf96bce61ae8925e6b19fbbf730528078dadc9f615abbc65900ea3d705495"
+  },
+  "dump 1.0.0/DummyDll/_Services.GameFlow.dll": {
+    "size": 3072,
+    "sha256": "dbc5b1a91afc56a9467f23bac9fc144fc2a65254297dbe9de09d5ac638e1899a"
+  },
+  "dump 1.0.0/DummyDll/_Services.GameModeContent.dll": {
+    "size": 9216,
+    "sha256": "15d368279b97d835ad44f3daad2917c586fe3c09e102f1aa400d3969485329a2"
+  },
+  "dump 1.0.0/DummyDll/_Services.GamePasses.dll": {
+    "size": 10752,
+    "sha256": "1bdff554e3e04e7936d90dc8ef0b75f5b24722667ff15d390eea07b34ed1354f"
+  },
+  "dump 1.0.0/DummyDll/_Services.Gdpr.dll": {
+    "size": 3584,
+    "sha256": "e86e098f00d97373f52a0d96188261cf5e063e4844af63647e99c70458636b69"
+  },
+  "dump 1.0.0/DummyDll/_Services.GoldBank.dll": {
+    "size": 6656,
+    "sha256": "1192f5738ae9dab2988ba715f3204428056207ba83d220ce563dd90b5c96bbf1"
+  },
+  "dump 1.0.0/DummyDll/_Services.HelpCenter.dll": {
+    "size": 7168,
+    "sha256": "c54c1a29c935020022986a78178307403364bd41bc1c4594c10a0331840b46a9"
+  },
+  "dump 1.0.0/DummyDll/_Services.Inspect.dll": {
+    "size": 52224,
+    "sha256": "6a08f08c3476c5be101bcfdfa461106f379d16c39c0de12b40d96c7e959d6ad0"
+  },
+  "dump 1.0.0/DummyDll/_Services.InspectInHands.dll": {
+    "size": 5632,
+    "sha256": "973440d260483ec269791a73afaaf814ea280ae8881f18e31f5ec1637d344cd7"
+  },
+  "dump 1.0.0/DummyDll/_Services.Integrity.dll": {
+    "size": 10240,
+    "sha256": "59c728f250eb74c756e7de0c746590b6d51bd83a1923d0dcf237d0f1cf6619a8"
+  },
+  "dump 1.0.0/DummyDll/_Services.Inventory.dll": {
+    "size": 49152,
+    "sha256": "f5e136c69d51b09aaa6077de3b7138289d93a26548797d566e08d5ba117447bb"
+  },
+  "dump 1.0.0/DummyDll/_Services.InventoryFilters.dll": {
+    "size": 14336,
+    "sha256": "074fc75d18cb9d9768630cbb9ef55489b2b49ed1efba584b851ac85bc60d210b"
+  },
+  "dump 1.0.0/DummyDll/_Services.JumbleRumbleEvent.dll": {
+    "size": 8192,
+    "sha256": "0e4bc0c6cf5152694f3945d37fef995c5350f4098460a936e1c9d608937d63eb"
+  },
+  "dump 1.0.0/DummyDll/_Services.Leaderboards.Players.dll": {
+    "size": 8192,
+    "sha256": "aed5176215818721b5c0becdb74c3f649f337f140b4f1b9268e435c0c6b4d517"
+  },
+  "dump 1.0.0/DummyDll/_Services.Lobby.dll": {
+    "size": 23552,
+    "sha256": "fb7bea84820fbbe289571fac2298f0e70a15872399ab83d44836402a263b9523"
+  },
+  "dump 1.0.0/DummyDll/_Services.LobbyMatchmaking.dll": {
+    "size": 12288,
+    "sha256": "26922e399932ad6afbc22004a20442e085523958d9e21f514e042c1e1ac3334f"
+  },
+  "dump 1.0.0/DummyDll/_Services.LobbyProperties.dll": {
+    "size": 10752,
+    "sha256": "94a3138a9e0741f02c7033cb69c38c4cf0d94441fab1a5b4c7c2e1053b038433"
+  },
+  "dump 1.0.0/DummyDll/_Services.LobbyVoiceChat.dll": {
+    "size": 4608,
+    "sha256": "d61c87ef3afef19c1f65c5e6cf33445fafbc871d11621857f25e6cc4e054a1e6"
+  },
+  "dump 1.0.0/DummyDll/_Services.MapContent.dll": {
+    "size": 4608,
+    "sha256": "d7928f702d694097e23472b59fd73ab2962058b029103a2c909fde2c63f53c31"
+  },
+  "dump 1.0.0/DummyDll/_Services.Marketplace.dll": {
+    "size": 15872,
+    "sha256": "111afd9a8f2d8bd636f173d18a1d105056b6925d67673a84c0d2224cedd0204a"
+  },
+  "dump 1.0.0/DummyDll/_Services.MatchChat.dll": {
+    "size": 3072,
+    "sha256": "65ba28160c16742a611fc0b8a83602cec79fad412d659f9b19d3d553e5477ae9"
+  },
+  "dump 1.0.0/DummyDll/_Services.MatchHistory.dll": {
+    "size": 9216,
+    "sha256": "cd2eb4a150cca1400e839f4647b54e4ead63d5e74ab3a4489acd9aaf798e0f84"
+  },
+  "dump 1.0.0/DummyDll/_Services.Matchmaking.Abstractions.dll": {
+    "size": 7680,
+    "sha256": "4f162f0e079864d608358920da18e19fc2d5a4b1ff8ec38f4322c1fc5972a728"
+  },
+  "dump 1.0.0/DummyDll/_Services.MatchSession.dll": {
+    "size": 25088,
+    "sha256": "490ec2c79a7c6af0eab8af506aee50d5f25f0c3cc34362bee17ee78c7accc38c"
+  },
+  "dump 1.0.0/DummyDll/_Services.Messages.dll": {
+    "size": 8704,
+    "sha256": "57b830ec7f9f8c46082fe2faf07e6efe391668f840759156cfa087c20b6caf78"
+  },
+  "dump 1.0.0/DummyDll/_Services.Music.dll": {
+    "size": 5632,
+    "sha256": "c8e06514377d92bbaace86cc61e2002b169c3471dacadeedbed3862cbf8fd466"
+  },
+  "dump 1.0.0/DummyDll/_Services.NameGenerator.dll": {
+    "size": 3072,
+    "sha256": "df90959fa9569b388bee5d37db1dd59cfaa9ff2c0dd3db2cfe484010bd8c4610"
+  },
+  "dump 1.0.0/DummyDll/_Services.NetworkSettingsCollectors.dll": {
+    "size": 4096,
+    "sha256": "714e3f9f6fa9315033548c5d2af116085070a773b1b4636046862d68a4ace0b7"
+  },
+  "dump 1.0.0/DummyDll/_Services.OpenUrl.dll": {
+    "size": 6144,
+    "sha256": "17b137474992ee5a5d1316c5fcc4c681886a98966226270c0cde43cc4d70941b"
+  },
+  "dump 1.0.0/DummyDll/_Services.Permissions.dll": {
+    "size": 4608,
+    "sha256": "62378cda7bdf430a3395515261888e899d88ac9e910d58a9273136913d3f601f"
+  },
+  "dump 1.0.0/DummyDll/_Services.Player.dll": {
+    "size": 11776,
+    "sha256": "16aecd3433a99f16b7ebab8c660fa83d9befe83d4f1132d9a93ce2740fbccd22"
+  },
+  "dump 1.0.0/DummyDll/_Services.PlayerProfile.dll": {
+    "size": 5120,
+    "sha256": "46e84561f4cac5eeb79ca2645f7ea7545b2adeb6e21e93590c4945da4fbdafe3"
+  },
+  "dump 1.0.0/DummyDll/_Services.PlayerProgress.dll": {
+    "size": 6144,
+    "sha256": "c299a47996e2a30abd538a9d763cbed0fc8f22234f57458e6911d8595466e33f"
+  },
+  "dump 1.0.0/DummyDll/_Services.PlayerStats.dll": {
+    "size": 14336,
+    "sha256": "4e70b9d7b6ca52942a04a25ece325e911b4d7c38168d5daa0f5c7871a79a70f5"
+  },
+  "dump 1.0.0/DummyDll/_Services.PrivacyPolicy.dll": {
+    "size": 4096,
+    "sha256": "25a81c0b4ad77007b44db3465a53abf345bce4b024455f42b2e120382882cd42"
+  },
+  "dump 1.0.0/DummyDll/_Services.Purchases.dll": {
+    "size": 14848,
+    "sha256": "b4bceafe135c934ad0c3d0352e0293373cb91bd04498beb2368223b11de485b2"
+  },
+  "dump 1.0.0/DummyDll/_Services.QrCode.dll": {
+    "size": 3584,
+    "sha256": "242f35c8019089e3dc32558f8120db5d502eb045e122c8f5aff16a0da67040c3"
+  },
+  "dump 1.0.0/DummyDll/_Services.RateGame.dll": {
+    "size": 5120,
+    "sha256": "97a3b16628ef87cbd186a977c2a5a4a1471379d27d54e7afccd72bab6a835ac0"
+  },
+  "dump 1.0.0/DummyDll/_Services.Regions.dll": {
+    "size": 8704,
+    "sha256": "da2e578160b7dc0d21c3b4a9adce265da89f05fbef20c49517eca9b912838205"
+  },
+  "dump 1.0.0/DummyDll/_Services.Settings.dll": {
+    "size": 26112,
+    "sha256": "ba7d1c97f51df5e0fe36c04f39ea72a689931d0686fda9f4e2bedbc99cb5e36c"
+  },
+  "dump 1.0.0/DummyDll/_Services.SpecialOffers.dll": {
+    "size": 7680,
+    "sha256": "3c8d0570b7e88be59fc40c3583bbfbe89ee88762862bb167b689bb3ce38307e9"
+  },
+  "dump 1.0.0/DummyDll/_Services.StarterPass.dll": {
+    "size": 5120,
+    "sha256": "539b8863e20f4c1ece572480601668e58c3e54ddf234402b0e317917e669ffde"
+  },
+  "dump 1.0.0/DummyDll/_Services.StoreAnnouncementsService.dll": {
+    "size": 4096,
+    "sha256": "7311f785728e9557155562022908c048ab20c130397af234e05cdc8f5826e832"
+  },
+  "dump 1.0.0/DummyDll/_Services.SystemMessages.dll": {
+    "size": 17408,
+    "sha256": "2ffd903616a3ab2f91c301dc08842a99154465534bd70e73d3e95c9ee6a943dd"
+  },
+  "dump 1.0.0/DummyDll/_Services.Tutorial.dll": {
+    "size": 7168,
+    "sha256": "e5d656d643108cb1a9f923502ce3ee38059f118e98fb4ac1bb5aa38e56cc1de8"
+  },
+  "dump 1.0.0/DummyDll/_Services.UpgradeEvent.dll": {
+    "size": 10752,
+    "sha256": "f31a0900f7d3a932897d1f89894d8c9c8d2e006535fd622c0e22c9c7caa2e681"
+  },
+  "dump 1.0.0/DummyDll/_Services.VeteranProgression.dll": {
+    "size": 4608,
+    "sha256": "f6d5a811d81e13b5489d31b07bd3c9de80b57b1b4600bc90ac46ea2f406fd8b0"
+  },
+  "dump 1.0.0/DummyDll/_Services.VideoAds.dll": {
+    "size": 11776,
+    "sha256": "e19dce332b2f3f5d02e26a7ee6be012148347e4049510501c670b30e4df675d3"
+  },
+  "dump 1.0.0/DummyDll/_Services.VoiceChat.dll": {
+    "size": 13824,
+    "sha256": "b0d5ce90c088b15f6c4b99c9ccc043497de6ec20a14983f38e07fb121de27663"
+  },
+  "dump 1.0.0/DummyDll/_Services.WeaponContent.dll": {
+    "size": 4096,
+    "sha256": "c43ca892eb30028bdb37495a10d7e30eaef3e1cd9c038a238cacfc2facc5d495"
+  },
+  "dump 1.0.0/DummyDll/_Shaders.dll": {
+    "size": 2560,
+    "sha256": "20078af0cd1e5599d41410d43fe54c6edcdabbaff41bef93f8dc981689f5c3b2"
+  },
+  "dump 1.0.0/DummyDll/_SplashScreen.dll": {
+    "size": 6144,
+    "sha256": "d17fa43bee3f083559c8436085c7fef7f7520089e3a9bb3b332be1ebeda65679"
+  },
+  "dump 1.0.0/DummyDll/_Utilities.dll": {
+    "size": 14848,
+    "sha256": "d2c380a038d6fdc98b4ee893d3fc4e446dab4770b4a1817444addb4beba744f2"
+  },
+  "dump 1.0.0/DummyDll/__Generated.dll": {
+    "size": 2048,
+    "sha256": "3bd731d5107e198a0fb8e423e25884aeda8a5df1b25dbee88afa441ba1063f3c"
+  },
+  "assets/lucide/crosshair.svg": {
+    "size": 412,
+    "sha256": "ae9ed8583286ea03bffae85bb69aee5227540e588b0370cf185f2141ebe25e8d"
+  },
+  "assets/lucide/eye.svg": {
+    "size": 360,
+    "sha256": "5bf90197dd7629cad64a2e48d1186a71559deb6121207d10e3dc5b19ebaffdcf"
+  },
+  "assets/lucide/sliders-horizontal.svg": {
+    "size": 422,
+    "sha256": "e43a00e5eb684e6cbb61083bed2528d7a3fa5f265693eb2b5f314cd432aa65f4"
+  },
+  "assets/lucide/user-round.svg": {
+    "size": 279,
+    "sha256": "84870f26f3faf8da45da84174517519e81b9e8f00319c78954fcbb74f50038a1"
+  },
+  "assets/lucide/layers.svg": {
+    "size": 510,
+    "sha256": "ce16d0a955e3581cda17f6b2fd5c5bc2034b405f9cecc31c8ebb8495b4afc1bb"
+  },
+  "assets/lucide/palette.svg": {
+    "size": 571,
+    "sha256": "8e7d3fde990cffd10469ba351f27c50202b057a9bb9af5626322e53fd3abc78c"
+  },
+  "assets/lucide/bone.svg": {
+    "size": 416,
+    "sha256": "2b764aae2e7b53409dbe9c4cd784f37f236a573258bb98e7903b1aa195b323f5"
+  },
+  "assets/lucide/settings-2.svg": {
+    "size": 324,
+    "sha256": "06d06c191bd7eb28afaf9d40acb5c49ef69448fdeda91801d9823d7c440a4e10"
+  },
+  "assets/lucide/diamond.svg": {
+    "size": 357,
+    "sha256": "2a2f4ccad87409bed020191ebfb30ff806dca49a1b687d0be96f4d7343da8d7c"
+  },
+  "assets/lucide/LICENSE": {
+    "size": 3208,
+    "sha256": "b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57"
+  },
+  "assets/lucide/SOURCES.txt": {
+    "size": 771,
+    "sha256": "cbc1b646592a5c8dec2b191e8cd347a2ccf7a894c1c2379106eb1296135e5211"
+  },
+  "out/arm64-v8a/liblemmingrmt.so": {
+    "size": 946576,
+    "sha256": "bf6bbb7746352e0932d80209325b306d9021e97b7d2951915f65ebc81b964966"
+  },
+  "diagnostics/native-camera-20260929-232216/pid.txt": {
+    "size": 6,
+    "sha256": "71ea2c0657e997432055afc44ba84f9b36f2708f938a2cbf9560306029631e3a"
+  },
+  "diagnostics/native-camera-20260929-232216/pre-logcat.txt": {
+    "size": 233898,
+    "sha256": "069a7955a2e325cc6c7df8a342dad05434bf41235761035bf71e30ddd6a2cb52"
+  },
+  "diagnostics/native-camera-20260929-232216/live-logcat.txt": {
+    "size": 246882,
+    "sha256": "4d190dbfd3464ff828887add54faf6990dd4dd0145a4d2f51964f1429558c70d"
+  },
+  "diagnostics/native-camera-20260929-232216/all-logcat.txt": {
+    "size": 246882,
+    "sha256": "4d190dbfd3464ff828887add54faf6990dd4dd0145a4d2f51964f1429558c70d"
+  },
+  "diagnostics/native-camera-20260929-232216/crash-buffer.txt": {
+    "size": 21854,
+    "sha256": "7cf20bc4207c24794e283c08f3178b8db29292d8c3d88e08f007c2d56dfaa391"
+  },
+  "diagnostics/native-camera-20260929-232216/combined.txt": {
+    "size": 480780,
+    "sha256": "5db474e68e93b9bafdf53bf700769f7714b899399138d554650594247b4d0d51"
+  },
+  "diagnostics/w2s-mono-crash-20260929/device-state.txt": {
+    "size": 7,
+    "sha256": "c98373c1abef78070f6beef6b4ae4fbf3de348dac280195c7f93441920584af9"
+  },
+  "diagnostics/w2s-mono-crash-20260929/device-date.txt": {
+    "size": 30,
+    "sha256": "e118b2eaaf9c5d3e5954afef1e962ce5a7621f01dc8461e905c3f95c541755ec"
+  },
+  "diagnostics/w2s-mono-crash-20260929/current-pid.txt": {
+    "size": 8,
+    "sha256": "6bbd052ab054ef222c1c87be60cd191addedd24cc882d1f5f7f7be61dc61bb3a"
+  },
+  "diagnostics/w2s-mono-crash-20260929/logcat-full.txt": {
+    "size": 93871271,
+    "sha256": "d17f287a6f0af27ffffcf4008254a5dc5d5b8278eb772573585cc9b9e3344c7b"
+  },
+  "diagnostics/w2s-mono-crash-20260929/crash-buffer.txt": {
+    "size": 21854,
+    "sha256": "7cf20bc4207c24794e283c08f3178b8db29292d8c3d88e08f007c2d56dfaa391"
+  },
+  "diagnostics/w2s-mono-crash-20260929/exit-info.txt": {
+    "size": 11563,
+    "sha256": "8d56ac9f4303312d9c60b5ae5adb2edd809bbec40b239e34c1634b117ee2844b"
+  },
+  "diagnostics/w2s-mono-crash-20260929/meminfo.txt": {
+    "size": 45,
+    "sha256": "214e89ecfd17b1a908dc927513cafaf29a766df6f0fd9393f61cb0b9e35008e3"
+  },
+  "diagnostics/w2s-mono-crash-20260929/internal-symbolication.txt": {
+    "size": 693,
+    "sha256": "92dda3bc3b06ce97e28ce94dda9ae204a068b3364d225f1b95d3c109edf17ec1"
+  },
+  "diagnostics/w2s-mono-crash-20260929/analysis.txt": {
+    "size": 593,
+    "sha256": "fea559481a913f10d2c1b228132bd90300494b7a424b6fad3a6a56bc73dbc092"
+  },
+  "diagnostics/matrix-safe-live-20260929-234201/adb-state.txt": {
+    "size": 7,
+    "sha256": "c98373c1abef78070f6beef6b4ae4fbf3de348dac280195c7f93441920584af9"
+  },
+  "diagnostics/matrix-safe-live-20260929-234201/pid.txt": {
+    "size": 10,
+    "sha256": "3f6477eae3f246294b000b1365edbe9ab09c72f2a7d9684cb54c1bf6ca2354fd"
+  },
+  "diagnostics/matrix-safe-live-20260929-234201/device-date.txt": {
+    "size": 30,
+    "sha256": "eaef9183fdd4a4d66e9d81ea34ff830f63e9474bc20e6b97e05f4ce18c601e00"
+  },
+  "diagnostics/matrix-safe-live-20260929-234201/threads.txt": {
+    "size": 23412,
+    "sha256": "8736073cdfb0315ffcdd718d69ccc662db26a0168092c2d4ffb1f732ed0ebec2"
+  },
+  "diagnostics/matrix-safe-live-20260929-234201/logcat-before.txt": {
+    "size": 264151,
+    "sha256": "9b74cc3b2ac8058c6e55a6717571a8ffa71932a654653c39b117f9d8f6f172b0"
+  },
+  "diagnostics/matrix-safe-live-20260929-234201/logcat-live.txt": {
+    "size": 271598,
+    "sha256": "8ea2defbc887a8b3149c2bc5384ea3fdc5bc49ab874f3f1c640b429f7ae30b92"
+  },
+  "diagnostics/matrix-safe-live-20260929-234201/pid-after.txt": {
+    "size": 16,
+    "sha256": "fbfc13eff697c4804c084f8d8cebdb6c41f0d8cef72f487e43f0f872827edebd"
+  },
+  "diagnostics/matrix-safe-live-20260929-234201/logcat-combined.txt": {
+    "size": 535749,
+    "sha256": "3bfcad8626e12f31d152f21d829dbbf1374f5010b55adcc15165c8210d372283"
+  },
+  "diagnostics/main-thread-camera-live-20260929-235839/devices.txt": {
+    "size": 121,
+    "sha256": "318c171a4a0cd824c744c901e038308af66b556c2dfbb737f669417009fa45a1"
+  },
+  "diagnostics/main-thread-camera-live-20260929-235839/device-date.txt": {
+    "size": 30,
+    "sha256": "f82aa85eec720e6227d8b60250cf0cff92c1febca76df56d05040765de36f1ff"
+  },
+  "diagnostics/main-thread-camera-live-20260929-235839/pid-before.txt": {
+    "size": 5,
+    "sha256": "fe428dd23b62a26e1ceee240ba8f8b9b9e4401bf102317495ed5b8e6a5c0a4da"
+  },
+  "diagnostics/main-thread-camera-live-20260929-235839/logcat-before.txt": {
+    "size": 54023833,
+    "sha256": "ba2d1e8a92084992cc378d0560d1317bc4a227641dc0ad7eaecd4f5e4595d037"
+  },
+  "diagnostics/main-thread-camera-live-20260929-235839/threads-before.txt": {
+    "size": 23672,
+    "sha256": "d5455b54d3b076ea320f952303216dd19fe9c2710e16c7b29c29560eb4831459"
+  },
+  "diagnostics/main-thread-camera-live-20260929-235839/pid-after.txt": {
+    "size": 5,
+    "sha256": "fe428dd23b62a26e1ceee240ba8f8b9b9e4401bf102317495ed5b8e6a5c0a4da"
+  },
+  "diagnostics/main-thread-camera-live-20260929-235839/logcat-after.txt": {
+    "size": 54124155,
+    "sha256": "b70ca6af99c557ccf4ac9742ac0e4c927dcea9460cd1baabde7916c779bbfe15"
+  },
+  "diagnostics/main-thread-camera-live-20260929-235839/threads-after.txt": {
+    "size": 23672,
+    "sha256": "1391d689816fc81049c7d7d0a9bbf6c2e588fc34b362557e339e9c9495ee1163"
+  },
+  "diagnostics/main-thread-camera-live-20260929-235839/crash-buffer.txt": {
+    "size": 21854,
+    "sha256": "7cf20bc4207c24794e283c08f3178b8db29292d8c3d88e08f007c2d56dfaa391"
+  },
+  "diagnostics/main-thread-camera-live-20260929-235839/exit-info.txt": {
+    "size": 11565,
+    "sha256": "c20debd75dc344eb6fa217d947d23fe72aec8b111b64caa750ba1e5750df5be1"
+  },
+  "diagnostics/native-camera-cache-20260930/build.pid": {
+    "size": 5,
+    "sha256": "29b22357fc719efecc2e7856a7c1df2ed73936d887a7236728594c0f5b3d28e2"
+  },
+  "diagnostics/native-camera-cache-20260930/build.log": {
+    "size": 252,
+    "sha256": "16b4fba35db800c521929f59338ef8fde396656b495fdd279d9d04d11c359df2"
+  },
+  "diagnostics/native-camera-cache-20260930/build.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/native-camera-cache-20260930/analysis.txt": {
+    "size": 1870,
+    "sha256": "f38d85cd0b1ec72cd21ca6a3c902fdcc9b2779092be6ef02a00932ebcec65644"
+  },
+  "diagnostics/native-camera-cache-20260930/final-build.pid": {
+    "size": 5,
+    "sha256": "40018b450e07a9e38210ddafab88184450ec579ef6f51500fd08275f0a42ef83"
+  },
+  "diagnostics/native-camera-cache-20260930/final-build.log": {
+    "size": 252,
+    "sha256": "16b4fba35db800c521929f59338ef8fde396656b495fdd279d9d04d11c359df2"
+  },
+  "diagnostics/native-camera-cache-20260930/final-build.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/native-camera-cache-20260930/patch_camera.py": {
+    "size": 20243,
+    "sha256": "f0498489edd1221554095a0fcb29f558020ec1a45b64d91cc02d0d02882f36eb"
+  },
+  "diagnostics/native-camera-cache-20260930/build-verification.json": {
+    "size": 711,
+    "sha256": "00286c9359c143e5bcd4705ba594a84b84c86bbecc2554e80f794d329d2d97b1"
+  },
+  "diagnostics/native-camera-cache-20260930/build-verification.txt": {
+    "size": 612,
+    "sha256": "04aa45c3c63f5aa54bd88557f72599e577787457495350bf01bd8c2e7f5522b6"
+  },
+  "diagnostics/present-sync-20260930/backup-path.txt": {
+    "size": 79,
+    "sha256": "eb782a71382c39bbccbfc2b2d67079a8273bdc032e9f6f54e85c5f46385213c7"
+  },
+  "diagnostics/present-sync-20260930/analysis.txt": {
+    "size": 594,
+    "sha256": "e362ae0e87e128d4c916740699a43a5bc892dabc8286397ef0a67618916bfc35"
+  },
+  "diagnostics/present-sync-20260930/previous-build-live.txt": {
+    "size": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diagnostics/present-sync-20260930/patch_present_sync.py": {
+    "size": 13141,
+    "sha256": "75713036e92c1b682d11dd9994ba907cd1e15caaa8c05f851c9e61a01efec58d"
+  },
+  "diagnostics/present-sync-20260930/build.pid": {
+    "size": 5,
+    "sha256": "f0a72e5aa5418a681ad1dd1bc4a938cff8332afea835fdd77f72c5aee22e62c5"
+  },
+  "diagnostics/present-sync-20260930/build.log": {
+    "size": 252,
+    "sha256": "16b4fba35db800c521929f59338ef8fde396656b495fdd279d9d04d11c359df2"
+  },
+  "diagnostics/present-sync-20260930/build.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/present-sync-20260930/verification.json": {
+    "size": 820,
+    "sha256": "5e15da05d0c3f8ef422406622f83a74a50f6d29621060ade80a8e1d25552f9c7"
+  },
+  "diagnostics/present-sync-20260930/verification.txt": {
+    "size": 713,
+    "sha256": "ac07162ce78b2a9b294d5497216436fada95ff407ed45d7db968474067fcbba1"
+  },
+  "diagnostics/premium-ui-20260930/backup-path.txt": {
+    "size": 77,
+    "sha256": "15daea68649ba050f7c84abef1f6e6b2e546d172f887a820ac3f661574efc52a"
+  },
+  "diagnostics/premium-ui-20260930/analysis.txt": {
+    "size": 2000,
+    "sha256": "86a0235d312f3e39e83cfdd757ba4a7f7a3f0199a1424b44327ff708e289dfa2"
+  },
+  "diagnostics/premium-ui-20260930/patch_ui.py": {
+    "size": 42840,
+    "sha256": "77146c779dea9e4b2bee787f59496da893894846ec279f35e77f57105267c9d5"
+  },
+  "diagnostics/premium-ui-20260930/build.pid": {
+    "size": 5,
+    "sha256": "10a942503279068ca7d3bdd6364324151a4f4c8034b2c53a23a032459b5c6c24"
+  },
+  "diagnostics/premium-ui-20260930/build.log": {
+    "size": 457,
+    "sha256": "1781d099948ad110b6d3e67914355d7c4ae2c5d5bf208016c437671239d72a5a"
+  },
+  "diagnostics/premium-ui-20260930/build.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/premium-ui-20260930/finalize_ui.py": {
+    "size": 1809,
+    "sha256": "cc0325f60739b3ce31e0d163648d960822dcf2ec06066391df130d2d6efc6771"
+  },
+  "diagnostics/premium-ui-20260930/final-build.pid": {
+    "size": 5,
+    "sha256": "29f5c081d5d799ee5ee739314a39e60496184204c512dc0d6e5bf86785fcbd25"
+  },
+  "diagnostics/premium-ui-20260930/final-build.log": {
+    "size": 252,
+    "sha256": "16b4fba35db800c521929f59338ef8fde396656b495fdd279d9d04d11c359df2"
+  },
+  "diagnostics/premium-ui-20260930/final-build.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/premium-ui-20260930/release-build.pid": {
+    "size": 5,
+    "sha256": "db012178e554439f836cac36313fbf0b8c3a7ba3f0edcfbbe59b9095b13ba723"
+  },
+  "diagnostics/premium-ui-20260930/release-build.log": {
+    "size": 252,
+    "sha256": "16b4fba35db800c521929f59338ef8fde396656b495fdd279d9d04d11c359df2"
+  },
+  "diagnostics/premium-ui-20260930/release-build.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/premium-ui-20260930/menu.ppm": {
+    "size": 7581617,
+    "sha256": "bafcf82ab0f079181104f9396bb98cfd0504cff81fb8e1f62d3f5cbb0c7ff954"
+  },
+  "diagnostics/premium-ui-20260930/verification.json": {
+    "size": 1311,
+    "sha256": "e1cad7b37bc852a5dd9e4e39e8b94634ef95de84295caf38021a74bb5af7e3f7"
+  },
+  "diagnostics/premium-ui-20260930/verification.txt": {
+    "size": 1186,
+    "sha256": "9f093b3c4d902b9ccdd3998940bd7a8431816166a841a99e5175689b251fb1c2"
+  },
+  "diagnostics/aim-debug/before.log": {
+    "size": 175101,
+    "sha256": "7d7dbf8525836dd7bfadec5d701fcef1bddb0076324908dbcf46ca55c4df5771"
+  },
+  "diagnostics/aim-debug/add_aim_debug.py": {
+    "size": 14286,
+    "sha256": "5086ce84413420cef7e87122c4a26b53cf1beb5352df7c7aa7e2686155f1a16b"
+  },
+  "diagnostics/aim-debug/build.pid": {
+    "size": 6,
+    "sha256": "8bc6ceea7ec15db088434c9f54165fc650500b686e56f8aca3b10e8d6b050c0e"
+  },
+  "diagnostics/aim-debug/build.log": {
+    "size": 252,
+    "sha256": "16b4fba35db800c521929f59338ef8fde396656b495fdd279d9d04d11c359df2"
+  },
+  "diagnostics/aim-debug/unit.pid": {
+    "size": 6,
+    "sha256": "c765168b7fea30fc0c77282f5c672b1b7a5b1c07fb4aedbe4409f794e3802e1f"
+  },
+  "diagnostics/aim-debug/ui.pid": {
+    "size": 6,
+    "sha256": "9b0b2641c40833180863efba47c61dacdfc781cb2240ffcb73a6f68e902004ee"
+  },
+  "diagnostics/aim-debug/unit-compile.log": {
+    "size": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diagnostics/aim-debug/ui-compile.log": {
+    "size": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diagnostics/aim-debug/aim_test": {
+    "size": 172232,
+    "sha256": "a70f0e1739f68ec4c2ef67d42b66776545ec044200d17e8f8ddfd14923f99f6f"
+  },
+  "diagnostics/aim-debug/unit-compile.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/aim-debug/unit-test.log": {
+    "size": 161,
+    "sha256": "e38f9861db1094a570e0128869bd4b0c4f3456ac77e2826307079c041a90a3ad"
+  },
+  "diagnostics/aim-debug/unit-test.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/aim-debug/build.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/aim-debug/ui_test": {
+    "size": 1152888,
+    "sha256": "07f7ee2b141356445d91bffb3bbf57210393adb9f139a407a144f4c3730a21b4"
+  },
+  "diagnostics/aim-debug/ui-compile.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/aim-debug/ui-test.log": {
+    "size": 2159,
+    "sha256": "9eeb086d4f6e32963a68d96ecf844e4917c48d5754ab2cc8f788b76c7032bcc1"
+  },
+  "diagnostics/aim-debug/ui-test.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/aim-debug/aim_debug_smoke.cpp": {
+    "size": 1699,
+    "sha256": "11f26fd59e264dee617b23738dcd205af61765013d6b7d0589dff6690d34d1e0"
+  },
+  "diagnostics/aim-debug/smoke-compile.log": {
+    "size": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diagnostics/aim-debug/aim_debug_smoke": {
+    "size": 165856,
+    "sha256": "2c556c8c0e5f3455be2b5e799379eb7f2616a80ddcbf655ab9421e5190902a8a"
+  },
+  "diagnostics/aim-debug/smoke-compile.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/aim-debug/smoke-test.log": {
+    "size": 1021,
+    "sha256": "96d33d7e2234485b003b09cae9de062063354f41713de36ef963f12eee869d8d"
+  },
+  "diagnostics/aim-debug/smoke-test.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/aim-debug/capture-test.pid": {
+    "size": 6,
+    "sha256": "5fe8e44751bf5f5d18b1b2f4a951419e24dbc3c5dc0deb55c426ecab95beec9f"
+  },
+  "diagnostics/aim-debug/capture-test.log": {
+    "size": 223,
+    "sha256": "5776964d95c418bd06d95afbc9d37509ab8a010c351c4d15395ba6a6ac233961"
+  },
+  "diagnostics/aim-debug/capture-20261001-013541.log": {
+    "size": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diagnostics/aim-debug/latest-capture.txt": {
+    "size": 85,
+    "sha256": "e78a752ba2aa63dfcade6ebeac0895ad68f705dff54e209fac2a5eb1bc4436da"
+  },
+  "diagnostics/aim-debug/capture-20261001-013541-aim.log": {
+    "size": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diagnostics/aim-debug/capture-test.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/aim-debug/final-qa.txt": {
+    "size": 569,
+    "sha256": "855dbf2beec7c576104151701dfedd2285e06a0ca6a113409097722610477f5a"
+  },
+  "diagnostics/organization/migration.pid": {
+    "size": 6,
+    "sha256": "b0a201e5c8f146cb7eba219200208cb2d839f895a01d257304cb30f31cd7d533"
+  },
+  "diagnostics/organization/migration.log": {
+    "size": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui.pid": {
+    "size": 5,
+    "sha256": "1575923ea2ada11f612f7db7bb17d1c9e2bb04b6321320c00610e17154703cb6"
+  },
+  "diagnostics/premium-ui-20260930/tests/runtime.pid": {
+    "size": 5,
+    "sha256": "1245117d2324b8a35afd72a69b72ae243046c608e5b416c18cdb06015e7ac2b9"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui-compile.log": {
+    "size": 447,
+    "sha256": "c322a092945485985abed52437895d930f606d81a91df9e989aec844785dd96e"
+  },
+  "diagnostics/premium-ui-20260930/tests/runtime-compile.log": {
+    "size": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diagnostics/premium-ui-20260930/tests/present_sync_test": {
+    "size": 636632,
+    "sha256": "85b59aa1369339ec5cbbc81847f189dc1e42da4fb4e30112e5f0999b9eadfaa9"
+  },
+  "diagnostics/premium-ui-20260930/tests/runtime-test.log": {
+    "size": 340,
+    "sha256": "bbbf5bc5a9722074ebce5d3d0484f81cb6565fa9d4c00fbce1c05f4cb06267b1"
+  },
+  "diagnostics/premium-ui-20260930/tests/runtime.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui.exit": {
+    "size": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  "diagnostics/premium-ui-20260930/tests/skeleton_test.cpp": {
+    "size": 3497,
+    "sha256": "3e87877b4a38e5c38f27b8279c79183039b9ed4037e8721d8f59ebf744901471"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui-final.pid": {
+    "size": 5,
+    "sha256": "88536d16af4ab69ef7fbf471dd9e62c4d7e0ad508209020baada067c7c0a7548"
+  },
+  "diagnostics/premium-ui-20260930/tests/skeleton.pid": {
+    "size": 5,
+    "sha256": "447d6b48a592e4489850513ec8a87765f9b5436182307e4919db6cdd7139f31e"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui-compile-final.log": {
+    "size": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diagnostics/premium-ui-20260930/tests/skeleton-compile.log": {
+    "size": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diagnostics/premium-ui-20260930/tests/skeleton_test": {
+    "size": 562696,
+    "sha256": "47363b8c74daadd8072139a7c92808db2782cac47b4e2a7061465d2a1af9090f"
+  },
+  "diagnostics/premium-ui-20260930/tests/skeleton-test.log": {
+    "size": 210,
+    "sha256": "4747759c80cbf4a4e32f05ec90f86264f43c9bfd10046ce014581c13accd1003"
+  },
+  "diagnostics/premium-ui-20260930/tests/skeleton.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui-test-final.log": {
+    "size": 168,
+    "sha256": "c8408ecaf6024e710540e2b590842f1fa8fba5b8c921fb6040a47eb9c15b34db"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui-final.exit": {
+    "size": 4,
+    "sha256": "e726b440cc164001999e718b51780d80314709efe06e7857282377be9111127b"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui-layout.pid": {
+    "size": 5,
+    "sha256": "29fa1dc9d7d53c518e8d3d1126781c2f3ff0d4372f640179d70c2fe4c775a5d4"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui-compile-layout.log": {
+    "size": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui-test-layout.log": {
+    "size": 420,
+    "sha256": "eb904bfb2e443d27d32697cb3da921847694d8bed829e918c072562bcd8c4a76"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui-layout.exit": {
+    "size": 4,
+    "sha256": "e726b440cc164001999e718b51780d80314709efe06e7857282377be9111127b"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui-verified.pid": {
+    "size": 5,
+    "sha256": "38294f9bfc5c0362d64d71fc550f771fbea93de2ffd8520d56ab0338d651bf1c"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui-compile-verified.log": {
+    "size": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui_test": {
+    "size": 4411896,
+    "sha256": "f1b6814c63138269db2c6e4ef47c4cbecb55957d31ab96ecbdf97f42ba8cb9cc"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui-test-verified.log": {
+    "size": 591,
+    "sha256": "adb272caeab1fbcb0ffb5d2f8a39629f0cf14fe680a071f3562524a4bd6df04d"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui-verified.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui-compile-menu-layout.log": {
+    "size": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui_test_menu_layout": {
+    "size": 5191320,
+    "sha256": "5d855f5557118efb37a285613e4f3563e2c42dbb9f70601adda30659c351d74b"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui-test-menu-layout.log": {
+    "size": 591,
+    "sha256": "adb272caeab1fbcb0ffb5d2f8a39629f0cf14fe680a071f3562524a4bd6df04d"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui-menu-layout.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui_test.cpp": {
+    "size": 11197,
+    "sha256": "411dd7e27ddd3a5cab7358919789f0f82612ba25ba92cc2171810389b55202d5"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui-compile-large-editor.log": {
+    "size": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui-large-editor-compile.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui-test-large-editor.log": {
+    "size": 565,
+    "sha256": "c8c47a5ce68e25f7ce87154720109ba68111b5cf71faffa0ab489812f564a7b8"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui-large-editor.exit": {
+    "size": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui_test_large_editor": {
+    "size": 1146488,
+    "sha256": "4950ae392113d0afcdc6dfbf68ef2d7fe95452e338c8f67fb9d76422957ee859"
+  },
+  "diagnostics/premium-ui-20260930/tests/ui_test_aim": {
+    "size": 1152888,
+    "sha256": "1ac3e5488f7da68984755c1daf7e68f2c13297246b89783e2fda92495c9b9670"
+  },
+  "diagnostics/premium-ui-20260930/tests/android/log.h": {
+    "size": 167,
+    "sha256": "713c240439d97df6fd6d504eda3761241b3f78f2086c7fc403f24a1bd7b0cc5e"
+  },
+  "diagnostics/present-sync-20260930/tests/present_sync_test.cpp": {
+    "size": 7615,
+    "sha256": "3d658b6264d1e9d2251e01d9b63d516fd3a5fccf994c77b4e254b82491297cb8"
+  },
+  "diagnostics/present-sync-20260930/tests/compile.log": {
+    "size": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diagnostics/present-sync-20260930/tests/present_sync_test": {
+    "size": 636736,
+    "sha256": "d0df9981b18fd6055c85e79e6e9df0f18e39272461c90583fa6889a06fc54808"
+  },
+  "diagnostics/present-sync-20260930/tests/test.log": {
+    "size": 340,
+    "sha256": "bbbf5bc5a9722074ebce5d3d0484f81cb6565fa9d4c00fbce1c05f4cb06267b1"
+  },
+  "diagnostics/present-sync-20260930/tests/android/log.h": {
+    "size": 167,
+    "sha256": "713c240439d97df6fd6d504eda3761241b3f78f2086c7fc403f24a1bd7b0cc5e"
+  },
+  "diagnostics/native-camera-cache-20260930/tests/runtime_offline_test.cpp": {
+    "size": 5690,
+    "sha256": "ad88722a8d80dc120e2eef5600805258e48e6cb68d84aab985695c276e8c7082"
+  },
+  "diagnostics/native-camera-cache-20260930/tests/compile.log": {
+    "size": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diagnostics/native-camera-cache-20260930/tests/runtime_offline_test": {
+    "size": 588704,
+    "sha256": "0dcb27ea84a88633d0cf8284f648bab3088278e34363011c3c9e7677bb8ba88c"
+  },
+  "diagnostics/native-camera-cache-20260930/tests/test.log": {
+    "size": 239,
+    "sha256": "e87463e6c74e958ff981059a0e08a8d9f9ef32d9b65cdeed45cb1b1057200c84"
+  },
+  "diagnostics/native-camera-cache-20260930/tests/android/log.h": {
+    "size": 167,
+    "sha256": "713c240439d97df6fd6d504eda3761241b3f78f2086c7fc403f24a1bd7b0cc5e"
+  },
+  "libs/arm64-v8a/liblemmingrmt.so": {
+    "size": 946576,
+    "sha256": "bf6bbb7746352e0932d80209325b306d9021e97b7d2951915f65ebc81b964966"
+  },
+  "obj/local/arm64-v8a/liblemmingrmt.so": {
+    "size": 5918432,
+    "sha256": "36a0f7244fb410b3735b6bf80eb5a2750be597753c6ac7ab94fafd4fcba1292d"
+  },
+  "obj/local/arm64-v8a/objs/lemmingrmt/linker.list": {
+    "size": 348,
+    "sha256": "b0afb4bd8a42cc87fcef997670ae71e0240940124fc8f73a4414c46fa8766dde"
+  },
+  "obj/local/arm64-v8a/objs/lemmingrmt/main.o.d": {
+    "size": 705,
+    "sha256": "0e92fec2c2bfe1935239ab9d0c641878c4cf3298bb53ef3255131bc9fbf4dd54"
+  },
+  "obj/local/arm64-v8a/objs/lemmingrmt/main.o": {
+    "size": 1974992,
+    "sha256": "2297ae0e1c24439c3ec133e0d8f01f95920d0d86b046a41256fee8db520dbf49"
+  },
+  "obj/local/arm64-v8a/objs/lemmingrmt/imgui/imgui_tables.o.d": {
+    "size": 230,
+    "sha256": "a9ea1ce1678b0b3ded4e729e47f9855641dbdc0198f08c71b63cd337adcf8535"
+  },
+  "obj/local/arm64-v8a/objs/lemmingrmt/imgui/imgui_tables.o": {
+    "size": 567352,
+    "sha256": "6a9157c715825884494582d54c41286846055bcdcfa8a5fe3903abf5914d43fd"
+  },
+  "obj/local/arm64-v8a/objs/lemmingrmt/imgui/imgui_draw.o.d": {
+    "size": 340,
+    "sha256": "918a621e358b080dd9c1f50e45a1136815295ffa3095ed9f2eafb24b7e45312d"
+  },
+  "obj/local/arm64-v8a/objs/lemmingrmt/imgui/imgui_draw.o": {
+    "size": 1185520,
+    "sha256": "0d6d99b244d12e3d646ee6eb3795c6f1ace7b367d1ddf04e3b48851687c60e4e"
+  },
+  "obj/local/arm64-v8a/objs/lemmingrmt/imgui/imgui_widgets.o.d": {
+    "size": 287,
+    "sha256": "2b99ee22da117b4be77de677445c2d65c0655dd24f20ee59af1bdbcf03e76b0a"
+  },
+  "obj/local/arm64-v8a/objs/lemmingrmt/imgui/imgui_widgets.o": {
+    "size": 1806816,
+    "sha256": "b23da1c62c6c00222040a16c7d86186dd59508603fcb2eaed9d6d18cbb151e0c"
+  },
+  "obj/local/arm64-v8a/objs/lemmingrmt/imgui/imgui.o.d": {
+    "size": 212,
+    "sha256": "8c154c4b5476672ebe52224cb7d4c2f410590c2ad93e5116f86465b281b2ba59"
+  },
+  "obj/local/arm64-v8a/objs/lemmingrmt/imgui/imgui.o": {
+    "size": 2974144,
+    "sha256": "013d716021ea49bc86d528b344d61d0364a854b4dac9263e8a18bf64ecddc361"
+  },
+  "obj/local/arm64-v8a/objs/lemmingrmt/imgui/backends/imgui_impl_opengl3.o.d": {
+    "size": 286,
+    "sha256": "42935852cff1ddf9a6801bb5504ad894f51467ffba41db1bb4725e3aef53d51b"
+  },
+  "obj/local/arm64-v8a/objs/lemmingrmt/imgui/backends/imgui_impl_opengl3.o": {
+    "size": 67136,
+    "sha256": "c7bba76bf64361adcbc6f7e67c6c4e672b44321810de138936db9514562d0fda"
+  },
+  "jni/imgui/imgui.cpp": {
+    "size": 882057,
+    "sha256": "af1cc31255fbf58d57ecc9d727cbd39a84e44fa8f11be7fd419fa0100c5255d8"
+  },
+  "jni/imgui/imgui.h": {
+    "size": 378236,
+    "sha256": "2d0180859ff85e7fe66ed9999b0f05f2fc45176773046a8f86b3b6bd190b0765"
+  },
+  "jni/imgui/imgui_draw.cpp": {
+    "size": 258761,
+    "sha256": "9d2d9ee6745d9b98d7f39a16da8ffcf783f90bb8c9e931038fc8e9a15cbe3d84"
+  },
+  "jni/imgui/imgui_tables.cpp": {
+    "size": 247597,
+    "sha256": "4ea380fa9d49cac6cbfbc8b969969f9b0705518ec9ca340681d8c70e3eefbc28"
+  },
+  "jni/imgui/imgui_widgets.cpp": {
+    "size": 517769,
+    "sha256": "54ac29dbcbe70091f5e5fc2cb4099e6d0b9d1c939e5158f2be983cb508714414"
+  },
+  "jni/imgui/imconfig.h": {
+    "size": 11579,
+    "sha256": "0884061cc43e27e1d346fe18dcd1425792eb2532d3d16610a82eb5ac751f7594"
+  },
+  "jni/imgui/imstb_rectpack.h": {
+    "size": 20344,
+    "sha256": "2efa3d5f7d003c19743b15155dad9f46d9f9fc783a18893d703b431d3c990972"
+  },
+  "jni/imgui/imstb_textedit.h": {
+    "size": 57128,
+    "sha256": "77010e494caf72c178b573569612aec409d24380409676325a31d02de0ec64b7"
+  },
+  "jni/imgui/imstb_truetype.h": {
+    "size": 199485,
+    "sha256": "87f08919ae8e7223451d0e9d06b62829075d3e920c9e6ad436db9d7e7427ffce"
+  },
+  "jni/imgui/LICENSE.txt": {
+    "size": 1083,
+    "sha256": "c80c5789748d955c4a650562baa0d750494e2c7128c2ca66aaebe2e3c4e198bf"
+  },
+  "jni/imgui/imgui_internal.h": {
+    "size": 272833,
+    "sha256": "1363c617a743957f367afe1c6c88345870b7aa25ee339809fb915466e4fb9575"
+  },
+  "jni/assets/MozillaText.ttf": {
+    "size": 86268,
+    "sha256": "a74b1a5c77811bab140c8c30b02adea4f6a90fe8811c669c52541dd78f5c5e87"
+  },
+  "jni/assets/MozillaText-OFL.txt": {
+    "size": 4399,
+    "sha256": "7796681a32b924d2dc5186e514bd53848dd72359f8f3f413797107a478ef1940"
+  },
+  "jni/fonts/mozilla_text.hpp": {
+    "size": 539378,
+    "sha256": "40f22885d282894edbdfdc170c25ef924b75057ace6683e768d7631d797ead26"
+  },
+  "jni/imgui/backends/imgui_impl_opengl3.cpp": {
+    "size": 50057,
+    "sha256": "cf3c535e3a673e19ef893da4b7d370197547cc1350acd5051e842606aef951d7"
+  },
+  "jni/imgui/backends/imgui_impl_opengl3.h": {
+    "size": 3574,
+    "sha256": "8239b72a4325f370c275d34b655b3fcaf2660ce9d7acfdea494a303dd51f9e5c"
+  },
+  "jni/imgui/backends/imgui_impl_opengl3_loader.h": {
+    "size": 39149,
+    "sha256": "9d17b1679dc876e0ca693631030e70656c372c808c6767644c3b545834483e24"
+  }
+}

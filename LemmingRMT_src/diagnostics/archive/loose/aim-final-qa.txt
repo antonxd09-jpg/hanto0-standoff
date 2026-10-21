@@ -1,0 +1,17 @@
+Aim integration QA: PASS
+
+Scope: matching ELF signatures, ARM64 compile, host math and memory guards, UI layout on six viewports, GLES3 offscreen rendering, visual contact-sheet review.
+NOT tested on an Android device or in a live game. Runtime hook installation and server hit acceptance remain unverified.
+
+PASS aim math, multipoints, multi-select, FOV/range/priority/lock, config guards, stale/team/world/dead filters, stack-span checks and original-call passthrough
+PASS Aim pages, independent modes/masks, clicks, multipoints, six viewports and no scrollbars
+PASS GLES3 offscreen rendering and GL_NO_ERROR
+PASS larger menu and rails, Rage/Config navigation, movable ESP Editor, style switching, no scrollbars, finite vertices and six viewport sizes
+
+Artifact:
+out/arm64-v8a/liblemmingrmt.so: ELF 64-bit LSB shared object, ARM aarch64, version 1 (SYSV), dynamically linked, for Android 23, built by NDK r30 (16248370), BuildID[sha1]=b389cf8ef194d88f2f63c7849c4484ee8c667b51, stripped
+938392 bytes
+7882a53949bca29b290b7c3b35a02f66ef2027be09eb4c2af826e759d5c39454  out/arm64-v8a/liblemmingrmt.so
+
+Backup:
+/home/leftcode/Projects/LemmingRMT/backups/20261001-010359-before-angle-silent-aim

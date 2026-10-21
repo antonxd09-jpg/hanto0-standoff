@@ -1,0 +1,179 @@
+--------- beginning of crash
+09-24 16:48:21.670  8112  8517 F libc    : Fatal signal 7 (SIGBUS), code 1 (BUS_ADRALN), fault addr 0x7daff97f72 in tid 8517 (Thread-57), pid 8112 (ebolt.standoff2)
+09-24 16:48:22.464 10789 10789 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+09-24 16:48:22.464 10789 10789 F DEBUG   : Build fingerprint: 'samsung/a26xxx/a26x:15/AP3A.240905.015.A2/A266BXXU3AYE6_OXM3AYE6:user/release-keys'
+09-24 16:48:22.464 10789 10789 F DEBUG   : Revision: '5'
+09-24 16:48:22.464 10789 10789 F DEBUG   : ABI: 'arm64'
+09-24 16:48:22.464 10789 10789 F DEBUG   : Processor: '6'
+09-24 16:48:22.464 10789 10789 F DEBUG   : Timestamp: 2026-09-24 16:48:21.896298845+0300
+09-24 16:48:22.464 10789 10789 F DEBUG   : Process uptime: 125s
+09-24 16:48:22.464 10789 10789 F DEBUG   : Cmdline: com.axlebolt.standoff2
+09-24 16:48:22.464 10789 10789 F DEBUG   : pid: 8112, tid: 8517, name: Thread-57  >>> com.axlebolt.standoff2 <<<
+09-24 16:48:22.464 10789 10789 F DEBUG   : uid: 10450
+09-24 16:48:22.464 10789 10789 F DEBUG   : tagged_addr_ctrl: 0000000000000001 (PR_TAGGED_ADDR_ENABLE)
+09-24 16:48:22.464 10789 10789 F DEBUG   : signal 7 (SIGBUS), code 1 (BUS_ADRALN), fault addr 0x0000007daff97f72
+09-24 16:48:22.464 10789 10789 F DEBUG   :     x0  0000007a40e6ad00  x1  00aaa2ec00aaa2e8  x2  00000079d1bc3318  x3  00000079b0aab324
+09-24 16:48:22.464 10789 10789 F DEBUG   :     x4  000000000000000c  x5  00000000024196e0  x6  00000079f23c96a0  x7  41c12706c18fac9f
+09-24 16:48:22.464 10789 10789 F DEBUG   :     x8  0000007daff97f72  x9  0000000000aaa710  x10 0000007a9ae9f150  x11 000000000000005d
+09-24 16:48:22.464 10789 10789 F DEBUG   :     x12 000000000000000c  x13 00000000bf4c89ca  x14 0000000000000000  x15 00000079b0aab2b8
+09-24 16:48:22.464 10789 10789 F DEBUG   :     x16 00000079d1bc304c  x17 00000079d1bc303c  x18 00000079d1934000  x19 00000079d1bc3190
+09-24 16:48:22.464 10789 10789 F DEBUG   :     x20 00000079c00000c0  x21 00000079c0000188  x22 00000079c00000c0  x23 0000000000000000
+09-24 16:48:22.464 10789 10789 F DEBUG   :     x24 0000000000aaa2ec  x25 0000007c600ed7f0  x26 00000079c000018c  x27 00000079b0001040
+09-24 16:48:22.464 10789 10789 F DEBUG   :     x28 00000079d1bc3900  x29 00000079d1bc3420
+09-24 16:48:22.464 10789 10789 F DEBUG   :     lr  0000007a9ae9ef7c  sp  00000079d1bc3190  pc  0000007a9ae9f194  pst 0000000080001000
+09-24 16:48:22.464 10789 10789 F DEBUG   : 6 total frames
+09-24 16:48:22.464 10789 10789 F DEBUG   : backtrace:
+09-24 16:48:22.464 10789 10789 F DEBUG   :       #00 pc 0000000005694194  /data/app/~~NG6T2JxRispDx2Oz797K5w==/com.axlebolt.standoff2-u5dRsnbV-803EO5-7rIALw==/lib/arm64/libunity.so (BuildId: fc2c8da4c307ca36)
+09-24 16:48:22.464 10789 10789 F DEBUG   :       #01 pc 0000000005693eac  /data/app/~~NG6T2JxRispDx2Oz797K5w==/com.axlebolt.standoff2-u5dRsnbV-803EO5-7rIALw==/lib/arm64/libunity.so (BuildId: fc2c8da4c307ca36)
+09-24 16:48:22.464 10789 10789 F DEBUG   :       #02 pc 0000000005693b74  /data/app/~~NG6T2JxRispDx2Oz797K5w==/com.axlebolt.standoff2-u5dRsnbV-803EO5-7rIALw==/lib/arm64/libunity.so (BuildId: fc2c8da4c307ca36)
+09-24 16:48:22.464 10789 10789 F DEBUG   :       #03 pc 000000000537a0e8  /data/app/~~NG6T2JxRispDx2Oz797K5w==/com.axlebolt.standoff2-u5dRsnbV-803EO5-7rIALw==/lib/arm64/libunity.so (BuildId: fc2c8da4c307ca36)
+09-24 16:48:22.464 10789 10789 F DEBUG   :       #04 pc 000000000006c428  /apex/com.android.runtime/lib64/bionic/libc.so (__pthread_start(void*)+196) (BuildId: 5aaaefd7c7468c04a1f4b916465b3c30)
+09-24 16:48:22.464 10789 10789 F DEBUG   :       #05 pc 000000000005f094  /apex/com.android.runtime/lib64/bionic/libc.so (__start_thread+64) (BuildId: 5aaaefd7c7468c04a1f4b916465b3c30)
+09-24 16:51:34.797 14005 14350 F libc    : Fatal signal 7 (SIGBUS), code 1 (BUS_ADRALN), fault addr 0x7daffa5092 in tid 14350 (Thread-56), pid 14005 (ebolt.standoff2)
+09-24 16:51:35.566 15999 15999 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+09-24 16:51:35.566 15999 15999 F DEBUG   : Build fingerprint: 'samsung/a26xxx/a26x:15/AP3A.240905.015.A2/A266BXXU3AYE6_OXM3AYE6:user/release-keys'
+09-24 16:51:35.566 15999 15999 F DEBUG   : Revision: '5'
+09-24 16:51:35.566 15999 15999 F DEBUG   : ABI: 'arm64'
+09-24 16:51:35.566 15999 15999 F DEBUG   : Processor: '4'
+09-24 16:51:35.566 15999 15999 F DEBUG   : Timestamp: 2026-09-24 16:51:35.036383092+0300
+09-24 16:51:35.566 15999 15999 F DEBUG   : Process uptime: 116s
+09-24 16:51:35.566 15999 15999 F DEBUG   : Cmdline: com.axlebolt.standoff2
+09-24 16:51:35.566 15999 15999 F DEBUG   : pid: 14005, tid: 14350, name: Thread-56  >>> com.axlebolt.standoff2 <<<
+09-24 16:51:35.566 15999 15999 F DEBUG   : uid: 10450
+09-24 16:51:35.566 15999 15999 F DEBUG   : tagged_addr_ctrl: 0000000000000001 (PR_TAGGED_ADDR_ENABLE)
+09-24 16:51:35.567 15999 15999 F DEBUG   : signal 7 (SIGBUS), code 1 (BUS_ADRALN), fault addr 0x0000007daffa5092
+09-24 16:51:35.567 15999 15999 F DEBUG   :     x0  0000007a40e6ad00  x1  001264cc001264c8  x2  00000079d0cc7318  x3  00000079b0127504
+09-24 16:51:35.567 15999 15999 F DEBUG   :     x4  000000000000000c  x5  0000000002430fa2  x6  00000079f19fb6c0  x7  3f0effdb41af3da3
+09-24 16:51:35.567 15999 15999 F DEBUG   :     x8  0000007daffa5092  x9  00000000001268e0  x10 0000007aa64bf150  x11 000000000000005d
+09-24 16:51:35.567 15999 15999 F DEBUG   :     x12 000000000000000c  x13 000000003eaa2590  x14 0000000000000000  x15 00000079b0127498
+09-24 16:51:35.567 15999 15999 F DEBUG   :     x16 00000079d0cc704c  x17 00000079d0cc703c  x18 00000079af490000  x19 00000079d0cc7190
+09-24 16:51:35.567 15999 15999 F DEBUG   :     x20 00000079c00000c0  x21 00000079c0000188  x22 00000079c00000c0  x23 0000000000000000
+09-24 16:51:35.567 15999 15999 F DEBUG   :     x24 00000000001264cc  x25 0000007c600ef730  x26 00000079c000018c  x27 00000079b0001040
+09-24 16:51:35.567 15999 15999 F DEBUG   :     x28 00000079d0cc7900  x29 00000079d0cc7420
+09-24 16:51:35.567 15999 15999 F DEBUG   :     lr  0000007aa64bef7c  sp  00000079d0cc7190  pc  0000007aa64bf194  pst 0000000080001000
+09-24 16:51:35.567 15999 15999 F DEBUG   : 6 total frames
+09-24 16:51:35.567 15999 15999 F DEBUG   : backtrace:
+09-24 16:51:35.567 15999 15999 F DEBUG   :       #00 pc 0000000005694194  /data/app/~~NG6T2JxRispDx2Oz797K5w==/com.axlebolt.standoff2-u5dRsnbV-803EO5-7rIALw==/lib/arm64/libunity.so (BuildId: fc2c8da4c307ca36)
+09-24 16:51:35.567 15999 15999 F DEBUG   :       #01 pc 0000000005693eac  /data/app/~~NG6T2JxRispDx2Oz797K5w==/com.axlebolt.standoff2-u5dRsnbV-803EO5-7rIALw==/lib/arm64/libunity.so (BuildId: fc2c8da4c307ca36)
+09-24 16:51:35.567 15999 15999 F DEBUG   :       #02 pc 0000000005693b74  /data/app/~~NG6T2JxRispDx2Oz797K5w==/com.axlebolt.standoff2-u5dRsnbV-803EO5-7rIALw==/lib/arm64/libunity.so (BuildId: fc2c8da4c307ca36)
+09-24 16:51:35.567 15999 15999 F DEBUG   :       #03 pc 000000000537a0e8  /data/app/~~NG6T2JxRispDx2Oz797K5w==/com.axlebolt.standoff2-u5dRsnbV-803EO5-7rIALw==/lib/arm64/libunity.so (BuildId: fc2c8da4c307ca36)
+09-24 16:51:35.567 15999 15999 F DEBUG   :       #04 pc 000000000006c428  /apex/com.android.runtime/lib64/bionic/libc.so (__pthread_start(void*)+196) (BuildId: 5aaaefd7c7468c04a1f4b916465b3c30)
+09-24 16:51:35.567 15999 15999 F DEBUG   :       #05 pc 000000000005f094  /apex/com.android.runtime/lib64/bionic/libc.so (__start_thread+64) (BuildId: 5aaaefd7c7468c04a1f4b916465b3c30)
+09-26 16:07:27.179  7127  7127 F libc    : Fatal signal 6 (SIGABRT), code -1 (SI_QUEUE) in tid 7127 (surfaceflinger), pid 7127 (surfaceflinger)
+09-26 16:07:28.101 27714 27714 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+09-26 16:07:28.101 27714 27714 F DEBUG   : Build fingerprint: 'samsung/a26xxx/a26x:15/AP3A.240905.015.A2/A266BXXU3AYE6_OXM3AYE6:user/release-keys'
+09-26 16:07:28.101 27714 27714 F DEBUG   : Revision: '5'
+09-26 16:07:28.101 27714 27714 F DEBUG   : ABI: 'arm64'
+09-26 16:07:28.101 27714 27714 F DEBUG   : Processor: '4'
+09-26 16:07:28.101 27714 27714 F DEBUG   : Timestamp: 2026-09-26 16:07:27.298956682+0300
+09-26 16:07:28.101 27714 27714 F DEBUG   : Process uptime: 0s
+09-26 16:07:28.101 27714 27714 F DEBUG   : Cmdline: surfaceflinger
+09-26 16:07:28.101 27714 27714 F DEBUG   : pid: 7127, tid: 7127, name: surfaceflinger  >>> surfaceflinger <<<
+09-26 16:07:28.101 27714 27714 F DEBUG   : uid: 0
+09-26 16:07:28.101 27714 27714 F DEBUG   : tagged_addr_ctrl: 0000000000000001 (PR_TAGGED_ADDR_ENABLE)
+09-26 16:07:28.101 27714 27714 F DEBUG   : signal 6 (SIGABRT), code -1 (SI_QUEUE), fault addr --------
+09-26 16:07:28.101 27714 27714 F DEBUG   : Abort message: 'Scudo ERROR: corrupted chunk header at address 0x200007a357b1710'
+09-26 16:07:28.101 27714 27714 F DEBUG   :     x0  0000000000000000  x1  0000000000001bd7  x2  0000000000000006  x3  0000007fd9978420
+09-26 16:07:28.101 27714 27714 F DEBUG   :     x4  6064671f6a6d7467  x5  6064671f6a6d7467  x6  6064671f6a6d7467  x7  7f7f7f7f7f7f7f7f
+09-26 16:07:28.101 27714 27714 F DEBUG   :     x8  00000000000000f0  x9  0000007bbb6b7468  x10 ffffff80ffffffdf  x11 000000003b9ac9ff
+09-26 16:07:28.101 27714 27714 F DEBUG   :     x12 0000007bce63c020  x13 000000007fffffff  x14 0000000005c62648  x15 000006ebf3469385
+09-26 16:07:28.101 27714 27714 F DEBUG   :     x16 0000007bbb766ff8  x17 0000007bbb7513c0  x18 0000007bcd8e8000  x19 0000000000001bd7
+09-26 16:07:28.102 27714 27714 F DEBUG   :     x20 0000000000001bd7  x21 00000000ffffffff  x22 0000005904d80ea0  x23 0000000000008220
+09-26 16:07:28.102 27714 27714 F DEBUG   :     x24 0000000000000afb  x25 0000007bbb77b000  x26 00000059048c4914  x27 0000007bbb77b000
+09-26 16:07:28.102 27714 27714 F DEBUG   :     x28 0000007bbb77b000  x29 0000007fd99784a0
+09-26 16:07:28.102 27714 27714 F DEBUG   :     lr  0000007bbb6ef774  sp  0000007fd9978400  pc  0000007bbb6ef7a4  pst 0000000000001000
+09-26 16:07:28.102 27714 27714 F DEBUG   : 13 total frames
+09-26 16:07:28.102 27714 27714 F DEBUG   : backtrace:
+09-26 16:07:28.102 27714 27714 F DEBUG   :   NOTE: Function names and BuildId information is missing for some frames due
+09-26 16:07:28.102 27714 27714 F DEBUG   :   NOTE: to unreadable libraries. For unwinds of apps, only shared libraries
+09-26 16:07:28.102 27714 27714 F DEBUG   :   NOTE: found under the lib/ directory are readable.
+09-26 16:07:28.102 27714 27714 F DEBUG   :   NOTE: On this device, run setenforce 0 to make the libraries readable.
+09-26 16:07:28.102 27714 27714 F DEBUG   :   NOTE: Unreadable libraries:
+09-26 16:07:28.102 27714 27714 F DEBUG   :   NOTE:   /data/local/tmp/uncode2.8.0.sh
+09-26 16:07:28.102 27714 27714 F DEBUG   :       #00 pc 000000000005b7a4  /apex/com.android.runtime/lib64/bionic/libc.so (abort+168) (BuildId: 5aaaefd7c7468c04a1f4b916465b3c30)
+09-26 16:07:28.102 27714 27714 F DEBUG   :       #01 pc 0000000000048ec0  /apex/com.android.runtime/lib64/bionic/libc.so (scudo::die()+8) (BuildId: 5aaaefd7c7468c04a1f4b916465b3c30)
+09-26 16:07:28.102 27714 27714 F DEBUG   :       #02 pc 0000000000049844  /apex/com.android.runtime/lib64/bionic/libc.so (scudo::reportRawError(char const*)+28) (BuildId: 5aaaefd7c7468c04a1f4b916465b3c30)
+09-26 16:07:28.102 27714 27714 F DEBUG   :       #03 pc 00000000000497c0  /apex/com.android.runtime/lib64/bionic/libc.so (scudo::ScopedErrorReport::~ScopedErrorReport()+12) (BuildId: 5aaaefd7c7468c04a1f4b916465b3c30)
+09-26 16:07:28.102 27714 27714 F DEBUG   :       #04 pc 0000000000049918  /apex/com.android.runtime/lib64/bionic/libc.so (scudo::reportHeaderCorruption(void*)+96) (BuildId: 5aaaefd7c7468c04a1f4b916465b3c30)
+09-26 16:07:28.102 27714 27714 F DEBUG   :       #05 pc 000000000004b268  /apex/com.android.runtime/lib64/bionic/libc.so (scudo::Allocator<scudo::AndroidNormalConfig, &scudo_malloc_postinit>::deallocate(void*, scudo::Chunk::Origin, unsigned long, unsigned long)+280) (BuildId: 5aaaefd7c7468c04a1f4b916465b3c30)
+09-26 16:07:28.102 27714 27714 F DEBUG   :       #06 pc 00000000009aa958  /data/local/tmp/uncode2.8.0.sh
+09-26 16:07:28.102 27714 27714 F DEBUG   :       #07 pc 000000000005c354  /apex/com.android.runtime/lib64/bionic/libc.so (__cxa_finalize+216) (BuildId: 5aaaefd7c7468c04a1f4b916465b3c30)
+09-26 16:07:28.102 27714 27714 F DEBUG   :       #08 pc 000000000006109c  /apex/com.android.runtime/lib64/bionic/libc.so (exit+24) (BuildId: 5aaaefd7c7468c04a1f4b916465b3c30)
+09-26 16:07:28.102 27714 27714 F DEBUG   :       #09 pc 00000000009a0258  /data/local/tmp/uncode2.8.0.sh
+09-26 16:07:28.102 27714 27714 F DEBUG   :       #10 pc 00000000009a2aa8  /data/local/tmp/uncode2.8.0.sh
+09-26 16:07:28.102 27714 27714 F DEBUG   :       #11 pc 00000000009ace90  /data/local/tmp/uncode2.8.0.sh
+09-26 16:07:28.102 27714 27714 F DEBUG   :       #12 pc 00000000000552d4  /apex/com.android.runtime/lib64/bionic/libc.so (__libc_init+116) (BuildId: 5aaaefd7c7468c04a1f4b916465b3c30)
+09-28 03:39:12.530  1320  1356 E AndroidRuntime: !@*** FATAL EXCEPTION IN SYSTEM PROCESS: android.ui
+09-28 03:39:12.530  1320  1356 E AndroidRuntime: java.lang.NullPointerException: NPE by silent reset. It's normal operation caused by device care
+09-28 03:39:12.530  1320  1356 E AndroidRuntime: 	at com.android.server.power.PowerManagerService$4.run(qb/96660306 bdab9c91bf6c6550013cb7fcc12549fe436d61ce4c063f4b21579260c2cdf1c0:66)
+09-28 03:39:12.530  1320  1356 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:959)
+09-28 03:39:12.530  1320  1356 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:100)
+09-28 03:39:12.530  1320  1356 E AndroidRuntime: 	at android.os.Looper.loopOnce(Looper.java:257)
+09-28 03:39:12.530  1320  1356 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:342)
+09-28 03:39:12.530  1320  1356 E AndroidRuntime: 	at android.os.HandlerThread.run(HandlerThread.java:85)
+09-28 03:39:12.530  1320  1356 E AndroidRuntime: 	at com.android.server.ServiceThread.run(qb/96660306 bdab9c91bf6c6550013cb7fcc12549fe436d61ce4c063f4b21579260c2cdf1c0:13)
+09-28 03:39:12.530  1320  1356 E AndroidRuntime: 	at com.android.server.UiThread.run(qb/96660306 bdab9c91bf6c6550013cb7fcc12549fe436d61ce4c063f4b21579260c2cdf1c0:16)
+09-28 03:39:12.797  4967  5962 E AndroidRuntime: FATAL EXCEPTION: SDHMS:g1.d
+09-28 03:39:12.797  4967  5962 E AndroidRuntime: Process: com.sec.android.sdhms, PID: 4967
+09-28 03:39:12.797  4967  5962 E AndroidRuntime: DeadSystemException: The system died; earlier logs will point to the root cause
+09-28 03:39:12.948 30761 30761 E AndroidRuntime: FATAL EXCEPTION: main
+09-28 03:39:12.948 30761 30761 E AndroidRuntime: Process: com.samsung.android.lool, PID: 30761
+09-28 03:39:12.948 30761 30761 E AndroidRuntime: DeadSystemException: The system died; earlier logs will point to the root cause
+09-28 14:11:33.234  6340  6340 F libc    : Fatal signal 6 (SIGABRT), code -1 (SI_QUEUE) in tid 6340 (surfaceflinger), pid 6340 (surfaceflinger)
+09-28 14:11:33.821  8161  8161 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+09-28 14:11:33.821  8161  8161 F DEBUG   : Build fingerprint: 'samsung/a26xxx/a26x:15/AP3A.240905.015.A2/A266BXXU3AYE6_OXM3AYE6:user/release-keys'
+09-28 14:11:33.821  8161  8161 F DEBUG   : Revision: '5'
+09-28 14:11:33.821  8161  8161 F DEBUG   : ABI: 'arm64'
+09-28 14:11:33.821  8161  8161 F DEBUG   : Processor: '5'
+09-28 14:11:33.821  8161  8161 F DEBUG   : Timestamp: 2026-09-28 14:11:33.318547522+0300
+09-28 14:11:33.821  8161  8161 F DEBUG   : Process uptime: 0s
+09-28 14:11:33.821  8161  8161 F DEBUG   : Cmdline: surfaceflinger
+09-28 14:11:33.821  8161  8161 F DEBUG   : pid: 6340, tid: 6340, name: surfaceflinger  >>> surfaceflinger <<<
+09-28 14:11:33.821  8161  8161 F DEBUG   : uid: 0
+09-28 14:11:33.821  8161  8161 F DEBUG   : tagged_addr_ctrl: 0000000000000001 (PR_TAGGED_ADDR_ENABLE)
+09-28 14:11:33.821  8161  8161 F DEBUG   : signal 6 (SIGABRT), code -1 (SI_QUEUE), fault addr --------
+09-28 14:11:33.821  8161  8161 F DEBUG   : Abort message: 'Scudo ERROR: corrupted chunk header at address 0x200007a401acc10'
+09-28 14:11:33.821  8161  8161 F DEBUG   :     x0  0000000000000000  x1  00000000000018c4  x2  0000000000000006  x3  0000007fd239ff70
+09-28 14:11:33.821  8161  8161 F DEBUG   :     x4  6064671f6a6d7467  x5  6064671f6a6d7467  x6  6064671f6a6d7467  x7  7f7f7f7f7f7f7f7f
+09-28 14:11:33.821  8161  8161 F DEBUG   :     x8  00000000000000f0  x9  0000007bb20d7468  x10 ffffff80ffffffdf  x11 000000003b9ac9ff
+09-28 14:11:33.821  8161  8161 F DEBUG   :     x12 0000007bcb1fa020  x13 000000007fffffff  x14 0000000009a3c958  x15 00000ad7ea58f1a1
+09-28 14:11:33.821  8161  8161 F DEBUG   :     x16 0000007bb2186ff8  x17 0000007bb21713c0  x18 0000007bca490000  x19 00000000000018c4
+09-28 14:11:33.821  8161  8161 F DEBUG   :     x20 00000000000018c4  x21 00000000ffffffff  x22 00000059806ffa90  x23 0000000000008238
+09-28 14:11:33.821  8161  8161 F DEBUG   :     x24 0000000000000aff  x25 0000007bb219b000  x26 000000598023d420  x27 0000007bb219b000
+09-28 14:11:33.821  8161  8161 F DEBUG   :     x28 0000007bb219b000  x29 0000007fd239fff0
+09-28 14:11:33.821  8161  8161 F DEBUG   :     lr  0000007bb210f774  sp  0000007fd239ff50  pc  0000007bb210f7a4  pst 0000000000001000
+09-28 14:11:33.821  8161  8161 F DEBUG   : 13 total frames
+09-28 14:11:33.821  8161  8161 F DEBUG   : backtrace:
+09-28 14:11:33.821  8161  8161 F DEBUG   :   NOTE: Function names and BuildId information is missing for some frames due
+09-28 14:11:33.821  8161  8161 F DEBUG   :   NOTE: to unreadable libraries. For unwinds of apps, only shared libraries
+09-28 14:11:33.821  8161  8161 F DEBUG   :   NOTE: found under the lib/ directory are readable.
+09-28 14:11:33.821  8161  8161 F DEBUG   :   NOTE: On this device, run setenforce 0 to make the libraries readable.
+09-28 14:11:33.821  8161  8161 F DEBUG   :   NOTE: Unreadable libraries:
+09-28 14:11:33.821  8161  8161 F DEBUG   :   NOTE:   /data/local/tmp/uncode.sh
+09-28 14:11:33.821  8161  8161 F DEBUG   :       #00 pc 000000000005b7a4  /apex/com.android.runtime/lib64/bionic/libc.so (abort+168) (BuildId: 5aaaefd7c7468c04a1f4b916465b3c30)
+09-28 14:11:33.821  8161  8161 F DEBUG   :       #01 pc 0000000000048ec0  /apex/com.android.runtime/lib64/bionic/libc.so (scudo::die()+8) (BuildId: 5aaaefd7c7468c04a1f4b916465b3c30)
+09-28 14:11:33.821  8161  8161 F DEBUG   :       #02 pc 0000000000049844  /apex/com.android.runtime/lib64/bionic/libc.so (scudo::reportRawError(char const*)+28) (BuildId: 5aaaefd7c7468c04a1f4b916465b3c30)
+09-28 14:11:33.821  8161  8161 F DEBUG   :       #03 pc 00000000000497c0  /apex/com.android.runtime/lib64/bionic/libc.so (scudo::ScopedErrorReport::~ScopedErrorReport()+12) (BuildId: 5aaaefd7c7468c04a1f4b916465b3c30)
+09-28 14:11:33.821  8161  8161 F DEBUG   :       #04 pc 0000000000049918  /apex/com.android.runtime/lib64/bionic/libc.so (scudo::reportHeaderCorruption(void*)+96) (BuildId: 5aaaefd7c7468c04a1f4b916465b3c30)
+09-28 14:11:33.821  8161  8161 F DEBUG   :       #05 pc 000000000004b268  /apex/com.android.runtime/lib64/bionic/libc.so (scudo::Allocator<scudo::AndroidNormalConfig, &scudo_malloc_postinit>::deallocate(void*, scudo::Chunk::Origin, unsigned long, unsigned long)+280) (BuildId: 5aaaefd7c7468c04a1f4b916465b3c30)
+09-28 14:11:33.821  8161  8161 F DEBUG   :       #06 pc 00000000009b37f4  /data/local/tmp/uncode.sh
+09-28 14:11:33.821  8161  8161 F DEBUG   :       #07 pc 000000000005c354  /apex/com.android.runtime/lib64/bionic/libc.so (__cxa_finalize+216) (BuildId: 5aaaefd7c7468c04a1f4b916465b3c30)
+09-28 14:11:33.821  8161  8161 F DEBUG   :       #08 pc 000000000006109c  /apex/com.android.runtime/lib64/bionic/libc.so (exit+24) (BuildId: 5aaaefd7c7468c04a1f4b916465b3c30)
+09-28 14:11:33.821  8161  8161 F DEBUG   :       #09 pc 00000000009a4584  /data/local/tmp/uncode.sh
+09-28 14:11:33.821  8161  8161 F DEBUG   :       #10 pc 00000000009a9528  /data/local/tmp/uncode.sh
+09-28 14:11:33.821  8161  8161 F DEBUG   :       #11 pc 00000000009b5a5c  /data/local/tmp/uncode.sh
+09-28 14:11:33.821  8161  8161 F DEBUG   :       #12 pc 00000000000552d4  /apex/com.android.runtime/lib64/bionic/libc.so (__libc_init+116) (BuildId: 5aaaefd7c7468c04a1f4b916465b3c30)
+09-29 06:49:29.628  8031  8031 E AndroidRuntime: FATAL EXCEPTION: main
+09-29 06:49:29.628  8031  8031 E AndroidRuntime: Process: org.telegram.messenger, PID: 8031
+09-29 06:49:29.628  8031  8031 E AndroidRuntime: android.app.RemoteServiceException$ForegroundServiceDidNotStopInTimeException: A foreground service of type dataSync did not stop within its timeout: ComponentInfo{org.telegram.messenger/org.telegram.messenger.VideoEncodingService}
+09-29 06:49:29.628  8031  8031 E AndroidRuntime: 	at android.app.ActivityThread.generateForegroundServiceDidNotStopInTimeException(ActivityThread.java:2504)
+09-29 06:49:29.628  8031  8031 E AndroidRuntime: 	at android.app.ActivityThread.throwRemoteServiceException(ActivityThread.java:2466)
+09-29 06:49:29.628  8031  8031 E AndroidRuntime: 	at android.app.ActivityThread.-$$Nest$mthrowRemoteServiceException(ActivityThread.java:0)
+09-29 06:49:29.628  8031  8031 E AndroidRuntime: 	at android.app.ActivityThread$H.handleMessage(ActivityThread.java:2816)
+09-29 06:49:29.628  8031  8031 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+09-29 06:49:29.628  8031  8031 E AndroidRuntime: 	at android.os.Looper.loopOnce(Looper.java:257)
+09-29 06:49:29.628  8031  8031 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:342)
+09-29 06:49:29.628  8031  8031 E AndroidRuntime: 	at android.app.ActivityThread.main(ActivityThread.java:9614)
+09-29 06:49:29.628  8031  8031 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+09-29 06:49:29.628  8031  8031 E AndroidRuntime: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:619)
+09-29 06:49:29.628  8031  8031 E AndroidRuntime: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:929)

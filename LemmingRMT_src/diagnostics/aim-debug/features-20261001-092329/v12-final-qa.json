@@ -1,0 +1,27 @@
+{
+  "profile": "v12-angle-assists",
+  "artifact": "out/arm64-v8a/liblemmingrmt.so",
+  "bytes": 1644048,
+  "sha256": "bdf23d3db9d6b9feb34968f5228365639a37314b34d7ff3518014c7b9166b8b2",
+  "build_id": "820a6e4c15a81e7f6a86ee04f8a4422fcb984b24",
+  "android_arm64_build": 0,
+  "host_tests": 0,
+  "six_viewports_no_scrollbars": true,
+  "fov_offscreen_synthetic_projection_test": true,
+  "native_virtual_rva_signature_checks": {
+    "0x972976c": true,
+    "0x9736fd8": true,
+    "0x97297b0": true,
+    "0x538bd0c": true,
+    "0x904d9c4": true,
+    "0x67f0658": true
+  },
+  "silent_handler_and_v11_installers_unchanged": true,
+  "esp_backend_and_hook_support_unchanged": true,
+  "backup": "/home/leftcode/Projects/LemmingRMT/backups/20261001-092406-before-aim-fov-rcs-visible",
+  "test_logs": "/home/leftcode/Projects/LemmingRMT/diagnostics/tests/20261001-095020-6167",
+  "phone_deployed": false,
+  "live_v12_verified": false,
+  "silent_damage_fixed": false,
+  "limits": "Live RCS, game-layer visibility behavior, FOV camera projection and performance require user-loaded v12 phone testing. Silent redirection counters do not prove damage."
+}

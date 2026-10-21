@@ -1,0 +1,17 @@
+{
+  "previous_loaded_marker": "v15-local-input-init",
+  "prior_failure": "input-component-missing; uys was not found despite independent retry",
+  "confirmed_source_defects": [
+    "post-Attack-gate hookup cannot bootstrap an idle command",
+    "Silent-only visibility preparation omitted",
+    "cached Silent lead could leave the head volume",
+    "Look not restored with owned buttons",
+    "unavailable optional scope blocked the whole cycle"
+  ],
+  "new_build": "v16-command-phase-hitbox",
+  "near_head_live_root_cause_proven": false,
+  "device_connected": false,
+  "new_build_live_verified": false,
+  "deployed": false,
+  "backup": "/home/leftcode/Projects/LemmingRMT/backups/20261001-134028-before-consumer-silent-fix"
+}

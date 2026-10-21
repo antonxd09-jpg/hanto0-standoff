@@ -1,0 +1,1 @@
+PASS: safe-reader valid/invalid/concurrent reads; native camera success; invalid-pointer, invalid-matrix, NaN, wrong-thread rejection; camera getters never called; projection front/back/Y; pose capture, stale-world, expiry and list bounds

@@ -1,0 +1,5 @@
+PASS v10 Aim debug: ARM64 build, existing unit/math guards, UI tests (six viewports/GLES3), diagnostic smoke (six report lines, callback counters and passthrough), bounded tag-only capture script.
+No v10 live-game test yet; game process was not running during the final capture. Aim failure remains unconfirmed, not fixed.
+Device copy: /sdcard/Download/liblemmingrmt-v10-debug-20261001-013154.so
+bf6bbb7746352e0932d80209325b306d9021e97b7d2951915f65ebc81b964966  out/arm64-v8a/liblemmingrmt.so
+/home/leftcode/Projects/LemmingRMT/backups/20261001-013154-before-aim-debug

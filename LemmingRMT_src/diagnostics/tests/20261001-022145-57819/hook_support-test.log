@@ -1,0 +1,1 @@
+PASS exact native camera-slot validation with non-plaintext metadata, BL limits/opcodes, 4K/16K/64K free-gap search beyond old hints, and real non-clobbering near allocation

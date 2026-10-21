@@ -1,0 +1,610 @@
+STANDOFF 2 1.0.0 — ARM64 VALIDATED OFFSETS
+============================================================
+Источник: Standoff 2 (1.0.0).apk
+APK SHA-256: 863073036c0fcf6532906d50c087677e5fcc5cf0b2566aa98e10eb5f7a2ef0a2
+Библиотека: arm64-v8a/libunity.so
+libunity.so SHA-256: a5d530e0ee7f4982d4bafec50c6109737b6119525935cac3e423e5145ff33e0f
+IDA: Professional 9.3, полностью проанализированная AArch64-база
+Дата проверки: 2026-09-29
+
+ВАЖНО
+------
+Все значения ниже — RVA относительно загруженной базы libunity.so:
+    runtime_address = libunity_base + RVA
+
+Статус IDA+STRING CONFIRMED означает, что RVA взят не из старого дампа,
+а из точной native-ICall регистрации внутри ARM64 libunity.so, извлечённой
+из APK и подтверждённой в IDA по имени строки и адресу целевой функции.
+
+Старый ARM32 dump.cs/il2cpp.h/script.json НЕ использован как источник
+ни одного итогового значения. Неподтверждённые игровые token-mapping
+адреса не включены: их подписи противоречат ARM64-псевдокоду IDA.
+
+============================================================
+[ESP / CAMERA]
+============================================================
+
+Camera::get_main_Injected
+RVA: 0x53653C4
+IDA registration stub: 0x53799CC
+Status: IDA+STRING CONFIRMED
+Назначение: получить основную Unity Camera.
+
+Camera::get_currentInternal_Injected
+RVA: 0x53653E8
+IDA registration stub: 0x53799E0
+Status: IDA+STRING CONFIRMED
+Назначение: текущая камера рендера.
+
+Camera::get_fieldOfView_Injected
+RVA: 0x5364FE4
+IDA registration stub: 0x537960C
+Status: IDA+STRING CONFIRMED
+Назначение: FOV камеры.
+
+Camera::get_worldToCameraMatrix_Injected
+RVA: 0x5365204
+IDA registration stub: 0x53798DC
+Status: IDA+STRING CONFIRMED
+Назначение: view/world-to-camera matrix.
+
+Camera::get_projectionMatrix_Injected
+RVA: 0x5365228
+IDA registration stub: 0x53798F0
+Status: IDA+STRING CONFIRMED
+Назначение: projection matrix.
+
+Camera::WorldToScreenPoint_Injected
+RVA: 0x5365268
+IDA registration stub: 0x5379954
+Status: IDA+STRING CONFIRMED
+Native signature from APK:
+  (Camera*, Vector3* world, MonoOrStereoscopicEye, Vector3* screen_out)
+Назначение: базовый WorldToScreen для ESP.
+
+Camera::ScreenToWorldPoint_Injected
+RVA: 0x53652FC
+IDA registration stub: 0x5379990
+Status: IDA+STRING CONFIRMED
+Native signature from APK:
+  (Camera*, Vector3* screen, MonoOrStereoscopicEye, Vector3* world_out)
+
+============================================================
+[ESP / TRANSFORMS / BONES / BOUNDS]
+============================================================
+
+Component::get_transform_Injected
+RVA: 0x5371D30
+IDA registration stub: 0x537EA30
+Status: IDA+STRING CONFIRMED
+Назначение: Transform компонента.
+
+GameObject::get_transform_Injected
+RVA: 0x53727CC
+IDA registration stub: 0x537EBD4
+Status: IDA+STRING CONFIRMED
+Назначение: Transform GameObject.
+
+Transform::GetPositionAndRotation_Injected
+RVA: 0x53764E0
+IDA registration stub: 0x537FDB8
+Status: IDA+STRING CONFIRMED
+Назначение: позиция + Quaternion за один native вызов.
+
+Animator::GetBoneTransformInternal_Injected
+RVA: 0x539569C
+IDA registration stub: 0x5397E98
+Status: IDA+STRING CONFIRMED
+Native signature from APK:
+  (Animator*, int HumanBodyBones) -> Transform*
+Назначение: кости головы/шеи/груди/рук/ног для skeleton ESP и aim point.
+
+Renderer::get_bounds_Injected
+RVA: 0x53689D0
+IDA registration stub: 0x537AFAC
+Status: IDA+STRING CONFIRMED
+Назначение: Bounds рендера для box ESP.
+
+Collider::get_bounds_Injected
+RVA: 0x538B650
+IDA registration stub: 0x538C82C
+Status: IDA+STRING CONFIRMED
+Назначение: Bounds коллайдера/хитбокса.
+
+GameObject::GetComponentsInternal_Injected
+RVA: 0x5372370
+IDA registration stub: 0x537EB20
+Status: IDA+STRING CONFIRMED
+Назначение: перечисление компонентов объекта, если известен GameObject/Type.
+
+============================================================
+[VISIBILITY / RAYCAST / AIM BUILDING BLOCKS]
+============================================================
+
+PhysicsScene::Internal_RaycastTest_Injected
+RVA: 0x538BCF4
+IDA registration stub: 0x538CCA0
+Status: IDA+STRING CONFIRMED
+Native signature from APK:
+  (PhysicsScene*, Ray*, float maxDistance, int layerMask,
+   QueryTriggerInteraction) -> bool
+Назначение: дешёвая проверка препятствия/видимости без RaycastHit.
+
+PhysicsScene::Internal_Raycast_Injected
+RVA: 0x538BD0C
+IDA registration stub: 0x538CCB4
+Status: IDA+STRING CONFIRMED
+Native signature from APK:
+  (PhysicsScene*, Ray*, float maxDistance, RaycastHit* out,
+   int layerMask, QueryTriggerInteraction) -> bool
+Назначение: visibility check и получение hit point/collider.
+
+PhysicsScene::Internal_RaycastNonAlloc_Injected
+RVA: 0x538BD24
+IDA registration stub: 0x538CCC8
+Status: IDA+STRING CONFIRMED
+Назначение: non-alloc raycast по нескольким попаданиям.
+
+PhysicsScene::Query_SphereCast_Injected
+RVA: 0x538BDBC
+IDA registration stub: 0x538CCF0
+Status: IDA+STRING CONFIRMED
+Назначение: sphere-cast; полезно для теста объёма/радиуса.
+
+PhysicsScene::Query_BoxCast_Injected
+RVA: 0x538BE40
+IDA registration stub: 0x538CD18
+Status: IDA+STRING CONFIRMED
+Назначение: box-cast.
+
+============================================================
+[IL2CPP / EMBEDDED METADATA ANCHORS]
+============================================================
+
+IL2CPP registration entry RVA:       0x6365C4C
+Registration wrapper RVA:            0x6331CF0
+Registration setter RVA:             0x6342A08
+Embedded-metadata initializer RVA:    0x6342A1C
+Embedded-metadata provider RVA:       0x63630D4
+Code registration RVA:               0xB8CE740
+Metadata registration RVA:           0xB8CE7C0
+Codegen options RVA:                 0x2FD8294
+Embedded metadata pointer global:     0xBF20308
+Embedded metadata block RVA:          0x1A9A580
+Codegen module-pointer table RVA:     0xBF20310
+Global method-pointer table RVA:      0xBBCD6A8
+First global ARM64 method pointer:     0xBBCD6B0
+Status: IDA CONFIRMED FROM MATCHING APK
+
+============================================================
+[SILENT AIM / RECOIL / TEAM / HP — VALIDATION STATUS]
+============================================================
+
+Отдельного универсального "silent aim offset" в Unity нет. Для полноценного
+silent aim нужен именно игровой путь input/shot/command/network hit validation.
+В этой сборке сервер может быть авторитетным, поэтому подмена только локального
+Ray/HitPoint может не изменить подтверждённое сервером попадание.
+
+Подтверждённые строительные блоки для aim/visibility уже перечислены выше:
+  0x53653C4  Camera::get_main_Injected
+  0x5365268  Camera::WorldToScreenPoint_Injected
+  0x539569C  Animator::GetBoneTransformInternal_Injected
+  0x53764E0  Transform::GetPositionAndRotation_Injected
+  0x538BCF4  PhysicsScene::Internal_RaycastTest_Injected
+  0x538BD0C  PhysicsScene::Internal_Raycast_Injected
+
+НЕ ВКЛЮЧЕНЫ как "валидные":
+- HP/team/local-player поля;
+- recoil/spread/accuracy поля;
+- active weapon / WeaponContext object chain;
+- input/view-angle command;
+- игровой shot/hit/network submit hook.
+
+Причина: доступные старые имена и layout пришли из невалидного ARM32-дампа,
+а прямое сопоставление token -> ARM64 RVA дало несоответствие реальному
+псевдокоду IDA. Переносить такие значения в список как рабочие было бы ложью.
+Для них требуется runtime-проверка на этой ARM64 сборке (trace/xref от реально
+вызванного shot path) либо корректный разбор embedded metadata этой версии.
+
+============================================================
+[КРАТКИЙ MACHINE-READABLE СПИСОК]
+============================================================
+
+CAMERA_GET_MAIN=0x53653C4
+CAMERA_GET_CURRENT=0x53653E8
+CAMERA_GET_FOV=0x5364FE4
+CAMERA_WORLD_TO_CAMERA_MATRIX=0x5365204
+CAMERA_PROJECTION_MATRIX=0x5365228
+CAMERA_WORLD_TO_SCREEN=0x5365268
+CAMERA_SCREEN_TO_WORLD=0x53652FC
+COMPONENT_GET_TRANSFORM=0x5371D30
+GAMEOBJECT_GET_TRANSFORM=0x53727CC
+TRANSFORM_GET_POSITION_AND_ROTATION=0x53764E0
+ANIMATOR_GET_BONE_TRANSFORM=0x539569C
+RENDERER_GET_BOUNDS=0x53689D0
+COLLIDER_GET_BOUNDS=0x538B650
+GAMEOBJECT_GET_COMPONENTS_INTERNAL=0x5372370
+PHYSICS_RAYCAST_TEST=0x538BCF4
+PHYSICS_RAYCAST=0x538BD0C
+PHYSICS_RAYCAST_NON_ALLOC=0x538BD24
+PHYSICS_SPHERE_CAST=0x538BDBC
+PHYSICS_BOX_CAST=0x538BE40
+
+################################################################################
+[ARM64 TYPEINFO / ИЗМЕНЕНИЯ 0.39.2 -> 1.0.0 / ПРАВИЛЬНЫЕ ПУТИ]
+################################################################################
+
+Источник семантики: предоставленная инструкция по 1.0.0.
+Источник ARM64 RVA: metadata-usage table совпадающего libunity.so из APK + IDA.
+Старые ARM32 RVA НЕ скопированы напрямую.
+
+СТАТУС TYPEINFO
+---------------
+ARM64 metadata-usage base подтверждён в IDA: 0xC191318.
+Для записей старой 32-битной metadata-usage таблицы применено индексное
+сопоставление, а не перенос адреса:
+
+  arm64_slot = 0xC191318 + 2 * (arm32_usage_slot - 0xA3989D0)
+
+Причина множителя 2: элемент metadata-usage имеет размер указателя — 4 байта
+в ARM32 и 8 байт в ARM64. Полученные адреса попадают в ARM64 .data; IDA также
+показывает реальные code/data xrefs для контрольных слотов PlayerBindings,
+HitBoxCollider, nrl и RootLifetimeScope.
+
+Статус списка ниже: STATIC HIGH CONFIDENCE. Перед heap scan обязательна
+runtime-проверка имени/namespace/TypeDef: до первой инициализации qword может
+содержать encoded metadata usage (например 0x33xxxxxx/0x20xxxxxx), а не
+Il2CppClass*. После штатной инициализации сравнивать object->klass с qword
+по адресу libunity_base + TYPEINFO_SLOT.
+
+=== ОСНОВНЫЕ ARM64 TYPEINFO SLOT RVA ==========================================
+
+CLIENTWORLD_NJH_TYPEINFO_SLOT=0xC1C2DB8
+REGISTRY_GAT_TYPEINFO_SLOT=0xC1C0828
+STORE_GZX_TYPEINFO_SLOT=0xC1C0CE8
+PLAYER_AKE_TYPEINFO_SLOT=0xC1BEB30
+NETOBJECT_MFC_TYPEINFO_SLOT=0xC1C27C0
+TRANSFORMS_DWC_TYPEINFO_SLOT=0xC1BFC80
+PLAYER_BINDINGS_TYPEINFO_SLOT=0xC1DBA90
+MODEL_JGI_TYPEINFO_SLOT=0xC1C1840
+CHARACTER_BINDINGS_TYPEINFO_SLOT=0xC1B0F18
+BONES_DICTIONARY_TYPEINFO_SLOT=0xC1B0900
+HITBOX_COLLIDER_TYPEINFO_SLOT=0xC202E90
+STATS_YLW_TYPEINFO_SLOT=0xC1C6810
+UNTOUCHABLE_TBQ_TYPEINFO_SLOT=0xC1C4A78
+VISIBILITY_QDP_TYPEINFO_SLOT=0xC1C3BF0
+TRANSPORT_HBU_TYPEINFO_SLOT=0xC1C0D50
+ACTOR_STN_TYPEINFO_SLOT=0xC1C48D8
+WEAPON_PART_NRK_TYPEINFO_SLOT=0xC1C2F80
+WEAPON_INSTANCE_QJF_TYPEINFO_SLOT=0xC1C3D18
+WEAPON_PROVIDER_IJQ_TYPEINFO_SLOT=0xC1C1380
+WEAPON_DEFINITION_TYPEINFO_SLOT=0xC1EE058
+GUN_PARAMETERS_TYPEINFO_SLOT=0xC1B4AE8
+INPUT_MANAGER_ZNN_TYPEINFO_SLOT=0xC1C6DC8
+INPUT_COMMAND_OWV_TYPEINFO_SLOT=0xC1C3568
+CAMERA_COMPONENT_IOS_TYPEINFO_SLOT=0xC1C1498
+ROTATION_EIR_TYPEINFO_SLOT=0xC1BFF70
+CAMERA_CONTROLLER_NRL_TYPEINFO_SLOT=0xC1FA380
+NAVIGATION_NIP_TYPEINFO_SLOT=0xC1C2D98
+MOVEMENT_TOF_TYPEINFO_SLOT=0xC1C4D08
+GLOBAL_OPTIONS_TYPEINFO_SLOT=0xC1B4648
+ROOT_LIFETIME_SCOPE_TYPEINFO_SLOT=0xC1F57C8
+
+=== СЕТЕВЫЕ ОБЪЕКТЫ / РЕЖИМЫ ================================================
+
+GRENADE_CIM_TYPEINFO_SLOT=0xC1BF488
+GRENADE_QAK_TYPEINFO_SLOT=0xC1E9620
+BOMB_ZNO_TYPEINFO_SLOT=0xC1C6DD0
+DROP_NJG_TYPEINFO_SLOT=0xC1C2DB0
+RAGDOLL_LOB_TYPEINFO_SLOT=0xC1C24A8
+MODE_NBS_TYPEINFO_SLOT=0xC1C2C60
+MODE_XLM_TYPEINFO_SLOT=0xC1C62D0
+MODE_YMN_TYPEINFO_SLOT=0xC1C6840
+MODE_QIN_TYPEINFO_SLOT=0xC1C3CE0
+MODE_HOG_TYPEINFO_SLOT=0xC1C0FC0
+
+=== IL2CPP TYPE-DESCRIPTOR / GENERIC SLOTS ===================================
+
+CHARACTER_BINDINGS_TYPE_VAR=0xC193710
+CLIENTWORLD_OPTIONS_TYPE_VAR=0xC193820
+GLOBAL_OPTIONS_TYPE_VAR=0xC194E00
+WEAPON_CONTEXT_TYPE_VAR=0xC197A28
+BUTTONINPUT_CONTAINER_TYPEINFO_SLOT=0xC1AD958
+CLIENTWORLD_FUNC_TYPEINFO_SLOT=0xC1A1AF0
+
+TYPE_VAR — это Il2CppType*/metadata descriptor, не готовый Il2CppClass*.
+Для класса использовать штатный class-from-type/metadata resolver либо
+соответствующий TYPEINFO_SLOT после runtime-инициализации.
+
+################################################################################
+[ARM64 БАЗОВЫЕ РАСКЛАДКИ — НЕ ИСПОЛЬЗОВАТЬ ARM32 +0x08/+0x0C]
+################################################################################
+
+Il2CppObject ARM64:
+  +0x00 Il2CppClass* klass
+  +0x08 MonitorData* monitor
+  +0x10 начало instance fields
+
+Il2CppString ARM64:
+  +0x10 int32 length
+  +0x14 UTF-16 chars
+
+Il2CppArray ARM64:
+  +0x10 bounds pointer
+  +0x18 max_length (uintptr_t)
+  +0x20 vector/data
+
+List<T> ARM64 (обычная System.Collections.Generic.List):
+  +0x10 T[] _items
+  +0x18 int32 _size
+  +0x1C int32 _version
+  +0x20 object _syncRoot
+
+Критично: числовые object-field offsets из ARM32-инструкции (+0x20 мир,
++0x40 dwc, +0x44 ylw и т.п.) НЕ являются ARM64-оффсетами. Из-за 8-байтных
+ссылок и выравнивания их нельзя исправить простым +8. Для ARM64 путь ниже
+строится через Il2CppClass/FieldInfo.offset и проверку field type.
+
+################################################################################
+[ПРАВИЛЬНЫЕ ПУТИ 1.0.0 — TYPE-BASED, УСТОЙЧИВЕЕ ОБФУСКАЦИИ]
+################################################################################
+
+Обозначения:
+  CLASS(slot) = *(libunity_base + slot), только после metadata init.
+  FIELD(obj, expected_type) = поле, найденное в obj->klass->fields по типу;
+                              использовать FieldInfo.offset этой ARM64 сборки.
+  PART(netObject, type) = элемент parts/components с klass == CLASS(type slot).
+
+1) WORLD / список всех сетевых объектов
+
+  world = heap object, где object->klass == CLASS(CLIENTWORLD_NJH_TYPEINFO_SLOT)
+  registry = FIELD(world, CLASS(REGISTRY_GAT_TYPEINFO_SLOT))
+  storage = FIELD(registry, CLASS(STORE_GZX_TYPEINFO_SLOT))
+  allObjects = FIELD(storage, sorted/list container of NetObject)
+  items = allObjects->_items  (ARM64 List: +0x10)
+  count = allObjects->_size   (ARM64 List: +0x18)
+
+  Не искать PlayerManager/PhotonNetwork: их больше нет.
+
+2) PLAYER / локальный игрок
+
+  player: element из allObjects, где klass == CLASS(PLAYER_AKE_TYPEINFO_SLOT)
+  netId/OwnerId: из базовой части NetObject mfc через FieldInfo.offset.
+  local actor: world -> transport(hbu) -> actor(stn), тоже через field type.
+  local player: player.OwnerId == localActor.ActorId.
+
+  Не использовать старые ARM32 player+0x40/+0x44/+0x50/+0x54 как ARM64.
+
+3) ESP position / model / bones
+
+  transforms = PART(player, TRANSFORMS_DWC_TYPEINFO_SLOT)
+  rootTransform = поле UnityEngine.Transform в transforms, подтверждённое
+                  движением объекта в runtime.
+
+  model = PART(player, MODEL_JGI_TYPEINFO_SLOT)
+  characterBindings = FIELD(model, CLASS(CHARACTER_BINDINGS_TYPEINFO_SLOT))
+  bones = FIELD(characterBindings, CLASS(BONES_DICTIONARY_TYPEINFO_SLOT))
+
+  Более устойчивый путь, когда Animator доступен:
+    model -> UnityEngine.Animator -> ANIMATOR_GET_BONE_TRANSFORM (0x539569C)
+  HumanBodyBones: Head=10, Neck=9, Spine=7, Chest=8, UpperChest=54,
+                  Hips=0; руки 11..18; ноги 1..6; toes 19/20.
+
+4) HITBOX / box ESP
+
+  hitboxes = массив/список элементов с
+             klass == CLASS(HITBOX_COLLIDER_TYPEINFO_SLOT)
+  для каждого HitBoxCollider: HumanBodyBones + UnityEngine.Collider поля
+  брать через FieldInfo.offset; bounds получать через
+  COLLIDER_GET_BOUNDS=0x538B650.
+
+5) HP / armor / team / visibility
+
+  stats = PART(player, STATS_YLW_TYPEINFO_SLOT)
+  untouchable = PART(player, UNTOUCHABLE_TBQ_TYPEINFO_SLOT)
+  visibility = PART(player, VISIBILITY_QDP_TYPEINFO_SLOT)
+
+  Порядок ushort/bool полей из ARM32-инструкции не считать подтверждённым.
+  Определять HP/armor по ARM64 getter/write xrefs или корреляции значений
+  в runtime; team дополнительно проверять по actor/snapshot данным.
+
+6) WEAPON / recoil / spread
+
+  weaponPart = PART(player, WEAPON_PART_NRK_TYPEINFO_SLOT)
+  WeaponContext — embedded value type; его ARM64 offset искать в fields
+  weaponPart по типу WEAPON_CONTEXT_TYPE_VAR=0xC197A28.
+  activeWeapon: reference field с klass == CLASS(WEAPON_INSTANCE_QJF_TYPEINFO_SLOT)
+  definition/provider: CLASS(WEAPON_PROVIDER_IJQ_TYPEINFO_SLOT) ->
+                       CLASS(WEAPON_DEFINITION_TYPEINFO_SLOT) ->
+                       CLASS(GUN_PARAMETERS_TYPEINFO_SLOT).
+
+  Recoil/Accuracy/WeaponDamage offsets из ARM32 не копировать: брать
+  FieldInfo.offset ARM64. Клиентские recoil/spread значения сервер может
+  перепроверять или пересчитывать.
+
+7) INPUT / команда owv / silent-aim candidate path
+
+  currentCommandHolder = FIELD(world, command-holder type)
+  command = reference/value внутри holder с
+            klass == CLASS(INPUT_COMMAND_OWV_TYPEINFO_SLOT)
+  inputManager = объект CLASS(INPUT_MANAGER_ZNN_TYPEINFO_SLOT)
+
+  ButtonInput искать внутри типизированного input container; действия:
+  "Attack", "Scope", "Jump", "Crouch", "Reload"; оси: "Look", "Move".
+  View angles/buttons в owv определять через FieldInfo.offset и runtime trace
+  функции сериализации/отправки команды. Старые silent RVA запрещены.
+  Из-за server-authoritative lag compensation локальная подмена Ray/HitPoint
+  может не пройти; кандидат — подмена углов ДО сериализации owv, но это
+  RUNTIME CHECK REQUIRED, а не подтверждённый standalone offset.
+
+8) CAMERA / angles / FOV
+
+  cameraPart = PART(player, CAMERA_COMPONENT_IOS_TYPEINFO_SLOT)
+  rotationPart = PART(player, ROTATION_EIR_TYPEINFO_SLOT)
+  cameraController = объект CLASS(CAMERA_CONTROLLER_NRL_TYPEINFO_SLOT)
+
+  Camera/Transform получать по типам и уже подтверждённым native ICalls.
+  Не читать native Camera matrix по старому фиксированному +0xE0:
+    CAMERA_WORLD_TO_CAMERA_MATRIX=0x5365204
+    CAMERA_PROJECTION_MATRIX=0x5365228
+    CAMERA_WORLD_TO_SCREEN=0x5365268
+    TRANSFORM_GET_POSITION_AND_ROTATION=0x53764E0
+
+9) MAP / GlobalOptions
+
+  rootScope = heap object CLASS(ROOT_LIFETIME_SCOPE_TYPEINFO_SLOT)
+  globalOptions = FIELD(rootScope, GLOBAL_OPTIONS_TYPE_VAR/GlobalOptions class)
+  LevelId брать по не обфусцированному FieldInfo имени "LevelId".
+  Room props/Photon здесь больше не использовать.
+
+10) grenades / bomb / drops / ragdolls / modes
+
+  Все находятся в allObjects и фильтруются по TYPEINFO_SLOT из раздела
+  "СЕТЕВЫЕ ОБЪЕКТЫ / РЕЖИМЫ". Отдельных GrenadeManager/BombManager/
+  WeaponDropManager больше не требуется.
+
+################################################################################
+[ОБЯЗАТЕЛЬНАЯ RUNTIME ВАЛИДАЦИЯ TYPEINFO]
+################################################################################
+
+Для каждого slot перед использованием:
+  1. addr = libunity_base + TYPEINFO_SLOT;
+  2. дождаться metadata init / первого штатного использования класса;
+  3. klass = *(uintptr_t*)addr;
+  4. проверить klass находится в читаемом диапазоне;
+  5. проверить klass->name/namespace/TypeDef и instance_size;
+  6. heap object принимать только если object->klass == klass;
+  7. все поля брать из FieldInfo.offset ARM64, не из ARM32 документа.
+
+Имена ake/njh/jgi/... обфусцированы и могут смениться в следующем билде.
+Необфусцированные structural anchors: CharacterBindings, PlayerBindings,
+HitBoxCollider, GlobalOptions, WeaponContext, ButtonInput, GunParameters,
+WeaponDamage и UnityEngine типы.
+
+################################################################################
+[ESP: ТОЛЬКО ВРАГИ + HP + ОРУЖИЕ + ПАТРОНЫ]
+################################################################################
+
+Статус: структура подтверждена metadata/dump; числовые ARM64 offsets,
+помеченные CANDIDATE, обязательно сверить через FieldInfo.offset или runtime.
+Старые ARM32 offsets здесь не используются напрямую.
+
+=== ИТОГОВЫЙ ESP PIPELINE ======================================================
+
+1. Из ClientWorld получить allObjects и оставить только объекты
+   klass == CLASS(PLAYER_AKE_TYPEINFO_SLOT).
+2. Найти localPlayer по OwnerId == localActor.ActorId.
+3. Получить localTeam через часть nrk -> WeaponContext.Team.
+4. Для каждого другого ake получить его WeaponContext.Team и рисовать только:
+      player != localPlayer && enemyTeam != 0 && enemyTeam != localTeam
+5. HP брать из единственного поля ake типа object.ylw.
+6. Оружие/патроны брать из части nrk -> WeaponContext.ActiveWeapon (qjf).
+
+=== HP / ARMOR: object.ylw ====================================================
+
+STATS_YLW_TYPEINFO_SLOT=0xC1C6810
+
+У ylw пустой base eur, поэтому ARM64 layout полей определяется однозначно:
+  ylw +0x10 ushort field_0   вероятный current HP
+  ylw +0x12 ushort field_1   вероятный max HP
+  ylw +0x14 ushort field_2   вероятный armor
+  ylw +0x16 ushort field_3   вероятный max armor
+  ylw +0x18 ushort field_4
+  ylw +0x1A ushort field_5
+  ylw +0x1C bool   helmet/status candidate
+  ylw +0x20 float  timer/value
+
+YLW_HP_CANDIDATE_OFFSET=0x10
+YLW_MAX_HP_CANDIDATE_OFFSET=0x12
+YLW_ARMOR_CANDIDATE_OFFSET=0x14
+YLW_MAX_ARMOR_CANDIDATE_OFFSET=0x16
+
+Проверка семантики: current HP уменьшается при уроне; max HP остаётся 100.
+Если значения поменяны местами серверным snapshot converter, выбрать из первых
+двух ushort поле, которое изменяется при получении урона. Не рисовать игрока,
+если подтверждённый current HP == 0.
+
+Получение без жёсткого ake-offset:
+  stats = FIELD(player, exact field type CLASS(STATS_YLW_TYPEINFO_SLOT))
+  hp = *(uint16_t*)((uintptr_t)stats + FieldInfo.offset(first ushort field))
+
+=== ТОЛЬКО ВРАГИ / TEAM =======================================================
+
+WEAPON_PART_NRK_TYPEINFO_SLOT=0xC1C2F80
+WEAPON_CONTEXT_TYPE_VAR=0xC197A28
+
+У WeaponContext поле Team не обфусцировано. Надёжный вариант:
+  weaponPart = PART(player, WEAPON_PART_NRK_TYPEINFO_SLOT)
+  contextOffset = FieldInfo.offset(field type == WeaponContext)
+  teamOffset = FieldInfo.offset(WeaponContext field name == "Team")
+  team = *(uint8_t*)((uintptr_t)weaponPart + contextOffset + teamOffset)
+
+ARM64 static layout candidate для nrk (base eur пустой):
+  nrk +0x10 Signal<qjf>*
+  nrk +0x18 byte slot/status
+  nrk +0x20 kyz*
+  nrk +0x28 vtl*
+  nrk +0x30 embedded WeaponContext
+  nrk +0x38 WeaponContext.Team
+  nrk +0x78 WeaponContext.ActiveWeapon* candidate
+
+NRK_WEAPON_CONTEXT_CANDIDATE_OFFSET=0x30
+NRK_TEAM_CANDIDATE_OFFSET=0x38
+NRK_ACTIVE_WEAPON_CANDIDATE_OFFSET=0x78
+
+Фильтр:
+  localTeam = ReadTeam(localPlayer)
+  enemyTeam = ReadTeam(player)
+  draw = player != localPlayer && enemyTeam != 0 && enemyTeam != localTeam
+
+Не сравнивать только OwnerId: OwnerId определяет владельца/актора, а не команду.
+
+=== ОРУЖИЕ И ПАТРОНЫ ==========================================================
+
+WEAPON_INSTANCE_QJF_TYPEINFO_SLOT=0xC1C3D18
+WEAPON_PROVIDER_IJQ_TYPEINFO_SLOT=0xC1C1380
+WEAPON_DEFINITION_TYPEINFO_SLOT=0xC1EE058
+
+Путь:
+  weaponPart = PART(player, WEAPON_PART_NRK_TYPEINFO_SLOT)
+  activeWeapon = WeaponContext.ActiveWeapon
+  weaponId = первый instance field qjf типа WeaponId
+  ammo = единственный instance field qjf типа ushort (<hjco> backing field)
+
+qjf ARM64 layout candidate (проверить FieldInfo.offset):
+  +0x10 WeaponId.Raw byte
+  +0x18 WeaponMetaData
+  +0x50 WeaponMetaId ushort
+  +0x52 byte state/slot
+  +0x54 ushort ammo candidate
+  +0x58 float value/time
+  +0x60 cky* state/definition reference
+  +0x68 byte mode
+
+QJF_WEAPON_ID_CANDIDATE_OFFSET=0x10
+QJF_AMMO_CANDIDATE_OFFSET=0x54
+
+Имя оружия — два допустимых способа:
+  A) WeaponId.Raw -> локальная таблица WeaponIds
+     (G22, USP, P350, Deagle, Tec9, FiveSeven, Berettas, UMP45,
+      AkimboUzi, MP7, P90, MP5, MAC10, VAL, M4A1, AKR, AKR12,
+      M4, M16, FAMAS, FnFal, AWM, M40, M110, SM1014, FabM,
+      M60, SPAS, Knife, Hands, GrenadeHE/Smoke/Flash и т.д.).
+  B) ijq provider -> Dictionary<WeaponId, WeaponDefinition> -> string Name.
+     Поля provider/definition получать по FieldInfo type; не переносить x32 +0x0C/+0x10.
+
+Для ESP рекомендуется вывод:
+  "{weaponName}  {ammo}" и "HP {hp}/{maxHp}".
+
+=== SAFE RUNTIME RESOLUTION ===================================================
+
+При старте один раз найти и кешировать offsets через metadata:
+  - ake field type object.ylw;
+  - nrk field type WeaponContext;
+  - WeaponContext fields "Team" и "ActiveWeapon";
+  - qjf first field type WeaponId;
+  - qjf единственный ushort instance field = ammo candidate;
+  - WeaponDefinition string field "Name".
+
+Числовые candidates применять только если найденные FieldInfo.offset совпали.
+Это защищает ESP от ложного ARM32 layout и от следующего изменения обфускации.

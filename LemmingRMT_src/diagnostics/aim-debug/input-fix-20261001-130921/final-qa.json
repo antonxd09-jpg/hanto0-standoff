@@ -1,0 +1,27 @@
+{
+  "profile": "v15-local-input-init",
+  "artifact": "out/arm64-v8a/liblemmingrmt.so",
+  "bytes": 1677704,
+  "sha256": "192179ca77f67a7ae3045b9aae09b678fed6bc5792e4109fb97fb5aecf3d4da4",
+  "buildId": "ccc659f12f317e69c6a1c0b3f9891b3a1a926de9",
+  "build_exit": 0,
+  "host_tests_exit": 0,
+  "host_test_run": "/home/leftcode/Projects/LemmingRMT/diagnostics/tests/20261001-130921-7355",
+  "preserved": {
+    "jni/src/features/visuals/esp_runtime.hpp": true,
+    "jni/src/features/aim/hook_support.hpp": true,
+    "jni/src/features/aim/offsets.hpp": true,
+    "jni/src/features/aim/prediction.hpp": true,
+    "jni/src/features/aim/assists.hpp": true,
+    "jni/src/features/aim/assist_runtime.hpp": true,
+    "jni/src/features/aim/automation.hpp": true
+  },
+  "camera_and_shot_installers_preserved": true,
+  "local_input_initialization_independent": true,
+  "verified_component_arrays_and_dictionary": true,
+  "phone_deployed": false,
+  "game_restarted": false,
+  "module_reloaded": false,
+  "live_v15_verified": false,
+  "silent_damage_fixed": false
+}

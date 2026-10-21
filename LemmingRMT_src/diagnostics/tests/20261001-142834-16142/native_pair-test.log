@@ -1,0 +1,1 @@
+PASS exact two-site transaction, changed/denied no-write, verify/RX rollback of BOTH words, rollback failure classification, same-page protection deduplication

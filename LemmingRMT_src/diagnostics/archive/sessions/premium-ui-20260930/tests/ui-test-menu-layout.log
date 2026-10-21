@@ -1,0 +1,8 @@
+LAYOUT viewport=2340,1080 main=820,245 size=700,590 scale=1
+LAYOUT viewport=1920,1080 main=610,245 size=700,590 scale=1
+LAYOUT viewport=1600,900 main=508,204 size=583,492 scale=0.833333
+LAYOUT viewport=1280,720 main=406,163 size=467,393 scale=0.666667
+LAYOUT viewport=960,540 main=305,122 size=350,295 scale=0.5
+LAYOUT viewport=1080,2340 main=277,948 size=525,443 scale=0.75
+PASS GLES3 offscreen rendering and GL_NO_ERROR
+PASS watermark-only open/close, separate ESP switches, tab/subtab transitions, actual RGBA popup, finite draw vertices and centered/clipped layout at six viewport sizes

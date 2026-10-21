@@ -1,0 +1,9 @@
+Crash memfd frames:
+lemming::esp::detail::project(unsigned long, lemming::esp::Vec3 const&, int, int, lemming::esp::Vec3&)
+/home/leftcode/Projects/LemmingRMT/jni/esp_runtime.hpp:1334
+lemming::esp::detail::produceBoxes(int, int, std::__ndk1::vector<lemming::esp::ScreenBox, std::__ndk1::allocator<lemming::esp::ScreenBox>>&)
+/home/leftcode/Projects/LemmingRMT/jni/esp_runtime.hpp:1503
+lemming::esp::update(unsigned long, int, int, std::__ndk1::vector<lemming::esp::ScreenBox, std::__ndk1::allocator<lemming::esp::ScreenBox>>&)
+/home/leftcode/Projects/LemmingRMT/jni/esp_runtime.hpp:1592
+(anonymous namespace)::hookedSwapBuffers(void*, void*)
+/home/leftcode/Projects/LemmingRMT/jni/main.cpp:675

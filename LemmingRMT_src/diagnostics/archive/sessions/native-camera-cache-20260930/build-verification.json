@@ -1,0 +1,15 @@
+{
+  "profile": "Standoff2-1.0.0-arm64-il2cppdump-v8-native-camera-cache",
+  "build_exit": 0,
+  "warnings": 0,
+  "errors": 0,
+  "architecture": "ELF64 AArch64",
+  "binary": "/home/leftcode/Projects/LemmingRMT/out/arm64-v8a/liblemmingrmt.so",
+  "sha256": "48353664508da352fbb57246cbc53d203d3eabd5f71a5a57eaa3b68156da8114",
+  "build_id": "abad4a83e414ec93ab4a9691d3bc88d3e65927d9",
+  "offline_tests": "PASS, ASan+UBSan; simulated inputs",
+  "phone_file": "/sdcard/Download/liblemmingrmt-v8-native-camera-cache.so",
+  "phone_hash_matches": true,
+  "live_game_test": "NOT PERFORMED; user must load the new build",
+  "backup": "/home/leftcode/Projects/LemmingRMT/backups/20260930-174750-before-native-camera-cache"
+}

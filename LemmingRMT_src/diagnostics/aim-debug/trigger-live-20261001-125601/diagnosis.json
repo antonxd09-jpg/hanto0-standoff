@@ -1,0 +1,14 @@
+{
+  "loaded_marker": "v14-prediction-fallback",
+  "live_pid": "15312",
+  "automation_enabled_snapshots": 68,
+  "first_enabled": "10-01 12:49:19.711 15312 17565 I LemmingRMT: AIM DEBUG automation enabled=1 back=0 scope=0 hook=0 stage=Idle reason=0 input=0 rays=0 requests=0 observedShots=0 restores=0 scopePulses=0 timeouts=0 (shots != damage)",
+  "latest": "10-01 12:56:02.425 15312 17565 I LemmingRMT: AIM DEBUG automation enabled=1 back=1 scope=1 hook=0 stage=Idle reason=0 input=0 rays=0 requests=0 observedShots=0 restores=0 scopePulses=0 timeouts=0 (shots != damage)",
+  "input_ready_lines": 0,
+  "confirmed_failure_stage": "input handler not installed; no automation callback or fire request",
+  "source_defect": "input installation is gated by the shared all-player install timer and attempted only if the triggering player is local",
+  "exact_install_rejection_unknown": true,
+  "phone_restarted": false,
+  "module_reloaded": false,
+  "production_source_modified": false
+}

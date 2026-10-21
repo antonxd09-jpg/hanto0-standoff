@@ -1,0 +1,27 @@
+{
+  "profile": "v14-prediction-fallback",
+  "artifact": "out/arm64-v8a/liblemmingrmt.so",
+  "bytes": 1675488,
+  "sha256": "9d8e102b3d3137b903bdb8a48120cc20db3671c3b0a18c1132996ab238567978",
+  "buildId": "9f8414e9f72b942e0d02561d4f63da1835717f20",
+  "arm64_build_exit": 0,
+  "host_tests_exit": 0,
+  "host_test_run": "/home/leftcode/Projects/LemmingRMT/diagnostics/tests/20261001-123643-5204",
+  "preserved": {
+    "jni/src/features/visuals/esp_runtime.hpp": true,
+    "jni/src/features/aim/hook_support.hpp": true,
+    "jni/src/features/aim/offsets.hpp": true,
+    "jni/src/features/aim/assists.hpp": true,
+    "jni/src/features/aim/assist_runtime.hpp": true
+  },
+  "camera_and_shot_installers_preserved": true,
+  "checkbox_only_camera_return_removed": true,
+  "aim_pages": 6,
+  "prediction_default": true,
+  "prediction_extra_ms": 20,
+  "prediction_horizon_cap_ms": 250,
+  "prediction_distance_cap_m": 1,
+  "phone_deployed": false,
+  "live_v14_verified": false,
+  "silent_damage_fixed": false
+}

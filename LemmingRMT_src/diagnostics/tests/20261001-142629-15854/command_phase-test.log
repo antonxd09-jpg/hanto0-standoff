@@ -1,0 +1,1 @@
+PASS unchanged original gate return, original end exactly once before restore, local/world/thread ownership, scope survives late consumer, 12-byte Look restore, physical hold preservation, producer-token reuse no-write

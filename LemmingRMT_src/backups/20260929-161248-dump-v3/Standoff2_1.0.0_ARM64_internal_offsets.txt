@@ -1,0 +1,702 @@
+LEMMINGRMT — STANDOFF 2 1.0.0 ARM64 INTERNAL OFFSET PROFILE
+======================================================================
+Target: /home/leftcode/Projects/LemmingRMT
+Architecture: arm64-v8a only
+Target library: libunity.so
+Game version: 1.0.0
+Created: 2026-09-29
+
+APK SHA-256:
+863073036c0fcf6532906d50c087677e5fcc5cf0b2566aa98e10eb5f7a2ef0a2
+
+Matching libunity.so SHA-256:
+a5d530e0ee7f4982d4bafec50c6109737b6119525935cac3e423e5145ff33e0f
+
+Master research file:
+/home/leftcode/Projects/Standoff2_1.0.0_ARM64_valid_offsets.txt
+Master SHA-256 at profile creation:
+0bd2f1e824a1b95e085b55529c414b89b90a1825a494e412c6ad5b507f712ee8
+
+Address rule:
+  runtime address = loaded libunity.so base + RVA
+
+This file is the curated source of truth for future LemmingRMT work.
+Do not silently replace CANDIDATE/PENDING values with hardcoded production
+values until the listed runtime checks pass.
+
+
+======================================================================
+0. STATUS LEGEND
+======================================================================
+
+IDA_CONFIRMED
+  Exact ARM64 function/slot was checked in the matching IDA database.
+
+STATIC_HIGH_CONFIDENCE
+  Derived from matching ARM64 metadata tables and supported by control xrefs.
+  Must still validate class name/namespace/instance size at runtime.
+
+LAYOUT_CONFIRMED
+  ARM64 layout follows unambiguous value-field ordering with an empty base.
+
+CANDIDATE
+  Useful starting value calculated for ARM64, but must equal FieldInfo.offset
+  before LemmingRMT is allowed to use it.
+
+RUNTIME_REQUIRED
+  Resolve through IL2CPP metadata/heap/VContainer while the game is running.
+
+NOT_READY
+  Required call path or server behavior is not yet validated. Never expose the
+  feature as working merely because related helper offsets exist.
+
+
+======================================================================
+1. CRITICAL MIGRATION NOTE — DISABLE LEGACY PROFILE
+======================================================================
+
+The current jni/game_offsets.hpp contains an older Photon/PlayerController/
+GunController profile. It is NOT the active 1.0.0 gameplay architecture.
+The following old concepts must not be used by new code:
+
+  PhotonNetwork / PhotonPlayer / CustomProperties
+  PlayerManager / old PlayerController
+  GunController / WeaponryController / ShootingState / StateSimple
+  old BipedMap
+  old AimController / AimingData pitch-yaw path
+  old silent-aim function/code-cave/.bss/return-address RVAs
+
+Standoff 2 1.0.0 uses Axlebolt.NetCode.Framework, ClientWorld, NetObject,
+parts/components, snapshots and per-tick input command owv.
+
+Project action for later implementation:
+  - keep old constants only behind a LEGACY_DISABLED namespace, or remove them;
+  - replace kProfileName/kSourceSha256 with this ARM64 profile;
+  - do not validate the new build using old kWeaponryOnPreInitialize.
+
+
+======================================================================
+2. ELF / IL2CPP / METADATA ANCHORS
+======================================================================
+
+[IDA_CONFIRMED]
+ELF_TEXT_RVA=0x535F940
+ELF_TEXT_SIZE=0x65224C0
+ELF_DATA_REL_RO_RVA=0xB886F80
+ELF_DATA_RVA=0xBF07F60
+ELF_BSS_RVA=0xC46CF80
+
+REGISTRATION_ENTRY_RVA=0x6365C4C
+REGISTRATION_WRAPPER_RVA=0x6331CF0
+REGISTRATION_SETTER_RVA=0x6342A08
+METADATA_INITIALIZER_RVA=0x6342A1C
+METADATA_PROVIDER_RVA=0x63630D4
+INDEX_WIDTH_SELECTOR_RVA=0xB2F55C8
+CODE_REGISTRATION_RVA=0xB8CE740
+METADATA_REGISTRATION_RVA=0xB8CE7C0
+CODEGEN_OPTIONS_RVA=0x2FD8294
+EMBEDDED_METADATA_GLOBAL_RVA=0xBF20308
+EMBEDDED_METADATA_BLOCK_RVA=0x1A9A580
+MODULE_POINTER_TABLE_RVA=0xBF20310
+GLOBAL_METHOD_POINTER_TABLE_RVA=0xBBCD6A8
+FIRST_METHOD_POINTER_SLOT_RVA=0xBBCD6B0
+METADATA_USAGE_BASE_RVA=0xC191318
+
+Metadata-usage remap used for this build:
+  arm64_slot = 0xC191318 + 2 * (arm32_usage_slot - 0xA3989D0)
+
+Never use an ARM32 address directly. The formula maps table indices; it does
+not convert code RVAs or object layouts.
+
+
+======================================================================
+3. IL2CPP API RVAs USED BY THE CURRENT INTERNAL RESOLVER
+======================================================================
+
+Status: PROJECT_EXISTING_REVERIFY.
+These addresses are already present in jni/game_offsets.hpp. Before migrating
+them into the new profile, validate function prologues and a harmless call on
+the exact libunity hash above.
+
+IL2CPP_RESOLVE_ICALL_RVA=0x63279F4
+IL2CPP_FREE_RVA=0x63279F8
+IL2CPP_ASSEMBLY_GET_IMAGE_RVA=0x6327A18
+IL2CPP_CLASS_FROM_NAME_RVA=0x6327A3C
+IL2CPP_CLASS_GET_FIELDS_RVA=0x6327AC8
+IL2CPP_CLASS_GET_FIELD_FROM_NAME_RVA=0x6327AD0
+IL2CPP_CLASS_GET_NAME_RVA=0x6327AD8
+IL2CPP_CLASS_GET_NAMESPACE_RVA=0x6327ADC
+IL2CPP_CLASS_GET_PARENT_RVA=0x6327AE0
+IL2CPP_DOMAIN_GET_RVA=0x6327B70
+IL2CPP_DOMAIN_ASSEMBLY_OPEN_RVA=0x6327B74
+IL2CPP_FIELD_GET_OFFSET_RVA=0x6327C44
+IL2CPP_FIELD_GET_TYPE_RVA=0x6327C48
+IL2CPP_FIELD_STATIC_GET_VALUE_RVA=0x6327C50
+IL2CPP_THREAD_ATTACH_RVA=0x6327D70
+IL2CPP_TYPE_GET_NAME_RVA=0x6327D8C
+
+Required runtime policy:
+  1. prefer dlsym/export if available;
+  2. use base+RVA only for this exact libunity SHA-256;
+  3. attach the worker thread before metadata calls;
+  4. validate every pointer against readable /proc/self/maps ranges;
+  5. cache FieldInfo.offset results; never scan metadata every frame.
+
+
+======================================================================
+4. UNITY ENGINE NATIVE FUNCTIONS
+======================================================================
+
+All entries in this section are IDA_CONFIRMED ARM64 targets in .text.
+Use the exact injected signature; an RVA being correct does not make an
+incorrect C++ prototype safe.
+
+CAMERA_GET_MAIN_RVA=0x53653C4
+CAMERA_GET_CURRENT_RVA=0x53653E8
+CAMERA_GET_FOV_RVA=0x5364FE4
+CAMERA_WORLD_TO_CAMERA_MATRIX_RVA=0x5365204
+CAMERA_PROJECTION_MATRIX_RVA=0x5365228
+CAMERA_WORLD_TO_SCREEN_RVA=0x5365268
+CAMERA_SCREEN_TO_WORLD_RVA=0x53652FC
+
+COMPONENT_GET_TRANSFORM_RVA=0x5371D30
+GAMEOBJECT_GET_TRANSFORM_RVA=0x53727CC
+TRANSFORM_GET_POSITION_AND_ROTATION_RVA=0x53764E0
+ANIMATOR_GET_BONE_TRANSFORM_RVA=0x539569C
+
+RENDERER_GET_BOUNDS_RVA=0x53689D0
+COLLIDER_GET_BOUNDS_RVA=0x538B650
+GAMEOBJECT_GET_COMPONENTS_INTERNAL_RVA=0x5372370
+
+PHYSICS_RAYCAST_TEST_RVA=0x538BCF4
+PHYSICS_RAYCAST_RVA=0x538BD0C
+PHYSICS_RAYCAST_NON_ALLOC_RVA=0x538BD24
+PHYSICS_SPHERE_CAST_RVA=0x538BDBC
+PHYSICS_BOX_CAST_RVA=0x538BE40
+
+Recommended use:
+  ESP projection       -> CAMERA_WORLD_TO_SCREEN_RVA
+  manual matrix path   -> WORLD_TO_CAMERA + PROJECTION
+  skeleton             -> ANIMATOR_GET_BONE_TRANSFORM_RVA
+  box ESP              -> COLLIDER_GET_BOUNDS_RVA or RENDERER_GET_BOUNDS_RVA
+  visibility check     -> PHYSICS_RAYCAST_TEST/RAYCAST
+  target position      -> TRANSFORM_GET_POSITION_AND_ROTATION_RVA
+
+Do not read the old fixed native Camera +0xE0 matrix. Use the confirmed ICalls.
+
+
+======================================================================
+5. ARM64 TYPEINFO / METADATA USAGE SLOTS
+======================================================================
+
+Status for this table: STATIC_HIGH_CONFIDENCE.
+At runtime the qword can initially hold metadata/type data rather than a ready
+Il2CppClass*. Wait for metadata initialization, then verify name, namespace,
+TypeDef and instance_size before using object->klass comparisons.
+
+CLIENTWORLD_NJH_TYPEINFO_SLOT=0xC1C2DB8
+REGISTRY_GAT_TYPEINFO_SLOT=0xC1C0828
+STORE_GZX_TYPEINFO_SLOT=0xC1C0CE8
+PLAYER_AKE_TYPEINFO_SLOT=0xC1BEB30
+NETOBJECT_MFC_TYPEINFO_SLOT=0xC1C27C0
+
+TRANSFORMS_DWC_TYPEINFO_SLOT=0xC1BFC80
+PLAYER_BINDINGS_TYPEINFO_SLOT=0xC1DBA90
+MODEL_JGI_TYPEINFO_SLOT=0xC1C1840
+CHARACTER_BINDINGS_TYPEINFO_SLOT=0xC1B0F18
+BONES_DICTIONARY_TYPEINFO_SLOT=0xC1B0900
+HITBOX_COLLIDER_TYPEINFO_SLOT=0xC202E90
+STATS_YLW_TYPEINFO_SLOT=0xC1C6810
+UNTOUCHABLE_TBQ_TYPEINFO_SLOT=0xC1C4A78
+VISIBILITY_QDP_TYPEINFO_SLOT=0xC1C3BF0
+
+TRANSPORT_HBU_TYPEINFO_SLOT=0xC1C0D50
+ACTOR_STN_TYPEINFO_SLOT=0xC1C48D8
+
+WEAPON_PART_NRK_TYPEINFO_SLOT=0xC1C2F80
+WEAPON_INSTANCE_QJF_TYPEINFO_SLOT=0xC1C3D18
+WEAPON_PROVIDER_IJQ_TYPEINFO_SLOT=0xC1C1380
+WEAPON_DEFINITION_TYPEINFO_SLOT=0xC1EE058
+GUN_PARAMETERS_TYPEINFO_SLOT=0xC1B4AE8
+
+INPUT_MANAGER_ZNN_TYPEINFO_SLOT=0xC1C6DC8
+INPUT_COMMAND_OWV_TYPEINFO_SLOT=0xC1C3568
+CAMERA_COMPONENT_IOS_TYPEINFO_SLOT=0xC1C1498
+ROTATION_EIR_TYPEINFO_SLOT=0xC1BFF70
+CAMERA_CONTROLLER_NRL_TYPEINFO_SLOT=0xC1FA380
+NAVIGATION_NIP_TYPEINFO_SLOT=0xC1C2D98
+MOVEMENT_TOF_TYPEINFO_SLOT=0xC1C4D08
+
+GLOBAL_OPTIONS_TYPEINFO_SLOT=0xC1B4648
+ROOT_LIFETIME_SCOPE_TYPEINFO_SLOT=0xC1F57C8
+
+Type descriptors rather than ready class pointers:
+CHARACTER_BINDINGS_TYPE_VAR=0xC193710
+CLIENTWORLD_OPTIONS_TYPE_VAR=0xC193820
+GLOBAL_OPTIONS_TYPE_VAR=0xC194E00
+WEAPON_CONTEXT_TYPE_VAR=0xC197A28
+BUTTONINPUT_CONTAINER_TYPEINFO_SLOT=0xC1AD958
+CLIENTWORLD_FUNC_TYPEINFO_SLOT=0xC1A1AF0
+
+Additional world entities:
+GRENADE_CIM_TYPEINFO_SLOT=0xC1BF488
+GRENADE_QAK_TYPEINFO_SLOT=0xC1E9620
+BOMB_ZNO_TYPEINFO_SLOT=0xC1C6DD0
+DROP_NJG_TYPEINFO_SLOT=0xC1C2DB0
+RAGDOLL_LOB_TYPEINFO_SLOT=0xC1C24A8
+MODE_NBS_TYPEINFO_SLOT=0xC1C2C60
+MODE_XLM_TYPEINFO_SLOT=0xC1C62D0
+MODE_YMN_TYPEINFO_SLOT=0xC1C6840
+MODE_QIN_TYPEINFO_SLOT=0xC1C3CE0
+MODE_HOG_TYPEINFO_SLOT=0xC1C0FC0
+
+
+======================================================================
+6. ARM64 MANAGED LAYOUT BASICS
+======================================================================
+
+Il2CppObject:
+  +0x00 Il2CppClass* klass
+  +0x08 MonitorData* monitor
+  +0x10 first instance field
+
+Il2CppString:
+  +0x10 int32 length
+  +0x14 UTF-16 characters
+
+Il2CppArray:
+  +0x10 bounds pointer
+  +0x18 uintptr_t max_length
+  +0x20 vector/data
+
+System.Collections.Generic.List<T>:
+  +0x10 T[] _items
+  +0x18 int32 _size
+  +0x1C int32 _version
+  +0x20 object _syncRoot
+
+Never reuse ARM32 +0x08 object fields, +0x0C array length, +0x10 array data,
+or +0x08/+0x0C List offsets in ARM64 code.
+
+
+======================================================================
+7. WORLD AND PLAYER RESOLUTION
+======================================================================
+
+Status: RUNTIME_REQUIRED.
+No verified static ClientWorld singleton exists; VContainer or heap discovery is
+required.
+
+Abstract type-based path:
+
+  world = heap/VContainer object where
+          object->klass == CLASS(CLIENTWORLD_NJH_TYPEINFO_SLOT)
+
+  registry = FIELD_BY_TYPE(world, CLASS(REGISTRY_GAT_TYPEINFO_SLOT))
+  storage  = FIELD_BY_TYPE(registry, CLASS(STORE_GZX_TYPEINFO_SLOT))
+  allObjects = FIELD_BY_CONTAINER_TYPE(storage, NetObject collection)
+
+  items = allObjects + List._items(+0x10)
+  count = allObjects + List._size(+0x18)
+
+  player = item where object->klass == CLASS(PLAYER_AKE_TYPEINFO_SLOT)
+
+Local player:
+  localActor = world -> transport(hbu) -> actor(stn)
+  localPlayer = player whose NetObjectId.OwnerId == localActor.ActorId
+
+Do not use OwnerId to decide team. OwnerId identifies the owning actor.
+
+Required runtime validations:
+  - list count is sane (0..4096);
+  - every item/object/class pointer is readable;
+  - class matches player ake before reading player fields;
+  - compare actor id and owner id using field metadata, not ARM32 offsets.
+
+
+======================================================================
+8. ESP — BOX, SKELETON, HP, TEAM, NAME, WEAPON, AMMO
+======================================================================
+
+Feature status:
+  ESP projection/native helpers = IDA_CONFIRMED
+  player enumeration            = RUNTIME_REQUIRED
+  fixed HP/team/ammo values      = CANDIDATE until FieldInfo check
+
+8.1 Position / box
+------------------
+
+  transforms = PART(player, TRANSFORMS_DWC_TYPEINFO_SLOT)
+  rootTransform = Transform field in transforms resolved by field type
+  position = TRANSFORM_GET_POSITION_AND_ROTATION_RVA(rootTransform)
+  screen = CAMERA_WORLD_TO_SCREEN_RVA(camera, position)
+
+Preferred box:
+  model = PART(player, MODEL_JGI_TYPEINFO_SLOT)
+  hitboxes = HitBoxCollider[] field in model
+  bounds = COLLIDER_GET_BOUNDS_RVA(hitbox->Collider)
+
+Fallback box:
+  root feet position + calibrated player height 1.78f.
+
+8.2 Bones / skeleton / aim points
+---------------------------------
+
+  model = PART(player, MODEL_JGI_TYPEINFO_SLOT)
+  Animator field -> ANIMATOR_GET_BONE_TRANSFORM_RVA
+
+HumanBodyBones IDs:
+  Hips=0
+  LeftUpperLeg=1, RightUpperLeg=2
+  LeftLowerLeg=3, RightLowerLeg=4
+  LeftFoot=5, RightFoot=6
+  Spine=7, Chest=8, Neck=9, Head=10
+  LeftShoulder=11, RightShoulder=12
+  LeftUpperArm=13, RightUpperArm=14
+  LeftLowerArm=15, RightLowerArm=16
+  LeftHand=17, RightHand=18
+  LeftToes=19, RightToes=20
+  UpperChest=54
+
+8.3 HP / armor candidates
+-------------------------
+
+stats = field in player whose exact type is CLASS(STATS_YLW_TYPEINFO_SLOT)
+
+Because ylw has an empty base, this ARM64 value ordering is layout-confirmed;
+field meaning must still be calibrated once in a live match:
+
+YLW_HP_CANDIDATE_OFFSET=0x10
+YLW_MAX_HP_CANDIDATE_OFFSET=0x12
+YLW_ARMOR_CANDIDATE_OFFSET=0x14
+YLW_MAX_ARMOR_CANDIDATE_OFFSET=0x16
+YLW_EXTRA_1_OFFSET=0x18
+YLW_EXTRA_2_OFFSET=0x1A
+YLW_HELMET_STATUS_CANDIDATE_OFFSET=0x1C
+YLW_FLOAT_VALUE_OFFSET=0x20
+
+Calibration rule:
+  current HP is the first/second ushort that decreases on damage;
+  max HP usually stays 100;
+  armor decreases separately;
+  hide dead players only after current HP semantics are confirmed.
+
+8.4 Enemy-only team filter
+--------------------------
+
+Stable route uses the non-obfuscated WeaponContext.Team field:
+
+  weaponPart = PART(player, WEAPON_PART_NRK_TYPEINFO_SLOT)
+  contextOffset = FieldInfo.offset(field type == WeaponContext)
+  teamOffset = FieldInfo.offset(WeaponContext field name == "Team")
+  team = *(uint8_t*)(weaponPart + contextOffset + teamOffset)
+
+ARM64 candidates for comparison only:
+NRK_WEAPON_CONTEXT_CANDIDATE_OFFSET=0x30
+NRK_TEAM_CANDIDATE_OFFSET=0x38
+NRK_ACTIVE_WEAPON_CANDIDATE_OFFSET=0x78
+
+Draw condition:
+  player != localPlayer
+  localTeam != 0
+  enemyTeam != 0
+  enemyTeam != localTeam
+  confirmedCurrentHp > 0
+
+8.5 Name
+--------
+
+  ownerId = player NetObjectId.OwnerId
+  actor = actor collection entry where ActorId == ownerId
+  name = string field in actor stn
+
+Resolve ActorId/string fields through FieldInfo type and live correlation.
+Do not use PhotonPlayer.Name.
+
+8.6 Weapon and ammo
+-------------------
+
+  weaponPart = PART(player, WEAPON_PART_NRK_TYPEINFO_SLOT)
+  activeWeapon = WeaponContext.ActiveWeapon
+  validate activeWeapon->klass == CLASS(WEAPON_INSTANCE_QJF_TYPEINFO_SLOT)
+
+QJF_WEAPON_ID_CANDIDATE_OFFSET=0x10
+QJF_AMMO_CANDIDATE_OFFSET=0x54
+
+Expected ARM64 qjf candidate layout:
+  +0x10 WeaponId.Raw byte
+  +0x18 WeaponMetaData
+  +0x50 WeaponMetaId ushort
+  +0x52 byte state/slot
+  +0x54 ushort ammo candidate
+  +0x58 float time/value
+  +0x60 state/definition reference
+  +0x68 byte mode
+
+Production resolver rule:
+  WeaponId = first qjf instance field whose type is WeaponId
+  Ammo = the qjf ushort backing field correlated with fire/reload
+
+Weapon display name:
+  A. WeaponId.Raw -> local WeaponIds table; or
+  B. ijq provider -> Dictionary<WeaponId, WeaponDefinition> -> string Name.
+
+Recommended ESP label:
+  NAME
+  HP current/max | ARMOR
+  WEAPON_NAME | AMMO
+
+
+======================================================================
+9. NORMAL AIMBOT
+======================================================================
+
+Status: PARTIAL / RUNTIME_REQUIRED.
+Target acquisition math is ready; the authoritative write path is not yet fixed.
+
+Target acquisition:
+  1. enumerate enemy-only players using section 8;
+  2. reject dead/untouchable/invalid targets;
+  3. choose Head(10), Neck(9), Chest(8) or nearest visible hitbox;
+  4. get world position from Animator bone Transform;
+  5. optional visibility raycast from camera/HitTransform to target bone;
+  6. project to screen and select smallest FOV distance;
+  7. smooth/limit angle delta.
+
+Useful confirmed helpers:
+  CAMERA_GET_MAIN_RVA
+  CAMERA_WORLD_TO_SCREEN_RVA
+  TRANSFORM_GET_POSITION_AND_ROTATION_RVA
+  ANIMATOR_GET_BONE_TRANSFORM_RVA
+  PHYSICS_RAYCAST_TEST_RVA / PHYSICS_RAYCAST_RVA
+
+Potential write routes:
+  A. input command owv view Vector2 before command serialization;
+  B. rotation part eir quaternion fields for local visual aim.
+
+Route A is preferred for normal networked aiming, but exact owv field offsets and
+the producer/send method must be found in the ARM64 build. Route B may only rotate
+the local camera/model and can desync from server input.
+
+TypeInfo references (canonical values are listed once in section 5):
+  INPUT_COMMAND_OWV_TYPEINFO_SLOT
+  INPUT_MANAGER_ZNN_TYPEINFO_SLOT
+  ROTATION_EIR_TYPEINFO_SLOT
+  CAMERA_COMPONENT_IOS_TYPEINFO_SLOT
+
+AIM_WRITE_STATUS=NOT_READY
+Do not enable an aim write until a live trace proves which owv Vector2 is view
+angles and shows the update occurring before serialization/send.
+
+
+======================================================================
+10. SILENT AIM
+======================================================================
+
+Status: NOT_READY.
+
+All old silent RVAs from 0.39.2 are invalid, including the old rotation ICall slot,
+shot function, code cave, .bss scratch address and forward/right/up return hooks.
+
+Server-authoritative lag compensation means changing only a local Ray or camera
+rotation is unlikely to define the registered hit. Current working hypothesis:
+
+  selected target angle
+    -> replace view angle in current owv command
+    -> preserve rendered local camera angle if desired
+    -> command serializer/send
+    -> server reconstructs shot from tick/history
+
+Required discoveries before implementation:
+  SILENT_1 = exact current-command owner field in ClientWorld
+  SILENT_2 = exact owv tick/view/buttons offsets via FieldInfo and live trace
+  SILENT_3 = owv serialization function RVA
+  SILENT_4 = command send/queue function RVA
+  SILENT_5 = proof that modified command angle affects server-confirmed hit
+  SILENT_6 = restore/render separation without corrupting subsequent commands
+
+Related but insufficient offsets:
+  INPUT_COMMAND_OWV_TYPEINFO_SLOT=0xC1C3568
+  PHYSICS_RAYCAST_RVA=0x538BD0C
+  PHYSICS_RAYCAST_NON_ALLOC_RVA=0x538BD24
+  CAMERA_SCREEN_TO_WORLD_RVA=0x53652FC
+
+SILENT_AIM_STATUS=NOT_READY_SERVER_VALIDATION_REQUIRED
+Never label the feature "working silent" based solely on camera/raycast helpers.
+
+
+======================================================================
+11. VISUALS
+======================================================================
+
+11.1 Ready building blocks
+--------------------------
+  2D boxes          -> W2S + root position/bounds
+  skeleton          -> Animator bone transforms + W2S
+  snaplines         -> W2S point
+  distance          -> camera position vs target position
+  HP/armor text     -> ylw after runtime calibration
+  name              -> actor stn after actor mapping
+  weapon/ammo text  -> WeaponContext/qjf after FieldInfo validation
+  visibility color  -> Physics raycast or qdp after runtime validation
+
+11.2 Camera / FOV
+-----------------
+  CAMERA_GET_FOV_RVA=0x5364FE4 is getter only.
+  A safe setter/hook path is not included in this profile yet.
+  Do not write a guessed native Camera field.
+
+11.3 Chams / outline / material override
+----------------------------------------
+  CHAMS_STATUS=NOT_READY
+  Required: Renderer collection, material/shader APIs and a reversible render-only
+  override. RENDERER_GET_BOUNDS_RVA does not provide a chams write path.
+
+11.4 Other world ESP
+--------------------
+  grenades -> GRENADE_CIM / GRENADE_QAK
+  bomb     -> BOMB_ZNO
+  drops    -> DROP_NJG
+  ragdolls -> RAGDOLL_LOB
+  modes    -> MODE_* slots
+
+All are filtered from the same ClientWorld allObjects collection; no separate
+GrenadeManager/BombManager/WeaponDropManager exists.
+
+
+======================================================================
+12. RECOIL / SPREAD / WEAPON MODIFIERS
+======================================================================
+
+Status: RUNTIME_REQUIRED; server may recompute or validate values.
+
+Path:
+  player -> nrk -> embedded WeaponContext
+  WeaponContext -> AccuracyContext / RecoilContext / ActiveWeapon
+  WeaponId -> ijq provider -> WeaponDefinition -> GunParameters
+
+Structural anchors:
+  WEAPON_CONTEXT_TYPE_VAR=0xC197A28
+  GUN_PARAMETERS_TYPEINFO_SLOT=0xC1B4AE8
+
+Do not use old SafeFloat/GunController offsets from jni/game_offsets.hpp.
+Version 1.0.0 stores ordinary float/short/int fields, but their ARM64 FieldInfo
+offsets still need runtime resolution.
+
+NO_RECOIL_STATUS=NOT_READY
+NO_SPREAD_STATUS=NOT_READY
+
+
+======================================================================
+13. FEATURE READINESS MATRIX
+======================================================================
+
+ESP_BOXES=PARTIAL_READY_NEEDS_WORLD_RESOLVER
+ESP_SKELETON=PARTIAL_READY_NEEDS_PLAYER_MODEL_RESOLVER
+ESP_HP=PARTIAL_READY_NEEDS_YLW_SEMANTIC_CALIBRATION
+ESP_ARMOR=PARTIAL_READY_NEEDS_YLW_SEMANTIC_CALIBRATION
+ESP_ENEMY_ONLY=PARTIAL_READY_NEEDS_WEAPONCONTEXT_TEAM_FIELDINFO
+ESP_NAME=PARTIAL_READY_NEEDS_ACTOR_MAP
+ESP_WEAPON=PARTIAL_READY_NEEDS_QJF_FIELDINFO
+ESP_AMMO=PARTIAL_READY_NEEDS_QJF_RUNTIME_CORRELATION
+ESP_VISIBILITY=PARTIAL_READY_NEEDS_RAYCAST_SIGNATURE_TEST
+NORMAL_AIM=NOT_READY_NEEDS_OWV_WRITE_PATH
+SILENT_AIM=NOT_READY_SERVER_VALIDATION_REQUIRED
+FOV_READ=READY_NATIVE_ICALL
+FOV_WRITE=NOT_READY
+CHAMS=NOT_READY
+GRENADE_ESP=PARTIAL_READY_NEEDS_ENTITY_FIELDS
+BOMB_ESP=PARTIAL_READY_NEEDS_ENTITY_FIELDS
+DROP_ESP=PARTIAL_READY_NEEDS_ENTITY_FIELDS
+
+
+======================================================================
+14. IMPLEMENTATION ORDER FOR LEMMINGRMT
+======================================================================
+
+Phase 1 — profile cleanup
+  [ ] Disable/remove legacy Photon/PlayerController profile.
+  [ ] Add exact APK/libunity hash gate.
+  [ ] Validate IL2CPP API RVAs and attach thread.
+
+Phase 2 — metadata resolver
+  [ ] Resolve/validate TypeInfo slots after metadata initialization.
+  [ ] Implement FIELD_BY_TYPE and FIELD_BY_NAME using FieldInfo.offset.
+  [ ] Cache offsets and print a one-time diagnostic table.
+
+Phase 3 — world/player
+  [ ] Resolve ClientWorld by VContainer or heap scan.
+  [ ] Resolve registry/storage/allObjects.
+  [ ] Filter PLAYER_AKE class and identify local player by actor owner id.
+
+Phase 4 — ESP
+  [ ] Root position and W2S.
+  [ ] Enemy Team filter.
+  [ ] HP/armor calibration.
+  [ ] Animator bones/skeleton.
+  [ ] Name, weapon and ammo labels.
+  [ ] Visibility raycast.
+
+Phase 5 — aim
+  [ ] Target selection/FOV/smoothing.
+  [ ] Trace owv production and serialization.
+  [ ] Validate normal aim write.
+
+Phase 6 — silent
+  [ ] Only after server-confirmed owv/tick behavior is understood.
+  [ ] Keep disabled if changing the command does not alter authoritative hits.
+
+
+======================================================================
+15. RUNTIME SAFETY / VALIDATION RULES
+======================================================================
+
+For every TypeInfo slot:
+  addr = libunity_base + slot_rva
+  wait for metadata initialization
+  klass = *(uintptr_t*)addr
+  verify pointer readable
+  verify klass name/namespace/TypeDef/instance_size
+
+For every object:
+  verify object and object->klass are readable
+  verify expected class before reading fields
+  verify collection counts before indexing
+  verify strings/arrays/lists using ARM64 layouts
+
+For every CANDIDATE field:
+  discovered = il2cpp_field_get_offset(FieldInfo)
+  use value only when discovered == candidate
+  otherwise log the discovered value and update this profile
+
+For every native RVA:
+  use only when libunity SHA-256 matches
+  use exact calling convention/signature
+  disable feature on pointer/prologue/range mismatch
+
+
+======================================================================
+16. FUTURE UPDATE RECORD
+======================================================================
+
+When adding a newly validated value, append one record in this format:
+
+  DATE=YYYY-MM-DD
+  FEATURE=<esp|aim|silent|visual|weapon|world>
+  KEY=<UPPERCASE_NAME>
+  VALUE=0x...
+  STATUS=<IDA_CONFIRMED|RUNTIME_CONFIRMED|CANDIDATE>
+  EVIDENCE=<IDA function/xref or runtime FieldInfo/type check>
+  BUILD_SHA256=<libunity sha256>
+
+Never overwrite a failed candidate without recording why it failed.
+
+
+======================================================================
+17. TERMS / RISK
+======================================================================
+
+This profile changes no memory by itself. Loading or modifying a game client,
+reading hidden game state, aiming automation or altering commands can violate the
+game's Terms of Service and may cause account/device bans. Keep all NOT_READY
+features disabled until their listed technical checks pass.

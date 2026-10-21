@@ -1,0 +1,8 @@
+LAYOUT viewport=2340,1080 main=760,215 size=820,650 scale=1
+LAYOUT viewport=1920,1080 main=550,215 size=820,650 scale=1
+LAYOUT viewport=1600,900 main=458,179 size=683,542 scale=0.833333
+LAYOUT viewport=1280,720 main=366,143 size=547,433 scale=0.666667
+LAYOUT viewport=960,540 main=275,107 size=410,325 scale=0.5
+LAYOUT viewport=1080,2340 main=232,926 size=615,488 scale=0.75
+PASS GLES3 offscreen rendering and GL_NO_ERROR
+PASS larger menu and rails, Rage/Config navigation, movable ESP Editor, style switching, no scrollbars, finite vertices and six viewport sizes

@@ -1,0 +1,133 @@
+ACTIVITY MANAGER PROCESS EXIT INFO (dumpsys activity exit-info)
+Last Timestamp of Persistence Into Persistent Storage: 2026-09-29 23:41:21.276
+  package: com.axlebolt.standoff2
+    Historical Process Exit for uid=10460
+        ApplicationExitInfo #0:
+          timestamp=2026-09-29 23:46:45.415 pid=31790 realUid=99112 packageUid=10460 definingUid=10260 user=0
+          process=com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0 reason=10 (USER REQUESTED) subreason=22 (REMOVE TASK) status=0
+          importance=400 pss=0,00 rss=137MB description=remove task state=empty trace=null
+        ApplicationExitInfo #1:
+          timestamp=2026-09-29 23:46:45.413 pid=30990 realUid=10460 packageUid=10460 definingUid=10460 user=0
+          process=com.axlebolt.standoff2 reason=10 (USER REQUESTED) subreason=22 (REMOVE TASK) status=0
+          importance=400 pss=0,00 rss=1,3GB description=remove task state=71 bytes trace=null
+        ApplicationExitInfo #2:
+          timestamp=2026-09-29 23:30:12.095 pid=26506 realUid=10460 packageUid=10460 definingUid=10460 user=0
+          process=com.axlebolt.standoff2 reason=2 (SIGNALED) subreason=0 (UNKNOWN) status=11
+          importance=100 pss=0,00 rss=0,98GB description=null state=71 bytes trace=null
+        ApplicationExitInfo #3:
+          timestamp=2026-09-29 23:28:43.471 pid=24928 realUid=10460 packageUid=10460 definingUid=10460 user=0
+          process=com.axlebolt.standoff2 reason=2 (SIGNALED) subreason=0 (UNKNOWN) status=9
+          importance=100 pss=0,00 rss=762MB description=null state=71 bytes trace=null
+        ApplicationExitInfo #4:
+          timestamp=2026-09-29 23:28:43.468 pid=25406 realUid=99110 packageUid=10460 definingUid=10260 user=0
+          process=com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0 reason=13 (OTHER KILLS BY SYSTEM) subreason=17 (ISOLATED NOT NEEDED) status=0
+          importance=300 pss=0,00 rss=0,00 description=isolated not needed state=empty trace=null
+        ApplicationExitInfo #5:
+          timestamp=2026-09-29 23:26:26.418 pid=20380 realUid=10460 packageUid=10460 definingUid=10460 user=0
+          process=com.axlebolt.standoff2 reason=2 (SIGNALED) subreason=0 (UNKNOWN) status=11
+          importance=100 pss=0,00 rss=1,1GB description=null state=71 bytes trace=null
+        ApplicationExitInfo #6:
+          timestamp=2026-09-29 23:18:25.775 pid=18718 realUid=10460 packageUid=10460 definingUid=10460 user=0
+          process=com.axlebolt.standoff2 reason=10 (USER REQUESTED) subreason=22 (REMOVE TASK) status=0
+          importance=400 pss=0,00 rss=0,00 description=remove task state=empty trace=null
+        ApplicationExitInfo #7:
+          timestamp=2026-09-29 23:17:31.300 pid=12927 realUid=99108 packageUid=10460 definingUid=10260 user=0
+          process=com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0 reason=10 (USER REQUESTED) subreason=22 (REMOVE TASK) status=0
+          importance=400 pss=0,00 rss=148MB description=remove task state=empty trace=null
+        ApplicationExitInfo #8:
+          timestamp=2026-09-29 23:17:31.297 pid=7899 realUid=10460 packageUid=10460 definingUid=10460 user=0
+          process=com.axlebolt.standoff2 reason=10 (USER REQUESTED) subreason=22 (REMOVE TASK) status=0
+          importance=400 pss=0,00 rss=0,94GB description=remove task state=71 bytes trace=null
+        ApplicationExitInfo #9:
+          timestamp=2026-09-29 23:00:57.274 pid=3154 realUid=99107 packageUid=10460 definingUid=10260 user=0
+          process=com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0 reason=10 (USER REQUESTED) subreason=22 (REMOVE TASK) status=0
+          importance=400 pss=0,00 rss=51MB description=remove task state=empty trace=null
+        ApplicationExitInfo #10:
+          timestamp=2026-09-29 23:00:57.273 pid=2639 realUid=10460 packageUid=10460 definingUid=10460 user=0
+          process=com.axlebolt.standoff2 reason=3 (LOW_MEMORY) subreason=22 (REMOVE TASK) status=0
+          importance=400 pss=0,00 rss=1,1GB description=remove task state=71 bytes trace=null
+        ApplicationExitInfo #11:
+          timestamp=2026-09-29 22:47:51.990 pid=28978 realUid=10460 packageUid=10460 definingUid=10460 user=0
+          process=com.axlebolt.standoff2 reason=2 (SIGNALED) subreason=0 (UNKNOWN) status=11
+          importance=100 pss=0,00 rss=854MB description=null state=71 bytes trace=null
+        ApplicationExitInfo #12:
+          timestamp=2026-09-29 17:40:41.006 pid=4033 realUid=10460 packageUid=10460 definingUid=10460 user=0
+          process=com.axlebolt.standoff2 reason=2 (SIGNALED) subreason=0 (UNKNOWN) status=11
+          importance=100 pss=0,00 rss=352MB description=null state=71 bytes trace=null
+        ApplicationExitInfo #13:
+          timestamp=2026-09-29 17:07:45.918 pid=25289 realUid=10460 packageUid=10460 definingUid=10460 user=0
+          process=com.axlebolt.standoff2 reason=2 (SIGNALED) subreason=0 (UNKNOWN) status=11
+          importance=100 pss=0,00 rss=481MB description=null state=71 bytes trace=null
+        ApplicationExitInfo #14:
+          timestamp=2026-09-29 17:05:39.553 pid=23107 realUid=10460 packageUid=10460 definingUid=10460 user=0
+          process=com.axlebolt.standoff2 reason=2 (SIGNALED) subreason=0 (UNKNOWN) status=11
+          importance=100 pss=0,00 rss=865MB description=null state=71 bytes trace=null
+        ApplicationExitInfo #15:
+          timestamp=2026-09-29 17:04:02.992 pid=17052 realUid=99093 packageUid=10460 definingUid=10260 user=0
+          process=com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0 reason=10 (USER REQUESTED) subreason=22 (REMOVE TASK) status=0
+          importance=400 pss=0,00 rss=64MB description=remove task state=empty trace=null
+    Historical Process Exit for uid=99055
+        ApplicationExitInfo #0:
+          timestamp=2026-09-28 21:26:33.603 pid=28848 realUid=99055 packageUid=10460 definingUid=10260 user=0
+          process=com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0 reason=1 (EXIT_SELF) subreason=0 (UNKNOWN) status=0
+          importance=300 pss=0,00 rss=114MB description=null state=empty trace=null
+    Historical Process Exit for uid=99057
+        ApplicationExitInfo #0:
+          timestamp=2026-09-28 21:28:06.477 pid=31316 realUid=99057 packageUid=10460 definingUid=10260 user=0
+          process=com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0 reason=1 (EXIT_SELF) subreason=0 (UNKNOWN) status=0
+          importance=300 pss=0,00 rss=51MB description=null state=empty trace=null
+    Historical Process Exit for uid=99085
+        ApplicationExitInfo #0:
+          timestamp=2026-09-29 16:23:13.437 pid=17220 realUid=99085 packageUid=10460 definingUid=10260 user=0
+          process=com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0 reason=1 (EXIT_SELF) subreason=0 (UNKNOWN) status=0
+          importance=100 pss=0,00 rss=47MB description=null state=empty trace=null
+    Historical Process Exit for uid=99086
+        ApplicationExitInfo #0:
+          timestamp=2026-09-29 16:24:11.262 pid=20302 realUid=99086 packageUid=10460 definingUid=10260 user=0
+          process=com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0 reason=1 (EXIT_SELF) subreason=0 (UNKNOWN) status=0
+          importance=100 pss=0,00 rss=52MB description=null state=empty trace=null
+    Historical Process Exit for uid=99088
+        ApplicationExitInfo #0:
+          timestamp=2026-09-29 16:33:16.137 pid=27556 realUid=99088 packageUid=10460 definingUid=10260 user=0
+          process=com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0 reason=1 (EXIT_SELF) subreason=0 (UNKNOWN) status=0
+          importance=100 pss=0,00 rss=47MB description=null state=empty trace=null
+    Historical Process Exit for uid=99089
+        ApplicationExitInfo #0:
+          timestamp=2026-09-29 16:34:59.627 pid=30516 realUid=99089 packageUid=10460 definingUid=10260 user=0
+          process=com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0 reason=1 (EXIT_SELF) subreason=0 (UNKNOWN) status=0
+          importance=100 pss=0,00 rss=162MB description=null state=empty trace=null
+    Historical Process Exit for uid=99090
+        ApplicationExitInfo #0:
+          timestamp=2026-09-29 16:37:40.918 pid=2015 realUid=99090 packageUid=10460 definingUid=10260 user=0
+          process=com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0 reason=1 (EXIT_SELF) subreason=0 (UNKNOWN) status=0
+          importance=400 pss=0,00 rss=136MB description=null state=empty trace=null
+    Historical Process Exit for uid=99094
+        ApplicationExitInfo #0:
+          timestamp=2026-09-29 17:05:39.541 pid=23718 realUid=99094 packageUid=10460 definingUid=10260 user=0
+          process=com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0 reason=1 (EXIT_SELF) subreason=0 (UNKNOWN) status=0
+          importance=100 pss=0,00 rss=50MB description=null state=empty trace=null
+    Historical Process Exit for uid=99095
+        ApplicationExitInfo #0:
+          timestamp=2026-09-29 17:07:45.893 pid=25581 realUid=99095 packageUid=10460 definingUid=10260 user=0
+          process=com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0 reason=1 (EXIT_SELF) subreason=0 (UNKNOWN) status=0
+          importance=100 pss=0,00 rss=173MB description=null state=empty trace=null
+    Historical Process Exit for uid=99098
+        ApplicationExitInfo #0:
+          timestamp=2026-09-29 17:40:40.938 pid=4874 realUid=99098 packageUid=10460 definingUid=10260 user=0
+          process=com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0 reason=1 (EXIT_SELF) subreason=0 (UNKNOWN) status=0
+          importance=100 pss=0,00 rss=47MB description=null state=empty trace=null
+    Historical Process Exit for uid=99106
+        ApplicationExitInfo #0:
+          timestamp=2026-09-29 22:47:51.957 pid=29908 realUid=99106 packageUid=10460 definingUid=10260 user=0
+          process=com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0 reason=1 (EXIT_SELF) subreason=0 (UNKNOWN) status=0
+          importance=100 pss=0,00 rss=125MB description=null state=empty trace=null
+    Historical Process Exit for uid=99109
+        ApplicationExitInfo #0:
+          timestamp=2026-09-29 23:26:26.333 pid=20676 realUid=99109 packageUid=10460 definingUid=10260 user=0
+          process=com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0 reason=1 (EXIT_SELF) subreason=0 (UNKNOWN) status=0
+          importance=100 pss=0,00 rss=51MB description=null state=empty trace=null
+    Historical Process Exit for uid=99111
+        ApplicationExitInfo #0:
+          timestamp=2026-09-29 23:30:12.025 pid=26782 realUid=99111 packageUid=10460 definingUid=10260 user=0
+          process=com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0 reason=1 (EXIT_SELF) subreason=0 (UNKNOWN) status=0
+          importance=100 pss=0,00 rss=88MB description=null state=empty trace=null
