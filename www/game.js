@@ -13,18 +13,22 @@ window.addEventListener('resize', resize); resize();
 let audioCtx, audioEl, analyser, dataArray, source;
 let isPlaying = false;
 let lastBeatTime = 0;
-const BEAT_COOLDOWN = 350; // Задержка между спавном нод (мс)
-const BASS_THRESHOLD = 160; // Чувствительность к басу (чем меньше, тем чаще спавн)
+const BEAT_COOLDOWN = 400; // Минимум 400мс между нотами
+const BASS_THRESHOLD = 130; // Чувствительность (чем больше, тем реже спавн)
+
+// История басов для детекции именно удара (кика)
+let bassHistory = [];
 
 let state = 'menu', score = 0, combo = 0, lives = 3, nodes = [], particles = [], gameLoopId;
 let currentAudioUrl = null;
-let screenPulse = 0; // Для визуализации бита
+let screenPulse = 0;
 
 class Node {
     constructor(x, y, time) {
         this.x = x; this.y = y; this.radius = 45;
         this.startTime = time; 
-        this.duration = 600; // Кольцо сжимается ровно за 600мс
+        // УВЕЛИЧИЛИ ДЛИТЕЛЬНОСТЬ: теперь кольцо летит 1.2 секунды
+        this.duration = 1200; 
         this.hitTime = this.startTime + this.duration;
         this.isHit = false; this.isMissed = false;
         this.color = Math.random() > 0.5 ? '#00f3ff' : '#ff00ff';
@@ -32,10 +36,11 @@ class Node {
     draw(currentTime) {
         if (this.isHit || this.isMissed) return;
         const progress = (currentTime - this.startTime) / this.duration;
-        const ringRadius = this.radius + (1 - progress) * 50;
+        // Кольцо начинается шире и сжимается плавнее
+        const ringRadius = this.radius + (1 - progress) * 80;
         
         ctx.beginPath(); ctx.arc(this.x, this.y, Math.max(0, ringRadius), 0, Math.PI * 2); 
-        ctx.strokeStyle = this.color; ctx.lineWidth = 4; ctx.stroke();
+        ctx.strokeStyle = this.color; ctx.lineWidth = 5; ctx.stroke();
         
         ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); 
         ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.fill();
@@ -54,7 +59,7 @@ class Particle {
     draw() { ctx.globalAlpha = this.life; ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; }
 }
 
-// Воспроизведение звука тапа (чтобы чувствовать ритм)
+// Звук тапа
 function playTapSound(isPerfect) {
     if (!audioCtx) return;
     const osc = audioCtx.createOscillator();
@@ -91,6 +96,7 @@ function startGame(url) {
     analyser.connect(audioCtx.destination);
     
     dataArray = new Uint8Array(analyser.frequencyBinCount);
+    bassHistory = [];
 
     audioEl.play();
     audioEl.onended = () => endGame();
@@ -121,14 +127,12 @@ function triggerGlitch() {
 }
 
 function spawnNote(currentTime) {
-    const padding = 100; // Отступ от краев
+    const padding = 100;
     let x, y;
-    // Не спавним ноды слишком близко друг к другу
     do {
         x = Math.random() * (width - padding * 2) + padding;
         y = Math.random() * (height - padding * 2) + padding;
-    } while (nodes.some(n => Math.hypot(n.x - x, n.y - y) < 80));
-
+    } while (nodes.some(n => Math.hypot(n.x - x, n.y - y) < 100));
     nodes.push(new Node(x, y, currentTime));
 }
 
@@ -140,21 +144,21 @@ function checkTap(x, y) {
         const n = nodes[i];
         if (n.isHit || n.isMissed) continue;
 
-        // Зона попадания
+        // Большая зона клика
         if (Math.hypot(x - n.x, y - n.y) < n.radius + 60) {
             const timeDiff = Math.abs(currentTime - n.hitTime);
             n.isHit = true;
 
-            if (timeDiff < 250) { // PERFECT (Окно 250мс)
+            // Окна попадания растянуты под медленное кольцо
+            if (timeDiff < 200) { // PERFECT
                 combo++; score += 10 * Math.max(1, Math.floor(combo / 5) + 1);
                 for (let j = 0; j < 20; j++) particles.push(new Particle(n.x, n.y, n.color));
                 playTapSound(true);
-            } else if (timeDiff < 400) { // GOOD (Окно 400мс)
+            } else if (timeDiff < 350) { // GOOD
                 combo++; score += 5;
                 for (let j = 0; j < 10; j++) particles.push(new Particle(n.x, n.y, n.color));
                 playTapSound(false);
             } else {
-                // Если тапнули слишком рано (кольцо еще большое)
                 n.isMissed = true;
                 combo = 0; lives--;
                 triggerGlitch();
@@ -169,21 +173,28 @@ function gameLoop() {
     if (state !== 'playing') return;
     const currentTime = performance.now();
 
-    // Анализ музыки
+    // Анализ музыки (ТОЛЬКО БАСЫ 0-4 бина, игнорируем мелодию)
     analyser.getByteFrequencyData(dataArray);
     let bassSum = 0;
-    for (let i = 0; i < 8; i++) bassSum += dataArray[i];
-    let bassAvg = bassSum / 8;
+    for (let i = 0; i < 4; i++) bassSum += dataArray[i];
+    let currentBass = bassSum / 4;
 
-    // Пульсация экрана на бит
+    // Считаем среднее значение баса за последние кадры
+    bassHistory.push(currentBass);
+    if (bassHistory.length > 20) bassHistory.shift();
+    let avgBass = bassHistory.reduce((a, b) => a + b, 0) / bassHistory.length;
+
+    // Спавним нод, если бас РЕЗКО скакнул вверх (удар барабана)
+    let isKick = (currentBass > BASS_THRESHOLD && currentBass > avgBass * 1.2);
+
     screenPulse *= 0.9;
-    if (bassAvg > BASS_THRESHOLD && currentTime - lastBeatTime > BEAT_COOLDOWN) {
+    if (isKick && currentTime - lastBeatTime > BEAT_COOLDOWN) {
         spawnNote(currentTime);
         lastBeatTime = currentTime;
-        screenPulse = bassAvg / 255 * 50; // Сила пульсации
+        screenPulse = currentBass / 255 * 50;
     }
 
-    // Проверка пропущенных нод
+    // Проверка пропущенных
     for (let i = nodes.length - 1; i >= 0; i--) {
         const n = nodes[i];
         if (!n.isHit && !n.isMissed && currentTime > n.hitTime + 400) {
@@ -202,18 +213,17 @@ function gameLoop() {
     ctx.fillStyle = '#050510'; 
     ctx.fillRect(0, 0, width, height);
     
-    // Сетка + пульсация
     ctx.strokeStyle = `rgba(0, 243, 255, ${0.05 + screenPulse/500})`; 
     ctx.lineWidth = 1;
     for (let i = 0; i < width; i += 40) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, height); ctx.stroke(); }
     for (let i = 0; i < height; i += 40) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(width, i); ctx.stroke(); }
 
-    // Визуализатор (эквалайзер) внизу
-    const barWidth = width / dataArray.length;
-    for (let i = 0; i < dataArray.length; i++) {
+    // Визуализатор (только басы)
+    const barWidth = width / 16; 
+    for (let i = 0; i < 16; i++) {
         const barHeight = (dataArray[i] / 255) * 120;
-        ctx.fillStyle = i < 8 ? `rgba(255, 0, 255, ${0.5 + barHeight/240})` : 'rgba(0, 243, 255, 0.3)'; 
-        ctx.fillRect(i * barWidth, height - barHeight, barWidth, barHeight);
+        ctx.fillStyle = `rgba(255, 0, 255, ${0.5 + barHeight/240})`; 
+        ctx.fillRect(i * barWidth, height - barHeight, barWidth - 2, barHeight);
     }
 
     for (let i = particles.length - 1; i >= 0; i--) {
