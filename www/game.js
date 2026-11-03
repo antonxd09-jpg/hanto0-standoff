@@ -10,21 +10,21 @@ let width, height;
 function resize() { width = canvas.width = document.getElementById('game-container').clientWidth; height = canvas.height = document.getElementById('game-container').clientHeight; }
 window.addEventListener('resize', resize); resize();
 
-// Audio Setup
 let audioCtx, audioEl, analyser, dataArray, source;
 let isPlaying = false;
 let lastBeatTime = 0;
-const BEAT_COOLDOWN = 250; // ms between beats
-const BASS_THRESHOLD = 200; // Sensitivity
+const BEAT_COOLDOWN = 350; // Задержка между спавном нод (мс)
+const BASS_THRESHOLD = 160; // Чувствительность к басу (чем меньше, тем чаще спавн)
 
-// Game State
 let state = 'menu', score = 0, combo = 0, lives = 3, nodes = [], particles = [], gameLoopId;
 let currentAudioUrl = null;
+let screenPulse = 0; // Для визуализации бита
 
 class Node {
     constructor(x, y, time) {
-        this.x = x; this.y = y; this.radius = 40;
-        this.startTime = time; this.duration = 800; // time to hit
+        this.x = x; this.y = y; this.radius = 45;
+        this.startTime = time; 
+        this.duration = 600; // Кольцо сжимается ровно за 600мс
         this.hitTime = this.startTime + this.duration;
         this.isHit = false; this.isMissed = false;
         this.color = Math.random() > 0.5 ? '#00f3ff' : '#ff00ff';
@@ -32,30 +32,44 @@ class Node {
     draw(currentTime) {
         if (this.isHit || this.isMissed) return;
         const progress = (currentTime - this.startTime) / this.duration;
-        const ringRadius = this.radius + (1 - progress) * 60;
+        const ringRadius = this.radius + (1 - progress) * 50;
         
         ctx.beginPath(); ctx.arc(this.x, this.y, Math.max(0, ringRadius), 0, Math.PI * 2); 
-        ctx.strokeStyle = this.color; ctx.lineWidth = 3; ctx.stroke();
+        ctx.strokeStyle = this.color; ctx.lineWidth = 4; ctx.stroke();
         
         ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); 
         ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.fill();
         
-        ctx.beginPath(); ctx.arc(this.x, this.y, 5, 0, Math.PI * 2); 
+        ctx.beginPath(); ctx.arc(this.x, this.y, 8, 0, Math.PI * 2); 
         ctx.fillStyle = this.color; ctx.fill();
     }
 }
+
 class Particle {
-    constructor(x, y, color) { this.x = x; this.y = y; const a = Math.random() * Math.PI * 2; const s = Math.random() * 5 + 2; this.vx = Math.cos(a) * s; this.vy = Math.sin(a) * s; this.life = 1; this.color = color; this.size = Math.random() * 3 + 1; }
-    update() { this.x += this.vx; this.y += this.vy; this.vx *= 0.95; this.vy *= 0.95; this.life -= 0.03; }
+    constructor(x, y, color) { 
+        this.x = x; this.y = y; const a = Math.random() * Math.PI * 2; const s = Math.random() * 6 + 3; 
+        this.vx = Math.cos(a) * s; this.vy = Math.sin(a) * s; this.life = 1; this.color = color; this.size = Math.random() * 4 + 2; 
+    }
+    update() { this.x += this.vx; this.y += this.vy; this.vx *= 0.9; this.vy *= 0.9; this.life -= 0.04; }
     draw() { ctx.globalAlpha = this.life; ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; }
 }
 
-// Load Audio
+// Воспроизведение звука тапа (чтобы чувствовать ритм)
+function playTapSound(isPerfect) {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    const now = audioCtx.currentTime;
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(isPerfect ? 1200 : 800, now);
+    gain.gain.setValueAtTime(0.1, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+    osc.start(now); osc.stop(now + 0.1);
+}
+
 startBtn.addEventListener('click', () => audioUpload.click());
-restartBtn.addEventListener('click', () => { 
-    gameOverScreen.classList.add('hidden'); 
-    audioUpload.click(); 
-});
+restartBtn.addEventListener('click', () => { gameOverScreen.classList.add('hidden'); audioUpload.click(); });
 
 audioUpload.addEventListener('change', (e) => {
     const file = e.target.files[0];
@@ -66,10 +80,7 @@ audioUpload.addEventListener('change', (e) => {
 });
 
 function startGame(url) {
-    if (audioCtx) {
-        audioEl.pause();
-        audioCtx.close();
-    }
+    if (audioCtx) { audioEl.pause(); audioCtx.close(); }
 
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     audioEl = new Audio(url);
@@ -110,35 +121,46 @@ function triggerGlitch() {
 }
 
 function spawnNote(currentTime) {
-    // Спавним нод в случайном месте, избегая краев
-    const padding = 80;
-    const x = Math.random() * (width - padding * 2) + padding;
-    const y = Math.random() * (height - padding * 2) + padding;
+    const padding = 100; // Отступ от краев
+    let x, y;
+    // Не спавним ноды слишком близко друг к другу
+    do {
+        x = Math.random() * (width - padding * 2) + padding;
+        y = Math.random() * (height - padding * 2) + padding;
+    } while (nodes.some(n => Math.hypot(n.x - x, n.y - y) < 80));
+
     nodes.push(new Node(x, y, currentTime));
 }
 
 function checkTap(x, y) {
     if (state !== 'playing') return;
     const currentTime = performance.now();
-    let tappedSomething = false;
-
+    
     for (let i = nodes.length - 1; i >= 0; i--) {
         const n = nodes[i];
         if (n.isHit || n.isMissed) continue;
 
-        if (Math.hypot(x - n.x, y - n.y) < n.radius + 40) {
-            tappedSomething = true;
+        // Зона попадания
+        if (Math.hypot(x - n.x, y - n.y) < n.radius + 60) {
             const timeDiff = Math.abs(currentTime - n.hitTime);
             n.isHit = true;
 
-            if (timeDiff < 150) { // Perfect
+            if (timeDiff < 250) { // PERFECT (Окно 250мс)
                 combo++; score += 10 * Math.max(1, Math.floor(combo / 5) + 1);
-                for (let j = 0; j < 15; j++) particles.push(new Particle(n.x, n.y, n.color));
-            } else if (timeDiff < 300) { // Good
+                for (let j = 0; j < 20; j++) particles.push(new Particle(n.x, n.y, n.color));
+                playTapSound(true);
+            } else if (timeDiff < 400) { // GOOD (Окно 400мс)
                 combo++; score += 5;
-                for (let j = 0; j < 8; j++) particles.push(new Particle(n.x, n.y, n.color));
+                for (let j = 0; j < 10; j++) particles.push(new Particle(n.x, n.y, n.color));
+                playTapSound(false);
+            } else {
+                // Если тапнули слишком рано (кольцо еще большое)
+                n.isMissed = true;
+                combo = 0; lives--;
+                triggerGlitch();
             }
-            updateUI(); break;
+            updateUI(); 
+            break;
         }
     }
 }
@@ -147,23 +169,24 @@ function gameLoop() {
     if (state !== 'playing') return;
     const currentTime = performance.now();
 
-    // 1. Анализ музыки (Beat Detection)
+    // Анализ музыки
     analyser.getByteFrequencyData(dataArray);
-    // Берем первые 10 частот (низкие басы, бочка)
     let bassSum = 0;
-    for (let i = 0; i < 10; i++) bassSum += dataArray[i];
-    let bassAvg = bassSum / 10;
+    for (let i = 0; i < 8; i++) bassSum += dataArray[i];
+    let bassAvg = bassSum / 8;
 
-    // Если бас превышает порог и прошло достаточно времени - спавним нод
+    // Пульсация экрана на бит
+    screenPulse *= 0.9;
     if (bassAvg > BASS_THRESHOLD && currentTime - lastBeatTime > BEAT_COOLDOWN) {
         spawnNote(currentTime);
         lastBeatTime = currentTime;
+        screenPulse = bassAvg / 255 * 50; // Сила пульсации
     }
 
-    // 2. Проверка пропущенных нод
+    // Проверка пропущенных нод
     for (let i = nodes.length - 1; i >= 0; i--) {
         const n = nodes[i];
-        if (!n.isHit && !n.isMissed && currentTime > n.hitTime + 300) {
+        if (!n.isHit && !n.isMissed && currentTime > n.hitTime + 400) {
             n.isMissed = true;
             combo = 0;
             lives--;
@@ -175,19 +198,21 @@ function gameLoop() {
 
     if (lives <= 0) { endGame(); return; }
 
-    // 3. Отрисовка
-    ctx.fillStyle = '#050510'; ctx.fillRect(0, 0, width, height);
+    // Отрисовка
+    ctx.fillStyle = '#050510'; 
+    ctx.fillRect(0, 0, width, height);
     
-    // Сетка
-    ctx.strokeStyle = 'rgba(0, 243, 255, 0.05)'; ctx.lineWidth = 1;
+    // Сетка + пульсация
+    ctx.strokeStyle = `rgba(0, 243, 255, ${0.05 + screenPulse/500})`; 
+    ctx.lineWidth = 1;
     for (let i = 0; i < width; i += 40) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, height); ctx.stroke(); }
     for (let i = 0; i < height; i += 40) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(width, i); ctx.stroke(); }
 
-    // Визуализатор внизу экрана
+    // Визуализатор (эквалайзер) внизу
     const barWidth = width / dataArray.length;
     for (let i = 0; i < dataArray.length; i++) {
-        const barHeight = (dataArray[i] / 255) * 100;
-        ctx.fillStyle = i < 10 ? '#ff00ff' : '#00f3ff'; // Басы - розовые, остальное - синее
+        const barHeight = (dataArray[i] / 255) * 120;
+        ctx.fillStyle = i < 8 ? `rgba(255, 0, 255, ${0.5 + barHeight/240})` : 'rgba(0, 243, 255, 0.3)'; 
         ctx.fillRect(i * barWidth, height - barHeight, barWidth, barHeight);
     }
 
