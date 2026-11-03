@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GHOST_PROTOCOL</title>
+    <title>GHOST_PROTOCOL: RHYTHM</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,15 +14,18 @@
             <div class="stat" id="lives-display">SYS: [💚💚💚]</div>
         </div>
         <canvas id="gameCanvas"></canvas>
+        
         <div id="start-screen">
             <h1 class="glitch" data-text="GHOST_PROTOCOL">GHOST_PROTOCOL</h1>
-            <p>TAP THE NODES WHEN THE RING CLOSES.</p>
-            <button id="start-btn">INITIALIZE</button>
+            <p>SELECT YOUR AUDIO PAYLOAD (.mp3)</p>
+            <input type="file" id="audio-upload" accept="audio/*" style="display: none;">
+            <button id="start-btn">UPLOAD TRACK</button>
         </div>
+
         <div id="game-over" class="hidden">
-            <h1 class="glitch" data-text="SYSTEM HALTED">SYSTEM HALTED</h1>
+            <h1 class="glitch" data-text="CONNECTION LOST">CONNECTION LOST</h1>
             <p>DATA HARVESTED: <span id="final-score">0</span></p>
-            <button id="restart-btn">REBOOT</button>
+            <button id="restart-btn">REBOOT TRACK</button>
         </div>
     </div>
     <script src="game.js"></script>
