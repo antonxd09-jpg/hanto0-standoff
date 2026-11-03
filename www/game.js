@@ -13,11 +13,10 @@ window.addEventListener('resize', resize); resize();
 let audioCtx, audioEl, analyser, dataArray, source;
 let isPlaying = false;
 let lastBeatTime = 0;
-const BEAT_COOLDOWN = 400; // Минимум 400мс между нотами
-const BASS_THRESHOLD = 130; // Чувствительность (чем больше, тем реже спавн)
+const BEAT_COOLDOWN = 450; // Время между нотами (чтобы не спавнились пачками)
+const BASS_THRESHOLD = 110; // Базовая громкость для удара
 
-// История басов для детекции именно удара (кика)
-let bassHistory = [];
+let smoothBass = 0; // Плавное среднее для детекции скачков
 
 let state = 'menu', score = 0, combo = 0, lives = 3, nodes = [], particles = [], gameLoopId;
 let currentAudioUrl = null;
@@ -27,7 +26,6 @@ class Node {
     constructor(x, y, time) {
         this.x = x; this.y = y; this.radius = 45;
         this.startTime = time; 
-        // УВЕЛИЧИЛИ ДЛИТЕЛЬНОСТЬ: теперь кольцо летит 1.2 секунды
         this.duration = 1200; 
         this.hitTime = this.startTime + this.duration;
         this.isHit = false; this.isMissed = false;
@@ -36,7 +34,6 @@ class Node {
     draw(currentTime) {
         if (this.isHit || this.isMissed) return;
         const progress = (currentTime - this.startTime) / this.duration;
-        // Кольцо начинается шире и сжимается плавнее
         const ringRadius = this.radius + (1 - progress) * 80;
         
         ctx.beginPath(); ctx.arc(this.x, this.y, Math.max(0, ringRadius), 0, Math.PI * 2); 
@@ -59,7 +56,6 @@ class Particle {
     draw() { ctx.globalAlpha = this.life; ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; }
 }
 
-// Звук тапа
 function playTapSound(isPerfect) {
     if (!audioCtx) return;
     const osc = audioCtx.createOscillator();
@@ -96,7 +92,7 @@ function startGame(url) {
     analyser.connect(audioCtx.destination);
     
     dataArray = new Uint8Array(analyser.frequencyBinCount);
-    bassHistory = [];
+    smoothBass = 0;
 
     audioEl.play();
     audioEl.onended = () => endGame();
@@ -106,6 +102,7 @@ function startGame(url) {
     
     state = 'playing'; isPlaying = true;
     score = 0; combo = 0; lives = 3; nodes = []; particles = [];
+    lastBeatTime = performance.now(); // Сбрасываем таймер
     updateUI();
     
     if (gameLoopId) cancelAnimationFrame(gameLoopId);
@@ -144,17 +141,15 @@ function checkTap(x, y) {
         const n = nodes[i];
         if (n.isHit || n.isMissed) continue;
 
-        // Большая зона клика
         if (Math.hypot(x - n.x, y - n.y) < n.radius + 60) {
             const timeDiff = Math.abs(currentTime - n.hitTime);
             n.isHit = true;
 
-            // Окна попадания растянуты под медленное кольцо
-            if (timeDiff < 200) { // PERFECT
+            if (timeDiff < 200) {
                 combo++; score += 10 * Math.max(1, Math.floor(combo / 5) + 1);
                 for (let j = 0; j < 20; j++) particles.push(new Particle(n.x, n.y, n.color));
                 playTapSound(true);
-            } else if (timeDiff < 350) { // GOOD
+            } else if (timeDiff < 350) {
                 combo++; score += 5;
                 for (let j = 0; j < 10; j++) particles.push(new Particle(n.x, n.y, n.color));
                 playTapSound(false);
@@ -173,22 +168,23 @@ function gameLoop() {
     if (state !== 'playing') return;
     const currentTime = performance.now();
 
-    // Анализ музыки (ТОЛЬКО БАСЫ 0-4 бина, игнорируем мелодию)
+    // Анализ басов (0-4 бины)
     analyser.getByteFrequencyData(dataArray);
     let bassSum = 0;
     for (let i = 0; i < 4; i++) bassSum += dataArray[i];
     let currentBass = bassSum / 4;
 
-    // Считаем среднее значение баса за последние кадры
-    bassHistory.push(currentBass);
-    if (bassHistory.length > 20) bassHistory.shift();
-    let avgBass = bassHistory.reduce((a, b) => a + b, 0) / bassHistory.length;
+    // Сглаживаем значение (плавно опускаем планку)
+    smoothBass = smoothBass * 0.9 + currentBass * 0.1;
 
-    // Спавним нод, если бас РЕЗКО скакнул вверх (удар барабана)
-    let isKick = (currentBass > BASS_THRESHOLD && currentBass > avgBass * 1.2);
+    // Детектор удара: если текущий бас резко скакнул вверх
+    let isKick = (currentBass > smoothBass + 30) && (currentBass > BASS_THRESHOLD);
+
+    // СТРАХОВКА: если бас не детектится больше 1.5 секунд, спавним насильно
+    let forceSpawn = (currentTime - lastBeatTime > 1500);
 
     screenPulse *= 0.9;
-    if (isKick && currentTime - lastBeatTime > BEAT_COOLDOWN) {
+    if ((isKick || forceSpawn) && currentTime - lastBeatTime > BEAT_COOLDOWN) {
         spawnNote(currentTime);
         lastBeatTime = currentTime;
         screenPulse = currentBass / 255 * 50;
@@ -218,7 +214,7 @@ function gameLoop() {
     for (let i = 0; i < width; i += 40) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, height); ctx.stroke(); }
     for (let i = 0; i < height; i += 40) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(width, i); ctx.stroke(); }
 
-    // Визуализатор (только басы)
+    // Эквалайзер
     const barWidth = width / 16; 
     for (let i = 0; i < 16; i++) {
         const barHeight = (dataArray[i] / 255) * 120;
