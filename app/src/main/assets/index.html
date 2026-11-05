@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><style>
+*{margin:0;padding:0;box-sizing:border-box;user-select:none}
+body{background:transparent;font-family:'Segoe UI',sans-serif;height:100vh;overflow:hidden}
+#tab{position:fixed;left:280px;top:18px;width:18px;height:72px;background:#8b5cf6;border-radius:0 6px 6px 0;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:100;transition:all 0.25s}
+#tab:hover{background:#7c3aed}.tl{width:10px;height:2px;background:white;border-radius:1px;margin:3px 0}
+#menu{position:fixed;left:0;top:0;width:280px;height:100vh;background:rgba(19,19,26,0.95);border-right:1px solid #2a2a3a;display:flex;flex-direction:column;transition:transform 0.25s cubic-bezier(0.4,0,0.2,1);z-index:50}
+#menu.hidden{transform:translateX(-280px)}.m-header{background:rgba(15,15,24,0.95);padding:14px 16px 10px;border-bottom:1px solid #1e1e2e;flex-shrink:0}
+.m-brand{display:flex;align-items:center;gap:10px;margin-bottom:8px}.m-logo{width:32px;height:32px;background:#8b5cf6;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:white}
+.m-title{font-size:16px;font-weight:700;color:#e2e8f0}.m-ver{font-size:10px;color:#8b5cf6;margin-top:1px}
+.m-body{flex:1;overflow-y:auto;padding:8px}.section{margin-bottom:8px}.sec-title{font-size:9px;color:#4b5563;text-transform:uppercase;padding:4px 6px 2px;font-weight:600}
+.feat-row{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:6px;cursor:pointer;margin-bottom:2px;border:1px solid transparent}
+.feat-row:hover{background:#1a1a28}.feat-left{display:flex;align-items:center;gap:8px}.feat-icon{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.feat-name{font-size:12px;color:#cbd5e1;font-weight:500}.feat-sub{font-size:9px;color:#4b5563;margin-top:1px}
+.toggle{width:34px;height:18px;border-radius:9px;background:#1f2937;position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0;border:1px solid #374151}
+.toggle.on{background:#7c3aed;border-color:#8b5cf6}.toggle::after{content:'';position:absolute;width:12px;height:12px;border-radius:50%;background:white;top:2px;left:2px;transition:transform 0.2s}
+.toggle.on::after{transform:translateX(16px)}.m-footer{padding:8px 12px;border-top:1px solid #1e1e2e;flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.status-dot{width:6px;height:6px;border-radius:50%;background:#22c55e}.status-txt{font-size:10px;color:#4b5563;margin-left:5px}
+</style></head>
+<body>
+<div id="tab" onclick="toggleMenu()"><div><div class="tl"></div><div class="tl"></div><div class="tl"></div></div></div>
+<div id="menu">
+  <div class="m-header">
+    <div class="m-brand"><div class="m-logo">H</div><div><div class="m-title">HantoO</div><div class="m-ver">v1.1.0</div></div></div>
+  </div>
+  <div class="m-body">
+    <div class="section">
+      <div class="sec-title">ESP</div>
+      <div class="feat-row" onclick="toggleFeat(this,'esp')"><div class="feat-left"><div class="feat-icon" style="background:#1a1a2e;color:#22d3ee">&#9633;</div><div><div class="feat-name">Box ESP</div><div class="feat-sub">Bounding Box</div></div></div><div class="toggle on" id="t-esp"></div></div>
+    </div>
+  </div>
+  <div class="m-footer"><div style="display:flex;align-items:center"><div class="status-dot"></div><span class="status-txt">Injected</span></div></div>
+</div>
+<script>
+var menuOpen=true;
+function toggleMenu(){menuOpen=!menuOpen;document.getElementById('menu').classList.toggle('hidden',!menuOpen);document.getElementById('tab').style.left=menuOpen?'280px':'0';}
+function toggleFeat(row,id){var t=document.getElementById('t-'+id);if(!t)return;t.classList.toggle('on');var on=t.classList.contains('on');if(window.Android){Android.setFeature(id,on);}}
+</script>
+</body>
+</html>

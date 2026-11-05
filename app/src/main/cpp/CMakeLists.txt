@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.18.1)
+project("hantoo")
+add_subdirectory(Dobby)
+include_directories(Dobby/built/include)
+add_library(hantoo SHARED native-lib.cpp inject.cpp)
+target_link_libraries(hantoo android log EGL GLESv2 dobby)

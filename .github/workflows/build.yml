@@ -1,9 +1,14 @@
 name: Build Android APK
+<<<<<<< HEAD
 on: [push]
+=======
+on: [push, workflow_dispatch]
+>>>>>>> 9ea60eb (HantoO Internal Final)
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+<<<<<<< HEAD
     - uses: actions/checkout@v4
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -24,8 +29,37 @@ jobs:
         cd game
         cordova platform add android
         cordova build android
+=======
+    - uses: actions/checkout@v4
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with: { java-version: '17', distribution: 'zulu' }
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v2
+    - name: Download Dobby
+      run: |
+        git clone https://github.com/jmpews/Dobby.git Dobby
+        cd Dobby
+        mkdir build && cd build
+        cmake .. -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-21
+        make -j4
+        cd ../..
+        mkdir -p app/src/main/cpp/Dobby
+        cp -r Dobby/include app/src/main/cpp/Dobby/
+        mkdir -p app/src/main/cpp/Dobby/built/include
+        cp -r Dobby/built/include/* app/src/main/cpp/Dobby/built/include/ || true
+    - name: Build APK
+      run: |
+        chmod +x gradlew
+        ./gradlew assembleDebug
+>>>>>>> 9ea60eb (HantoO Internal Final)
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
+<<<<<<< HEAD
         name: Ghost-Protocol-APK
         path: game/platforms/android/app/build/outputs/apk/debug/app-debug.apk
+=======
+        name: HantoO-APK
+        path: app/build/outputs/apk/debug/app-debug.apk
+>>>>>>> 9ea60eb (HantoO Internal Final)
