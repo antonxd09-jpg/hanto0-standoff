@@ -24,7 +24,6 @@ android {
     externalNativeBuild { 
         cmake { 
             path "src/main/cpp/CMakeLists.txt" 
-            # Убрали version "3.18.1"
         } 
     }
     
