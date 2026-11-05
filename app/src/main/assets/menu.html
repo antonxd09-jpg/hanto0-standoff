@@ -1,0 +1,106 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>HantoO</title><style>
+*{margin:0;padding:0;box-sizing:border-box;user-select:none}
+body{background:transparent;font-family:sans-serif;height:100vh;overflow:hidden}
+#scene{width:100%;height:100vh;position:relative}
+#esp-canvas{position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:10}
+#tab{position:fixed;left:280px;top:18px;width:18px;height:72px;background:#8b5cf6;border-radius:0 6px 6px 0;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:100;transition:all .25s}
+.tl{width:10px;height:2px;background:#fff;border-radius:1px;margin:3px 0}
+#menu{position:fixed;left:0;top:0;width:280px;height:100vh;background:#13131a;border-right:1px solid #2a2a3a;display:flex;flex-direction:column;transition:transform .25s;z-index:50}
+#menu.hidden{transform:translateX(-280px)}
+.m-header{background:#0f0f18;padding:14px 16px 10px;border-bottom:1px solid #1e1e2e}
+.m-brand{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.m-logo{width:32px;height:32px;background:#8b5cf6;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff}
+.m-title{font-size:16px;font-weight:700;color:#e2e8f0}
+.m-ver{font-size:10px;color:#8b5cf6}
+.m-tabs{display:flex;gap:2px;margin-top:4px}
+.m-tab{flex:1;padding:5px 4px;font-size:10px;color:#6b7280;background:0 0;border:none;border-radius:4px;cursor:pointer;border-bottom:2px solid transparent}
+.m-tab.active{color:#8b5cf6;border-bottom-color:#8b5cf6;background:#1a1a2e}
+.m-body{flex:1;overflow-y:auto;padding:8px}
+.section{margin-bottom:8px}
+.sec-title{font-size:9px;color:#4b5563;text-transform:uppercase;letter-spacing:1.5px;padding:4px 6px 2px;font-weight:600}
+.feat-row{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:6px;cursor:pointer;margin-bottom:2px;border:1px solid transparent}
+.feat-row.active-feat{background:#1a1a2e;border-color:#8b5cf621}
+.feat-name{font-size:12px;color:#cbd5e1;font-weight:500}
+.feat-sub{font-size:9px;color:#4b5563}
+.toggle{width:34px;height:18px;border-radius:9px;background:#1f2937;position:relative;border:1px solid #374151}
+.toggle.on{background:#7c3aed;border-color:#8b5cf6}
+.toggle::after{content:'';position:absolute;width:12px;height:12px;border-radius:50%;background:#fff;top:2px;left:2px;transition:transform .2s}
+.toggle.on::after{transform:translateX(16px)}
+.slider-row{padding:6px 10px 10px}
+.slider-label{display:flex;justify-content:space-between;margin-bottom:5px;font-size:11px;color:#cbd5e1}
+.slider-val{color:#8b5cf6;font-weight:600}
+input[type=range]{width:100%;height:3px;accent-color:#8b5cf6}
+.m-footer{padding:8px 12px;border-top:1px solid #1e1e2e;display:flex;align-items:center;justify-content:space-between;font-size:10px;color:#4b5563}
+.status-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;margin-right:5px}
+.page{display:none}.page.active{display:block}
+</style></head><body>
+<canvas id="esp-canvas"></canvas>
+<div id="scene">
+  <div id="tab" onclick="toggleMenu()"><div><div class="tl"></div><div class="tl"></div><div class="tl"></div></div></div>
+  <div id="menu">
+    <div class="m-header">
+      <div class="m-brand"><div class="m-logo">H</div><div><div class="m-title">HantoO</div><div class="m-ver">v2.4.1 — Standoff 2</div></div></div>
+      <div class="m-tabs">
+        <button class="m-tab active" onclick="switchTab('aimbot',this)">Aimbot</button>
+        <button class="m-tab" onclick="switchTab('visuals',this)">Visuals</button>
+        <button class="m-tab" onclick="switchTab('misc',this)">Misc</button>
+      </div>
+    </div>
+    <div class="m-body">
+      <div id="page-aimbot" class="page active"><div class="section" id="sec-aim"></div>
+        <div class="slider-row"><div class="slider-label"><span>FOV</span><span class="slider-val" id="v-fov">45</span></div><input type="range" min="5" max="180" value="45" oninput="document.getElementById('v-fov').textContent=this.value;sendCmd('fov',this.value)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Smooth</span><span class="slider-val" id="v-smooth">5</span></div><input type="range" min="1" max="20" value="5" oninput="document.getElementById('v-smooth').textContent=this.value;sendCmd('smooth',this.value)"></div>
+      </div>
+      <div id="page-visuals" class="page"><div class="section" id="sec-vis"></div></div>
+      <div id="page-misc" class="page"><div class="section" id="sec-misc"></div></div>
+    </div>
+    <div class="m-footer"><div><span class="status-dot"></span>Injected (Root)</div><div>HantoO 2025</div></div>
+  </div>
+</div>
+<script>
+var menuOpen=true,state={};
+var items={
+  'sec-aim':[['aimbot','Aimbot','Auto aim'],['silentaim','Silent Aim','Bullet correction'],['triggerbot','Triggerbot','Auto shoot'],['prediction','Prediction','Move predict']],
+  'sec-vis':[['esp','Box ESP','Bounding box'],['skeleton','Skeleton','Bone overlay'],['healthbar','Health bar','Show HP'],['nametag','Name tag','Player name'],['distance','Distance','Range'],['radar','2D Radar','Minimap']],
+  'sec-misc':[['bunny','Bunny Hop','Auto jump'],['speed','Speed hack','Move mult'],['norecoil','No Recoil','Zero recoil'],['nospread','No Spread','Accuracy'],['rapidfire','Rapid Fire','Fast fire'],['nofog','No Fog','Remove fog']]
+};
+Object.keys(items).forEach(function(sec){
+  var el=document.getElementById(sec);
+  items[sec].forEach(function(it){
+    el.innerHTML+='<div class="feat-row" onclick="toggleFeat(this,\''+it[0]+'\')"><div><div class="feat-name">'+it[1]+'</div><div class="feat-sub">'+it[2]+'</div></div><div class="toggle" id="t-'+it[0]+'"></div></div>';
+  });
+});
+function sendCmd(k,v){if(window.HantoBridge)window.HantoBridge.sendCommand(k+'='+v);}
+function toggleMenu(){
+  menuOpen=!menuOpen;
+  document.getElementById('menu').classList.toggle('hidden',!menuOpen);
+  document.getElementById('tab').style.left=menuOpen?'280px':'0';
+  if(window.HantoBridge)window.HantoBridge.setMenuExpanded(menuOpen);
+}
+function switchTab(n,el){
+  document.querySelectorAll('.m-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');document.getElementById('page-'+n).classList.add('active');
+}
+function toggleFeat(row,id){
+  var t=document.getElementById('t-'+id);t.classList.toggle('on');
+  var on=t.classList.contains('on');state[id]=on;
+  row.classList.toggle('active-feat',on);sendCmd(id,on?1:0);
+}
+var c=document.getElementById('esp-canvas'),ctx=c.getContext('2d');
+function rs(){c.width=window.innerWidth;c.height=window.innerHeight;}window.onresize=rs;rs();
+setInterval(function(){
+  if(!window.HantoBridge)return;
+  if(!state.esp&&!state.healthbar&&!state.distance){ctx.clearRect(0,0,c.width,c.height);return;}
+  try{
+    var d=JSON.parse(window.HantoBridge.fetchEsp()),H=c.height;
+    ctx.clearRect(0,0,c.width,c.height);
+    d.players.forEach(function(p){
+      var tY=H-p.y1,bY=H-p.y2,h=Math.abs(bY-tY),w=h*0.52,x=p.x1-w/2;
+      if(state.esp){ctx.strokeStyle='#8b5cf6';ctx.lineWidth=1.5;ctx.strokeRect(x,tY,w,h);}
+      if(state.healthbar){var hp=Math.max(0,Math.min(1,p.hp/100));ctx.fillStyle='#22c55e';ctx.fillRect(x-5,tY+h*(1-hp),3,h*hp);}
+      if(state.distance){ctx.fillStyle='#fff';ctx.font='10px sans-serif';ctx.fillText(p.dist.toFixed(0)+'m',x,bY+11);}
+    });
+  }catch(e){}
+},33);
+</script></body></html>
