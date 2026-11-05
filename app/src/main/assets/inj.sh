@@ -13,7 +13,7 @@ DIR="/data/local/tmp"
 INJECTOR="$DIR/vpnService"
 LIB="$DIR/libastra.so"
 
-INJECT_DELAY=50
+INJECT_DELAY=40
 
 # ================================================
 #   [1/7] ПРОВЕРКА ФАЙЛОВ
@@ -73,7 +73,7 @@ if [ -z "$OLD_PID" ]; then
 else
     echo "   [*] Найден PID: $OLD_PID — убиваю"
     am force-stop $PACKAGE
-    sleep 2
+    sleep 1
     if [ -z "$(pidof $PACKAGE)" ]; then
         echo "   [+] Процесс убит"
     fi
@@ -187,7 +187,7 @@ settings put system user_rotation 0
         settings put secure accelerometer_rotation 0
         settings put global accelerometer_rotation 0
         settings put system user_rotation 0
-        sleep 2
+        sleep 1
     done
 ) &
 echo "   [+] Watchdog PID: $!"

@@ -27,12 +27,15 @@ class MainActivity : AppCompatActivity() {
 
         start.setOnClickListener {
             statusText.text = "Checking ROOT..."
+            start.isEnabled = false // Блокируем кнопку от двойного нажатия
+            
             Thread {
                 val hasRoot = RootUtil.hasRoot()
                 if (!hasRoot) {
                     runOnUiThread {
                         statusText.text = "ROOT DENIED"
                         Toast.makeText(this, "ROOT access required", Toast.LENGTH_LONG).show()
+                        start.isEnabled = true
                     }
                     return@Thread
                 }
@@ -42,10 +45,11 @@ class MainActivity : AppCompatActivity() {
                 
                 runOnUiThread {
                     if (success) {
-                        statusText.text = "Injection started.\nGame launches in 50s."
-                        Toast.makeText(this, "Menu in 50s...", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "Launching game... Menu in 40s.", Toast.LENGTH_SHORT).show()
+                        finish() // Мгновенно закрываем приложение, игра выходит на передний план
                     } else {
                         statusText.text = "Injection FAILED. Check assets."
+                        start.isEnabled = true
                     }
                 }
             }.start()
