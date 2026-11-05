@@ -3,7 +3,7 @@ PACKAGE="com.axlebolt.standoff2"
 DIR="/data/local/tmp"
 INJECTOR="$DIR/vpnService"
 LIB="$DIR/libastra.so"
-INJECT_DELAY=4
+INJECT_DELAY=15
 LOG="/sdcard/HantoO_log.txt"
 
 echo "=== HantoO INJECT START ===" > $LOG
@@ -25,7 +25,7 @@ fi
 echo "[+] Игра жива, PID: $NEW_PID" >> $LOG
 
 echo "[*] Инжект libastra.so (скрытый)..." >> $LOG
-$INJECTOR --package $PACKAGE --libs $LIB --memfd --hide --free --delay 2000000 >> $LOG 2>&1
+$INJECTOR --package $PACKAGE --libs $LIB --memfd --hide --delay 2000000 >> $LOG 2>&1
 
 echo "[*] Уничтожаем улики в /data/local/tmp..." >> $LOG
 rm -f /data/local/tmp/libastra.so
