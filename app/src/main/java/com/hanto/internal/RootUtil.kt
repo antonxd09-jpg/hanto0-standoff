@@ -6,13 +6,12 @@ import java.io.File
 import java.io.FileOutputStream
 
 object RootUtil {
-
     fun hasRoot(): Boolean {
         return try {
-            val process = Runtime.getRuntime().exec("su -c id")
-            val output = process.inputStream.bufferedReader().readText()
-            process.waitFor()
-            output.contains("uid=0")
+            val p = Runtime.getRuntime().exec("su -c id")
+            val out = p.inputStream.bufferedReader().readText()
+            p.waitFor()
+            out.contains("uid=0")
         } catch (e: Exception) {
             false
         }
@@ -23,7 +22,8 @@ object RootUtil {
             val assets = listOf("libastra.so", "vpnService", "inj.sh")
             val tmpDir = File(context.cacheDir, "hanto")
             tmpDir.mkdirs()
-
+            
+            // Вытаскиваем файлы из APK
             for (f in assets) {
                 val file = File(tmpDir, f)
                 context.assets.open(f).use { input ->
@@ -31,12 +31,11 @@ object RootUtil {
                         input.copyTo(output)
                     }
                 }
-                file.setExecutable(true)
             }
-
+            
+            // Выполняем инжект через root
             val process = Runtime.getRuntime().exec("su")
             val os = DataOutputStream(process.outputStream)
-
             os.writeBytes("cp ${tmpDir.absolutePath}/* /data/local/tmp/\n")
             os.writeBytes("chmod 777 /data/local/tmp/libastra.so\n")
             os.writeBytes("chmod 777 /data/local/tmp/vpnService\n")
@@ -44,8 +43,11 @@ object RootUtil {
             os.writeBytes("sh /data/local/tmp/inj.sh &\n")
             os.writeBytes("exit\n")
             os.flush()
+            os.close()
+            process.waitFor()
             true
         } catch (e: Exception) {
+            e.printStackTrace()
             false
         }
     }

@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var statusText: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,28 +18,37 @@ class MainActivity : AppCompatActivity() {
             setPadding(48, 48, 48, 48)
         }
 
-        val status = TextView(this).apply { text = "ROOT: checking..." }
+        statusText = TextView(this).apply { text = "Status: Ready", textSize = 18f }
         val start = Button(this).apply { text = "START" }
 
         start.setOnClickListener {
-            if (!RootUtil.hasRoot()) {
-                Toast.makeText(this, "ROOT access required", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-            Toast.makeText(this, "Launching game. Menu in 50s...", Toast.LENGTH_LONG).show()
-            RootUtil.setupAndInject(this)
-            finish()
+            statusText.text = "Checking ROOT..."
+            Thread {
+                val hasRoot = RootUtil.hasRoot()
+                if (!hasRoot) {
+                    runOnUiThread {
+                        statusText.text = "ROOT DENIED"
+                        Toast.makeText(this, "ROOT access required", Toast.LENGTH_LONG).show()
+                    }
+                    return@Thread
+                }
+                
+                runOnUiThread { statusText.text = "Injecting..." }
+                val success = RootUtil.setupAndInject(this)
+                
+                runOnUiThread {
+                    if (success) {
+                        statusText.text = "Injection process started.\nGame will launch in 50s."
+                        Toast.makeText(this, "Menu in 50s...", Toast.LENGTH_LONG).show()
+                    } else {
+                        statusText.text = "Injection FAILED. Check assets."
+                    }
+                }
+            }.start()
         }
 
-        layout.addView(status)
+        layout.addView(statusText)
         layout.addView(start)
         setContentView(layout)
-
-        Thread {
-            val ok = RootUtil.hasRoot()
-            runOnUiThread {
-                status.text = if (ok) "ROOT: granted" else "ROOT: denied"
-            }
-        }.start()
     }
 }
