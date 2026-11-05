@@ -22,14 +22,14 @@ public class MainActivity extends Activity {
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setPadding(60, 60, 60, 60);
         Button startBtn = new Button(this);
-        startBtn.setText("START STANDOFF 2 + INJECT");
+        startBtn.setText("START STANDOFF 2");
         startBtn.setTextSize(18f);
         startBtn.setOnClickListener(v -> {
             if (!Settings.canDrawOverlays(this)) {
                 startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())));
                 return;
             }
-            startBtn.setText("Injecting...");
+            startBtn.setText("Waiting 40 sec...");
             startBtn.setEnabled(false);
             new Thread(() -> {
                 try {
@@ -40,7 +40,9 @@ public class MainActivity extends Activity {
                     os.writeBytes("monkey -p com.axlebolt.standoff2 -c android.intent.category.LAUNCHER 1\n");
                     os.writeBytes("exit\n");
                     os.flush();
-                    Thread.sleep(12000);
+                    
+                    Thread.sleep(40000);
+                    
                     Process pidProc = Runtime.getRuntime().exec("su -c pidof com.axlebolt.standoff2");
                     BufferedReader reader = new BufferedReader(new InputStreamReader(pidProc.getInputStream()));
                     String pidStr = reader.readLine();
