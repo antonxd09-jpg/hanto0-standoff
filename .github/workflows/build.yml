@@ -18,8 +18,7 @@ jobs:
       run: |
         rm -rf app/src/main/cpp/Dobby
         git clone https://github.com/jmpews/Dobby.git app/src/main/cpp/Dobby
-        grep -rl '@PAGE' app/src/main/cpp/Dobby | xargs -r sed -i 's/@PAGE//g'
-        grep -rl '@PAGEOFF' app/src/main/cpp/Dobby | xargs -r sed -i 's/@PAGEOFF/:lo12:/g'
+        find app/src/main/cpp/Dobby -name "*.S" -exec sed -i 's/@PAGEOFF/:lo12:/g; s/@PAGE//g' {} +
 
     - name: Build APK
       run: |
