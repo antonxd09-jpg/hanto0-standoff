@@ -1,7 +1,7 @@
 #include <jni.h>
 #include <android/log.h>
 #include <EGL/egl.h>
-#include <GLES2/gl2.h>
+#include <GLES/gl.h>
 #include <dlfcn.h>
 #include <math.h>
 #include <string.h>
