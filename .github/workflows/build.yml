@@ -19,15 +19,15 @@ jobs:
         rm -rf app/src/main/cpp/Dobby
         git clone https://github.com/jmpews/Dobby.git app/src/main/cpp/Dobby
         cat > patch.py << 'PYEOF'
-        import os
-        for root, dirs, files in os.walk('app/src/main/cpp/Dobby'):
-            for file in files:
-                if file.endswith('.S'):
-                    path = os.path.join(root, file)
-                    with open(path, 'r') as f: c = f.read()
-                    c = c.replace('@PAGE', '').replace('@PAGEOFF', ':lo12:')
-                    with open(path, 'w') as f: f.write(c)
-        PYEOF
+import os
+for root, dirs, files in os.walk('app/src/main/cpp/Dobby'):
+    for file in files:
+        if file.endswith('.S'):
+            path = os.path.join(root, file)
+            with open(path, 'r') as f: c = f.read()
+            c = c.replace('@PAGE', '').replace('@PAGEOFF', ':lo12:')
+            with open(path, 'w') as f: f.write(c)
+PYEOF
         python3 patch.py
 
     - name: Build APK
