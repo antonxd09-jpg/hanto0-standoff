@@ -14,7 +14,7 @@ enum class Body:unsigned{Head,Neck,Chest,Stomach,Pelvis,Arms,Legs,Feet,Count};
 inline constexpr const char* kBodyNames[]={"Head","Neck","Chest","Stomach","Pelvis","Arms","Legs","Feet"};
 inline constexpr std::uint32_t bodyBit(Body b){return 1u<<unsigned(b);}
 inline int bodyForBone(int b){switch(b){case 10:return 0;case 9:return 1;case 8:case 54:return 2;case 7:return 3;case 0:return 4;case 11:case 12:case 13:case 14:case 15:case 16:case 17:case 18:return 5;case 1:case 2:case 3:case 4:return 6;case 5:case 6:case 19:case 20:return 7;default:return -1;}}
-struct Settings{bool enabled=false,multipoints=false,onAttack=true,lockTarget=false,showFov=false,rcs=false,visibleCheck=false,prediction=true,safeAim=true,noRecoil=false;std::uint32_t bodies=bodyBit(Body::Head)|bodyBit(Body::Chest);int priority=0;float fov=8,maxDistance=150,smoothing=.12f,pointScale=.5f,rcsStrength=100,predictionMs=20;};
+struct Settings{bool enabled=false,multipoints=false,onAttack=true,lockTarget=false,showFov=false,rcs=false,visibleCheck=false,prediction=true,safeAim=true,noRecoil=false;std::uint32_t bodies=bodyBit(Body::Head)|bodyBit(Body::Chest);int priority=0;float fov=180,maxDistance=1000,smoothing=.12f,pointScale=.5f,rcsStrength=100,predictionMs=20;};
 struct Configuration{Settings normal{},silent{};automation::Options autoFire{};bool pauseInMenu=true;Configuration(){normal.onAttack=false;silent.onAttack=false;}};
 inline std::mutex g_configMutex;inline Configuration g_config;
 inline std::atomic<bool> g_active{false},g_menuOpen{true},g_normalHookReady{false},g_silentHookReady{false};
@@ -23,7 +23,7 @@ inline std::atomic<bool> g_inputHookReady{false},g_autoScopeReady{false};
 inline std::atomic<int> g_autoStage{0},g_inputInstallReason{input_init::NotAttempted};
 inline std::atomic<int> g_normalState{0},g_silentState{0};inline std::atomic<std::uint64_t> g_normalApplications{0},g_silentApplications{0};
 inline float finiteClamp(float x,float fallback,float lo,float hi){return std::isfinite(x)?std::clamp(x,lo,hi):fallback;}
-inline Settings sanitize(Settings s){s.bodies&=255;s.priority=std::clamp(s.priority,0,2);s.fov=finiteClamp(s.fov,8,.1f,540);s.maxDistance=finiteClamp(s.maxDistance,150,1,500);s.smoothing=finiteClamp(s.smoothing,.12f,0,1);s.pointScale=finiteClamp(s.pointScale,.5f,0,.9f);s.rcsStrength=finiteClamp(s.rcsStrength,100,0,100);s.predictionMs=finiteClamp(s.predictionMs,20,-150,150);return s;}
+inline Settings sanitize(Settings s){s.bodies&=255;s.priority=std::clamp(s.priority,0,2);s.fov=finiteClamp(s.fov,8,.1f,540);s.maxDistance=finiteClamp(s.maxDistance,150,1,5000);s.smoothing=finiteClamp(s.smoothing,.12f,0,1);s.pointScale=finiteClamp(s.pointScale,.5f,0,.9f);s.rcsStrength=finiteClamp(s.rcsStrength,100,0,100);s.predictionMs=finiteClamp(s.predictionMs,20,-150,150);return s;}
 inline void publish(Configuration c){c.normal=sanitize(c.normal);c.silent=sanitize(c.silent);c.autoFire=automation::sanitize(c.autoFire);{std::lock_guard<std::mutex> l(g_configMutex);g_config=c;}g_active.store(c.normal.enabled||c.silent.enabled||c.autoFire.enabled,std::memory_order_release);}
 inline Configuration configuration(){std::lock_guard<std::mutex> l(g_configMutex);return g_config;}
 inline bool finite(Vec3 v){return std::isfinite(v.x)&&std::isfinite(v.y)&&std::isfinite(v.z)&&std::fabs(v.x)<100000&&std::fabs(v.y)<100000&&std::fabs(v.z)<100000;}

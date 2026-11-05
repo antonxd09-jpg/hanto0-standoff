@@ -386,7 +386,7 @@ static void silentLeft() {
         mark(ImGui::SliderFloat("FOV##silent", &edit.silent.fov, 1.f, 540.f, "%.1f deg"));
         mark(ImGui::Checkbox("Show FOV##silent", &edit.silent.showFov));
         mark(ImGui::Checkbox("Body aim (safe)##silent", &edit.silent.safeAim));
-        mark(ImGui::SliderFloat("Max distance##silent", &edit.silent.maxDistance, 10.f, 300.f, "%.0f"));
+        mark(ImGui::SliderFloat("Max distance##silent", &edit.silent.maxDistance, 10.f, 1000.f, "%.0f"));
         mark(ImGui::Checkbox("Visible check##silent", &edit.silent.visibleCheck));
         mark(ImGui::Checkbox("Lock target##silent", &edit.silent.lockTarget));
         ImGui::TextDisabled("Recoil options await a separate 1.1.0 port.");

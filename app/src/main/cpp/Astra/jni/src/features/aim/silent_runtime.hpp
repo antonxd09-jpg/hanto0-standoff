@@ -29,7 +29,7 @@ inline bool silentLivePoint(const Selection& selected,const Settings& s,Vec3 ori
  auto candidate=silent_accuracy::innerPoint(live,proposed);
  if(length(sub(candidate,live.center))>1e-5f&&!silentHitsBone(origin,candidate,colliderId)){candidate=live.center;debug::silentCenterFallback.fetch_add(1);}
  if(!silent_accuracy::inFov(origin,candidate,forward,s)){debug::silentPointRejected.fetch_add(1);return false;}
- if(s.visibleCheck&&!silentHitsBone(origin,candidate,colliderId)){
+ if(false(origin,candidate,colliderId)){
   if(candidate.x!=live.center.x||candidate.y!=live.center.y||candidate.z!=live.center.z){candidate=live.center;debug::silentCenterFallback.fetch_add(1);}
   if(!silent_accuracy::inFov(origin,candidate,forward,s)||!silentHitsBone(origin,candidate,colliderId)){debug::silentPointRejected.fetch_add(1);return false;}
  }
