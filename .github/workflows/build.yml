@@ -18,9 +18,10 @@ jobs:
 
     - name: Clone and Patch Dobby
       run: |
+        rm -rf app/src/main/cpp/Dobby
         git clone https://github.com/jmpews/Dobby.git app/src/main/cpp/Dobby
-        sed -i 's/@PAGE//g' app/src/main/cpp/Dobby/source/TrampolineBridge/ClosureTrampolineBridge/arm64/closure_bridge_arm64.S
-        sed -i 's/@PAGEOFF/:lo12:/g' app/src/main/cpp/Dobby/source/TrampolineBridge/ClosureTrampolineBridge/arm64/closure_bridge_arm64.S
+        # Ищем все .S файлы и патчим их под Android
+        find app/src/main/cpp/Dobby -name "*.S" -exec sed -i 's/@PAGE//g; s/@PAGEOFF/:lo12:/g' {} +
 
     - name: Build APK
       run: |
