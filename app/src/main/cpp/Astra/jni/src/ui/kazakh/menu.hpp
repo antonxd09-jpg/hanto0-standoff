@@ -552,7 +552,7 @@ static void configLeft() {
 }
 
 static void configRight() {
-    ImGui::TextDisabled("KRIWARE / Free");
+    ImGui::TextDisabled("HantoO / Free");
     const auto unityBase = g_unityBase.load(std::memory_order_acquire);
     ImGui::Text("Unity: %s", unityBase ? "found" : "waiting libunity.so");
     ImGui::Text("Unity base: %p", reinterpret_cast<void*>(unityBase));
@@ -717,7 +717,7 @@ static void drawKazakhMenu() {
                       ImColor(kazakh::accentColor.x, kazakh::accentColor.y,
                               kazakh::accentColor.z, kazakh::accentColor.w));
 
-    const char* title = "KRIWARE";
+    const char* title = "HantoO";
     const float titlePx = 26 * kazakh::kDpi;
     const float titleW = ImGui::CalcTextSize(title).x * (titlePx / ImGui::GetFontSize());
     wd->AddText(ImGui::GetFont(), titlePx,
@@ -805,7 +805,7 @@ static void drawKazakhMenu() {
 static void drawWatermark() {
     constexpr bool watermarkMode = true;
 
-    std::string t1 = ("KRIWARE ");
+    std::string t1 = ("HantoO ");
     std::string t2 = ("| internal ");
     std::string t3 = ("| ");
     time_t now = time(0);
