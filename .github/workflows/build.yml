@@ -18,20 +18,9 @@ jobs:
       run: |
         rm -rf app/src/main/cpp/Dobby
         git clone https://github.com/jmpews/Dobby.git app/src/main/cpp/Dobby
-        cat << 'PYEOF' > patch.py
-import os
-for root, dirs, files in os.walk('app/src/main/cpp/Dobby'):
-    for file in files:
-        if file.endswith('.S'):
-            path = os.path.join(root, file)
-            with open(path, 'r') as f:
-                content = f.read()
-            content = content.replace('@PAGE', '').replace('@PAGEOFF', ':lo12:')
-            with open(path, 'w') as f:
-                f.write(content)
-print("Dobby patched successfully!")
-PYEOF
-        python3 patch.py
+        find app/src/main/cpp/Dobby -name "*.S" -type f | xargs sed -i 's/@PAGE//g; s/@PAGEOFF/:lo12:/g'
+        echo "=== ПРОВЕРКА ПАТЧА ==="
+        grep -n "adrp x17" app/src/main/cpp/Dobby/source/TrampolineBridge/ClosureTrampolineBridge/arm64/closure_bridge_arm64.S || true
 
     - name: Build APK
       run: |
