@@ -18,7 +18,11 @@ class MainActivity : AppCompatActivity() {
             setPadding(48, 48, 48, 48)
         }
 
-        statusText = TextView(this).apply { text = "Status: Ready", textSize = 18f }
+        statusText = TextView(this).apply {
+            text = "Status: Ready"
+            textSize = 18f
+        }
+        
         val start = Button(this).apply { text = "START" }
 
         start.setOnClickListener {
@@ -38,7 +42,7 @@ class MainActivity : AppCompatActivity() {
                 
                 runOnUiThread {
                     if (success) {
-                        statusText.text = "Injection process started.\nGame will launch in 50s."
+                        statusText.text = "Injection started.\nGame launches in 50s."
                         Toast.makeText(this, "Menu in 50s...", Toast.LENGTH_LONG).show()
                     } else {
                         statusText.text = "Injection FAILED. Check assets."
