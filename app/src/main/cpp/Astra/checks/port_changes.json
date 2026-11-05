@@ -1,0 +1,1605 @@
+[
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kResolveIcall",
+    "old": "0x63279f4",
+    "new": "0x67c0188",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kFree",
+    "old": "0x63279f8",
+    "new": "0x677ec28",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kAssemblyGetImage",
+    "old": "0x6327a18",
+    "new": "0x6781f68",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kClassFromName",
+    "old": "0x6327a3c",
+    "new": "0x6781f8c",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kClassGetFields",
+    "old": "0x6327ac8",
+    "new": "0x6782018",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kClassGetFieldFromName",
+    "old": "0x6327ad0",
+    "new": "0x6782020",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kClassGetName",
+    "old": "0x6327ad8",
+    "new": "0x6782028",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kClassGetNamespace",
+    "old": "0x6327adc",
+    "new": "0x678202c",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kClassGetParent",
+    "old": "0x6327ae0",
+    "new": "0x6782030",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kDomainGet",
+    "old": "0x6327b70",
+    "new": "0x67820c4",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kDomainAssemblyOpen",
+    "old": "0x6327b74",
+    "new": "0x67820c8",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kFieldGetOffset",
+    "old": "0x6327c44",
+    "new": "0x6782198",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kFieldGetType",
+    "old": "0x6327c48",
+    "new": "0x678219c",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kFieldStaticGetValue",
+    "old": "0x6327c50",
+    "new": "0x67821a4",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kThreadAttach",
+    "old": "0x6327d6c",
+    "new": "0x67822c0",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kThreadDetach",
+    "old": "0x6327d70",
+    "new": "0x67822c4",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kTypeGetName",
+    "old": "0x6327d8c",
+    "new": "0x67822e0",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "unity::kNativeInjectEvent",
+    "old": "0x5668ad8",
+    "new": "0x5ac2f20",
+    "evidence": "native-icall-registration"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "unity::kCameraGetMain",
+    "old": "0x53653c4",
+    "new": "0x57bf044",
+    "evidence": "native-icall-registration"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "unity::kNativeCameraGetMain",
+    "old": "0x54c1338",
+    "new": "0x591b4fc",
+    "evidence": "native-icall-registration"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "unity::kCameraGetCurrent",
+    "old": "0x53653e8",
+    "new": "0x57bf068",
+    "evidence": "native-icall-registration"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "unity::kCameraGetFov",
+    "old": "0x5364fe4",
+    "new": "0x57bec64",
+    "evidence": "native-icall-registration"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "unity::kCameraWorldToCameraMatrix",
+    "old": "0x5365204",
+    "new": "0x57bee84",
+    "evidence": "native-icall-registration"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "unity::kCameraProjectionMatrix",
+    "old": "0x5365228",
+    "new": "0x57beea8",
+    "evidence": "native-icall-registration"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "unity::kCameraWorldToScreen",
+    "old": "0x5365268",
+    "new": "0x57beee8",
+    "evidence": "native-icall-registration"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "unity::kCameraScreenToWorld",
+    "old": "0x53652fc",
+    "new": "0x57bef7c",
+    "evidence": "native-icall-registration"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "unity::kComponentGetTransform",
+    "old": "0x5371d30",
+    "new": "0x57cb9c0",
+    "evidence": "native-icall-registration"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "unity::kGameObjectGetTransform",
+    "old": "0x53727cc",
+    "new": "0x57cc45c",
+    "evidence": "native-icall-registration"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "unity::kTransformGetPositionAndRotation",
+    "old": "0x53764e0",
+    "new": "0x57d0184",
+    "evidence": "native-icall-registration"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "unity::kRendererGetBounds",
+    "old": "0x53689d0",
+    "new": "0x57c2650",
+    "evidence": "native-icall-registration"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kClientWorld",
+    "old": "0xc2062e0",
+    "new": "0xcd2f9b0",
+    "evidence": "njh_TypeInfo -> ggk_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kRegistry",
+    "old": "0xc203d50",
+    "new": "0xcd32028",
+    "evidence": "gat_TypeInfo -> nba_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kStore",
+    "old": "0xc204210",
+    "new": "0xcd303e8",
+    "evidence": "gzx_TypeInfo -> ibc_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kPlayer",
+    "old": "0xc202058",
+    "new": "0xcd32658",
+    "evidence": "ake_TypeInfo -> odq_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kNetObject",
+    "old": "0xc205ce8",
+    "new": "0xcd359a0",
+    "evidence": "mfc_TypeInfo -> wwv_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kTransforms",
+    "old": "0xc2031a8",
+    "new": "0xcd31e68",
+    "evidence": "dwc_TypeInfo -> mtc_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kModel",
+    "old": "0xc204d68",
+    "new": "0xcd2dde8",
+    "evidence": "jgi_TypeInfo -> bis_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kStats",
+    "old": "0xc209d38",
+    "new": "0xcd360f0",
+    "evidence": "ylw_TypeInfo -> ydm_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kUntouchable",
+    "old": "0xc207fa0",
+    "new": "0xcd30c38",
+    "evidence": "tbq_TypeInfo -> jnw_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kVisibility",
+    "old": "0xc207118",
+    "new": "0xcd341c0",
+    "evidence": "qdp_TypeInfo -> szi_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kTransport",
+    "old": "0xc204278",
+    "new": "0xcd30c28",
+    "evidence": "hbu_TypeInfo -> jnr_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kActor",
+    "old": "0xc207e00",
+    "new": "0xcd34c50",
+    "evidence": "stn_TypeInfo -> uwa_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kWeaponPart",
+    "old": "0xc2064a8",
+    "new": "0xcd34ce0",
+    "evidence": "nrk_TypeInfo -> uyg_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kWeaponInstance",
+    "old": "0xc207240",
+    "new": "0xcd30d00",
+    "evidence": "qjf_TypeInfo -> jrx_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kWeaponProvider",
+    "old": "0xc2048a8",
+    "new": "0xcd36030",
+    "evidence": "ijq_TypeInfo -> xzp_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kInputManager",
+    "old": "0xc20a2f0",
+    "new": "0xcd337a0",
+    "evidence": "znn_TypeInfo -> rcv_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kInputCommand",
+    "old": "0xc206a90",
+    "new": "0xcd347c0",
+    "evidence": "owv_TypeInfo -> ubz_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kCameraComponent",
+    "old": "0xc2049c0",
+    "new": "0xcd36248",
+    "evidence": "ios_TypeInfo -> yjp_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kRotation",
+    "old": "0xc203498",
+    "new": "0xcd31080",
+    "evidence": "eir_TypeInfo -> kgd_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kNavigation",
+    "old": "0xc2062c0",
+    "new": "0xcd2eaa0",
+    "evidence": "nip_TypeInfo -> dpp_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kMovement",
+    "old": "0xc208230",
+    "new": "0xcd2fe20",
+    "evidence": "tof_TypeInfo -> hax_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kGrenadeCim",
+    "old": "0xc2029b0",
+    "new": "0xcd2e348",
+    "evidence": "cim_TypeInfo -> cim_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kBomb",
+    "old": "0xc20a2f8",
+    "new": "0xcd36938",
+    "evidence": "zno_TypeInfo -> zno_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kDrop",
+    "old": "0xc2062d8",
+    "new": "0xcd321f0",
+    "evidence": "njg_TypeInfo -> njg_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kRagdoll",
+    "old": "0xc2059d0",
+    "new": "0xcd36900",
+    "evidence": "lob_TypeInfo -> zma_TypeInfo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typevar::kActor",
+    "old": "0xc1dc598",
+    "new": "0xcd070b0",
+    "evidence": "stn_var -> uwa_var"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "managed_rva::kPlayerUpdateHook",
+    "old": "0x949e8a0",
+    "new": "0x9c83d78",
+    "evidence": "ake$$opmn -> odq$$fixo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "managed_rva::kPlayerGetPosition",
+    "old": "0x9489018",
+    "new": "0x9c9b170",
+    "evidence": "ake$$xdzx -> odq$$apss"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "managed_rva::kStatsGetHp",
+    "old": "0x94a7418",
+    "new": "0x9c98dd8",
+    "evidence": "ylw$$feao -> ydm$$bdqp"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "managed_rva::kStatsGetMaxHp",
+    "old": "0x949cd84",
+    "new": "0x9c9a434",
+    "evidence": "ylw$$cdjm -> ydm$$nfln"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "managed_rva::kStatsGetArmor",
+    "old": "0x948ea58",
+    "new": "0x9c83428",
+    "evidence": "ylw$$aqay -> ydm$$tgiz"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "managed_rva::kStatsGetMaxArmor",
+    "old": "0x94a3cbc",
+    "new": "0x9c89764",
+    "evidence": "ylw$$xpjw -> ydm$$fidx"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "managed_rva::kStatsGetHelmet",
+    "old": "0x9491630",
+    "new": "0x9c8a4f8",
+    "evidence": "ylw$$wcbi -> ydm$$ljbj"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "managed_rva::kWeaponPartGetContext",
+    "old": "0x948953c",
+    "new": "0x9c82fe0",
+    "evidence": "nrk$$mxmv -> uyg$$qtck"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "managed_rva::kWeaponPartGetActiveWeapon",
+    "old": "0x9489544",
+    "new": "0x9c81184",
+    "evidence": "nrk$$hpvy -> uyg$$lwgn"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "managed_rva::kWeaponGetId",
+    "old": "0x9735590",
+    "new": "0x9cb3480",
+    "evidence": "qjf$$neos -> jrx$$onxo"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "managed_rva::kWeaponGetMagazineAmmo",
+    "old": "0x973b9f4",
+    "new": "0x9cb2e14",
+    "evidence": "qjf$$iqpc -> jrx$$gqpy"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "managed_rva::kWeaponGetReserveAmmo",
+    "old": "0x973b400",
+    "new": "0x9cb22c8",
+    "evidence": "qjf$$hdgo -> jrx$$mrnk"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "managed_rva::kNetObjectGetParts",
+    "old": "0x74cc168",
+    "new": "0x7e2eb38",
+    "evidence": "mfc$$ofmk -> wwv$$hzcl"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kClassGetMethods",
+    "old": "0x6327ad4",
+    "new": "0x6782024",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kClassGetMethodFromName",
+    "old": "0x632ec5c",
+    "new": "0x67891c4",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kMethodGetName",
+    "old": "0x6327cec",
+    "new": "0x6782240",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kMethodGetParamCount",
+    "old": "0x6327cfc",
+    "new": "0x6782250",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kMethodGetParam",
+    "old": "0x6327d00",
+    "new": "0x6782254",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kMethodGetParamName",
+    "old": "0x63454e4",
+    "new": "0x679fa78",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kStringNew",
+    "old": "0x6327d58",
+    "new": "0x67822ac",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kStringChars",
+    "old": "0x6327d54",
+    "new": "0x67822a8",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "il2cpp_api::kObjectNew",
+    "old": "0x6327d14",
+    "new": "0x6782268",
+    "evidence": "native-api-wrapper"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "shader::kFind",
+    "old": "0x75faf74",
+    "new": "0x72feb98",
+    "evidence": "UnityEngine.Shader$$Find -> UnityEngine.Shader$$Find"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "shader::kFindBuiltin",
+    "old": "0x7603724",
+    "new": "0x7305ce8",
+    "evidence": "UnityEngine.Shader$$FindBuiltin -> UnityEngine.Shader$$FindBuiltin"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "material::kGetShader",
+    "old": "0x75f9610",
+    "new": "0x7307b1c",
+    "evidence": "UnityEngine.Material$$get_shader -> UnityEngine.Material$$get_shader"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "material::kSetShader",
+    "old": "0x7602d8c",
+    "new": "0x72de678",
+    "evidence": "UnityEngine.Material$$set_shader -> UnityEngine.Material$$set_shader"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "material::kCtorShader",
+    "old": "0x75f3798",
+    "new": "0x7301dac",
+    "evidence": "UnityEngine.Material$$.ctor -> UnityEngine.Material$$.ctor"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "material::kGetColorProp",
+    "old": "0x7612180",
+    "new": "0x72e7404",
+    "evidence": "UnityEngine.Material$$get_color -> UnityEngine.Material$$get_color"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "material::kSetColorProp",
+    "old": "0x76079e4",
+    "new": "0x72fc59c",
+    "evidence": "UnityEngine.Material$$set_color -> UnityEngine.Material$$set_color"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "material::kGetMainTexture",
+    "old": "0x760bdb0",
+    "new": "0x72e5370",
+    "evidence": "UnityEngine.Material$$get_mainTexture -> UnityEngine.Material$$get_mainTexture"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "material::kSetMainTexture",
+    "old": "0x7611648",
+    "new": "0x72e1034",
+    "evidence": "UnityEngine.Material$$set_mainTexture -> UnityEngine.Material$$set_mainTexture"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "material::kSetColor",
+    "old": "0x761134c",
+    "new": "0x72f3478",
+    "evidence": "UnityEngine.Material$$SetColor -> UnityEngine.Material$$SetColor"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "material::kGetColor",
+    "old": "0x76123e0",
+    "new": "0x72fca24",
+    "evidence": "UnityEngine.Material$$GetColor -> UnityEngine.Material$$GetColor"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "material::kHasProperty",
+    "old": "0x7612934",
+    "new": "0x72e23fc",
+    "evidence": "UnityEngine.Material$$HasProperty -> UnityEngine.Material$$HasProperty"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "material::kHasFloat",
+    "old": "0x75fdc64",
+    "new": "0x7301d50",
+    "evidence": "UnityEngine.Material$$HasFloat -> UnityEngine.Material$$HasFloat"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "material::kSetFloat",
+    "old": "0x75f6c44",
+    "new": "0x72efcc0",
+    "evidence": "UnityEngine.Material$$SetFloat -> UnityEngine.Material$$SetFloat"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "material::kGetFloat",
+    "old": "0x75e69e0",
+    "new": "0x72f3f70",
+    "evidence": "UnityEngine.Material$$GetFloat -> UnityEngine.Material$$GetFloat"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "material::kGetTexture",
+    "old": "0x76000d8",
+    "new": "0x72f6650",
+    "evidence": "UnityEngine.Material$$GetTexture -> UnityEngine.Material$$GetTexture"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "material::kSetTexture",
+    "old": "0x75f1238",
+    "new": "0x72fa778",
+    "evidence": "UnityEngine.Material$$SetTexture -> UnityEngine.Material$$SetTexture"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "material::kGetRenderQueue",
+    "old": "0x76027cc",
+    "new": "0x72f5050",
+    "evidence": "UnityEngine.Material$$get_renderQueue -> UnityEngine.Material$$get_renderQueue"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "material::kSetRenderQueue",
+    "old": "0x75fcb04",
+    "new": "0x72e6430",
+    "evidence": "UnityEngine.Material$$set_renderQueue -> UnityEngine.Material$$set_renderQueue"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "renderer::kGetMaterial",
+    "old": "0x75e7c4c",
+    "new": "0x7305428",
+    "evidence": "UnityEngine.Renderer$$GetMaterial -> UnityEngine.Renderer$$GetMaterial"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "renderer::kSetMaterial",
+    "old": "0x75f2de8",
+    "new": "0x72f3b64",
+    "evidence": "UnityEngine.Renderer$$set_material -> UnityEngine.Renderer$$set_material"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "renderer::kGetSharedMaterial",
+    "old": "0x7613034",
+    "new": "0x72fc504",
+    "evidence": "UnityEngine.Renderer$$get_sharedMaterial -> UnityEngine.Renderer$$get_sharedMaterial"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "renderer::kGetSharedMaterials",
+    "old": "0x7612138",
+    "new": "0x7307524",
+    "evidence": "UnityEngine.Renderer$$get_sharedMaterials -> UnityEngine.Renderer$$get_sharedMaterials"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "renderer::kSetSharedMaterials",
+    "old": "0x75eb8a0",
+    "new": "0x72ff268",
+    "evidence": "UnityEngine.Renderer$$set_sharedMaterials -> UnityEngine.Renderer$$set_sharedMaterials"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "reflection::kTypeGetType",
+    "old": "0x63a1e0c",
+    "new": "0x681bad4",
+    "evidence": "System.Type$$GetType -> System.Type$$GetType"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "reflection::kFindObjectsOfTypeAll",
+    "old": "0x67e81a0",
+    "new": "0x7920cb8",
+    "evidence": "UnityEngine.ResourcesAPIInternal$$FindObjectsOfTypeAll -> UnityEngine.ResourcesAPIInternal$$FindObjectsOfTypeAll"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kGetFog",
+    "old": "0x7612954",
+    "new": "0x72dc548",
+    "evidence": "UnityEngine.RenderSettings$$get_fog -> UnityEngine.RenderSettings$$get_fog"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kSetFog",
+    "old": "0x75f0bd4",
+    "new": "0x72e6ad8",
+    "evidence": "UnityEngine.RenderSettings$$set_fog -> UnityEngine.RenderSettings$$set_fog"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kGetFogColor",
+    "old": "0x760ec5c",
+    "new": "0x72d55d0",
+    "evidence": "UnityEngine.RenderSettings$$get_fogColor -> UnityEngine.RenderSettings$$get_fogColor"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kSetFogColor",
+    "old": "0x760931c",
+    "new": "0x7304d8c",
+    "evidence": "UnityEngine.RenderSettings$$set_fogColor -> UnityEngine.RenderSettings$$set_fogColor"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kGetAmbientSky",
+    "old": "0x7609eac",
+    "new": "0x72f4cf0",
+    "evidence": "UnityEngine.RenderSettings$$get_ambientSkyColor -> UnityEngine.RenderSettings$$get_ambientSkyColor"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kSetAmbientSky",
+    "old": "0x75e4898",
+    "new": "0x72e9e50",
+    "evidence": "UnityEngine.RenderSettings$$set_ambientSkyColor -> UnityEngine.RenderSettings$$set_ambientSkyColor"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kGetAmbientEquator",
+    "old": "0x760c3d8",
+    "new": "0x7302674",
+    "evidence": "UnityEngine.RenderSettings$$get_ambientEquatorColor -> UnityEngine.RenderSettings$$get_ambientEquatorColor"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kSetAmbientEquator",
+    "old": "0x761701c",
+    "new": "0x72fe9d8",
+    "evidence": "UnityEngine.RenderSettings$$set_ambientEquatorColor -> UnityEngine.RenderSettings$$set_ambientEquatorColor"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kGetAmbientGround",
+    "old": "0x7610320",
+    "new": "0x72f6688",
+    "evidence": "UnityEngine.RenderSettings$$get_ambientGroundColor -> UnityEngine.RenderSettings$$get_ambientGroundColor"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kSetAmbientGround",
+    "old": "0x760bd30",
+    "new": "0x72e4b60",
+    "evidence": "UnityEngine.RenderSettings$$set_ambientGroundColor -> UnityEngine.RenderSettings$$set_ambientGroundColor"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kGetAmbientLight",
+    "old": "0x760a254",
+    "new": "0x72d8708",
+    "evidence": "UnityEngine.RenderSettings$$get_ambientLight -> UnityEngine.RenderSettings$$get_ambientLight"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kSetAmbientLight",
+    "old": "0x75f8a00",
+    "new": "0x72f6b70",
+    "evidence": "UnityEngine.RenderSettings$$set_ambientLight -> UnityEngine.RenderSettings$$set_ambientLight"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kGetAmbientIntensity",
+    "old": "0x75fe000",
+    "new": "0x72f3e20",
+    "evidence": "UnityEngine.RenderSettings$$get_ambientIntensity -> UnityEngine.RenderSettings$$get_ambientIntensity"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kSetAmbientIntensity",
+    "old": "0x75f05f4",
+    "new": "0x72eef68",
+    "evidence": "UnityEngine.RenderSettings$$set_ambientIntensity -> UnityEngine.RenderSettings$$set_ambientIntensity"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kGetAmbientMode",
+    "old": "0x760b964",
+    "new": "0x73065f4",
+    "evidence": "UnityEngine.RenderSettings$$get_ambientMode -> UnityEngine.RenderSettings$$get_ambientMode"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kSetAmbientMode",
+    "old": "0x7611ffc",
+    "new": "0x73061c0",
+    "evidence": "UnityEngine.RenderSettings$$set_ambientMode -> UnityEngine.RenderSettings$$set_ambientMode"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kGetFogStart",
+    "old": "0x7616f70",
+    "new": "0x72e74c0",
+    "evidence": "UnityEngine.RenderSettings$$get_fogStartDistance -> UnityEngine.RenderSettings$$get_fogStartDistance"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kSetFogStart",
+    "old": "0x760d93c",
+    "new": "0x72ef738",
+    "evidence": "UnityEngine.RenderSettings$$set_fogStartDistance -> UnityEngine.RenderSettings$$set_fogStartDistance"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kGetFogEnd",
+    "old": "0x7601480",
+    "new": "0x7301b08",
+    "evidence": "UnityEngine.RenderSettings$$get_fogEndDistance -> UnityEngine.RenderSettings$$get_fogEndDistance"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kSetFogEnd",
+    "old": "0x76134ec",
+    "new": "0x72e1f64",
+    "evidence": "UnityEngine.RenderSettings$$set_fogEndDistance -> UnityEngine.RenderSettings$$set_fogEndDistance"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kGetFogMode",
+    "old": "0x76145a0",
+    "new": "0x73027dc",
+    "evidence": "UnityEngine.RenderSettings$$get_fogMode -> UnityEngine.RenderSettings$$get_fogMode"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kSetFogMode",
+    "old": "0x75ea52c",
+    "new": "0x72f7a24",
+    "evidence": "UnityEngine.RenderSettings$$set_fogMode -> UnityEngine.RenderSettings$$set_fogMode"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kGetFogDensity",
+    "old": "0x760b268",
+    "new": "0x72dc2d4",
+    "evidence": "UnityEngine.RenderSettings$$get_fogDensity -> UnityEngine.RenderSettings$$get_fogDensity"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kSetFogDensity",
+    "old": "0x76096d0",
+    "new": "0x7302444",
+    "evidence": "UnityEngine.RenderSettings$$set_fogDensity -> UnityEngine.RenderSettings$$set_fogDensity"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kGetSkybox",
+    "old": "0x75fed14",
+    "new": "0x72d7b70",
+    "evidence": "UnityEngine.RenderSettings$$get_skybox -> UnityEngine.RenderSettings$$get_skybox"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "render_settings::kSetSkybox",
+    "old": "0x75f7328",
+    "new": "0x72dda3c",
+    "evidence": "UnityEngine.RenderSettings$$set_skybox -> UnityEngine.RenderSettings$$set_skybox"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "skeleton::kAnimatorGetBoneTransform",
+    "old": "0x8828724",
+    "new": "0x7908b18",
+    "evidence": "UnityEngine.Animator$$GetBoneTransform -> UnityEngine.Animator$$GetBoneTransform"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "transform_rva::kGetPosition",
+    "old": "0x67ef458",
+    "new": "0x6937790",
+    "evidence": "UnityEngine.Transform$$get_position -> UnityEngine.Transform$$get_position"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "transform_rva::kSetPosition",
+    "old": "0x67f1268",
+    "new": "0x69378bc",
+    "evidence": "UnityEngine.Transform$$set_position -> UnityEngine.Transform$$set_position"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "transform_rva::kGetForward",
+    "old": "0x67f967c",
+    "new": "0x694b74c",
+    "evidence": "UnityEngine.Transform$$get_forward -> UnityEngine.Transform$$get_forward"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "transform_rva::kGetLocalPosition",
+    "old": "0x67fdc50",
+    "new": "0x6935e24",
+    "evidence": "UnityEngine.Transform$$get_localPosition -> UnityEngine.Transform$$get_localPosition"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "transform_rva::kSetLocalPosition",
+    "old": "0x67fdce0",
+    "new": "0x6945870",
+    "evidence": "UnityEngine.Transform$$set_localPosition -> UnityEngine.Transform$$set_localPosition"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "physics::kRaycast",
+    "old": "0x905a4cc",
+    "new": "0x92ddb4c",
+    "evidence": "UnityEngine.Physics$$Raycast -> UnityEngine.Physics$$Raycast"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "canvas_group::kSetAlpha",
+    "old": "0x7a68cd8",
+    "new": "0x84eab6c",
+    "evidence": "UnityEngine.CanvasGroup$$set_alpha -> UnityEngine.CanvasGroup$$set_alpha"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "camera::kGetFieldOfView",
+    "old": "0x6d2640c",
+    "new": "0x6be9c80",
+    "evidence": "UnityEngine.Camera$$get_fieldOfView -> UnityEngine.Camera$$get_fieldOfView"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "camera::kSetFieldOfView",
+    "old": "0x6d29968",
+    "new": "0x6bd4080",
+    "evidence": "UnityEngine.Camera$$set_fieldOfView -> UnityEngine.Camera$$set_fieldOfView"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "camera::kSetUseOcclusionCulling",
+    "old": "0x6d19818",
+    "new": "0x6bea084",
+    "evidence": "UnityEngine.Camera$$set_useOcclusionCulling -> UnityEngine.Camera$$set_useOcclusionCulling"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "camera::kGetBackgroundColor",
+    "old": "0x6d10ee0",
+    "new": "0x6bea648",
+    "evidence": "UnityEngine.ReflectionProbe$$get_backgroundColor -> UnityEngine.ReflectionProbe$$get_backgroundColor"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "camera::kSetBackgroundColor",
+    "old": "0x6d13af8",
+    "new": "0x6bd6b0c",
+    "evidence": "UnityEngine.ReflectionProbe$$set_backgroundColor -> UnityEngine.ReflectionProbe$$set_backgroundColor"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "camera::kGetAspect",
+    "old": "0x6d1f5b0",
+    "new": "0x6be084c",
+    "evidence": "UnityEngine.Camera$$get_aspect -> UnityEngine.Camera$$get_aspect"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "camera::kGetProjectionMatrixInjected",
+    "old": "0x6d1e880",
+    "new": "0x6bdeeb8",
+    "evidence": "UnityEngine.Camera$$get_projectionMatrix_Injected -> UnityEngine.Camera$$get_projectionMatrix_Injected"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "camera::kSetProjectionMatrixInjected",
+    "old": "0x6d0e720",
+    "new": "0x6be0a78",
+    "evidence": "UnityEngine.Camera$$set_projectionMatrix_Injected -> UnityEngine.Camera$$set_projectionMatrix_Injected"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "camera::kResetProjectionMatrixInjected",
+    "old": "0x6d16bbc",
+    "new": "0x6bdb4d8",
+    "evidence": "UnityEngine.Camera$$ResetProjectionMatrix_Injected -> UnityEngine.Camera$$ResetProjectionMatrix_Injected"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "light::kGetShadows",
+    "old": "0x760155c",
+    "new": "0x72dbbd0",
+    "evidence": "UnityEngine.Light$$get_shadows -> UnityEngine.Light$$get_shadows"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "light::kSetShadows",
+    "old": "0x760322c",
+    "new": "0x73019c0",
+    "evidence": "UnityEngine.Light$$set_shadows -> UnityEngine.Light$$set_shadows"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "light::kGetIntensity",
+    "old": "0x75fec9c",
+    "new": "0x72f92fc",
+    "evidence": "UnityEngine.Light$$get_intensity -> UnityEngine.Light$$get_intensity"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "light::kSetIntensity",
+    "old": "0x7613524",
+    "new": "0x72d67f0",
+    "evidence": "UnityEngine.Light$$set_intensity -> UnityEngine.Light$$set_intensity"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "animator::kGetCullingMode",
+    "old": "0x88342a0",
+    "new": "0x78f8024",
+    "evidence": "UnityEngine.Animator$$get_cullingMode -> UnityEngine.Animator$$get_cullingMode"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "animator::kSetCullingMode",
+    "old": "0x882e200",
+    "new": "0x78fdbf4",
+    "evidence": "UnityEngine.Animator$$set_cullingMode -> UnityEngine.Animator$$set_cullingMode"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "game_object::kComponentGetGameObject",
+    "old": "0x67d4fbc",
+    "new": "0x790db98",
+    "evidence": "UnityEngine.Component$$get_gameObject -> UnityEngine.Component$$get_gameObject"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "game_object::kGetActive",
+    "old": "0x67d5858",
+    "new": "0x7920088",
+    "evidence": "UnityEngine.GameObject$$get_active -> UnityEngine.GameObject$$get_active"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "game_object::kSetActive",
+    "old": "0x67d8a78",
+    "new": "0x7918cfc",
+    "evidence": "UnityEngine.GameObject$$set_active -> UnityEngine.GameObject$$set_active"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "camera_component::kIqkrExecute",
+    "old": "0xa0903dc",
+    "new": "0xaa73e0c",
+    "evidence": "ios$$iqkr -> yjp$$emxs"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x64feb98",
+    "new": "0x6a041a8",
+    "evidence": "System.Runtime.InteropServices.GCHandle$$GetTargetHandle -> System.Runtime.InteropServices.GCHandle$$GetTargetHandle"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x65017e0",
+    "new": "0x6a089b4",
+    "evidence": "System.Runtime.InteropServices.GCHandle$$GetTarget -> System.Runtime.InteropServices.GCHandle$$GetTarget"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x64febf4",
+    "new": "0x6a025d0",
+    "evidence": "System.Runtime.InteropServices.GCHandle$$FreeHandle -> System.Runtime.InteropServices.GCHandle$$FreeHandle"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x75eafc0",
+    "new": "0x72fe550",
+    "evidence": "UnityEngine.Renderer$$GetPropertyBlock -> UnityEngine.Renderer$$GetPropertyBlock"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x76128d4",
+    "new": "0x72de4b8",
+    "evidence": "UnityEngine.Renderer$$SetPropertyBlock -> UnityEngine.Renderer$$SetPropertyBlock"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x75fe6b8",
+    "new": "0x7305bb0",
+    "evidence": "UnityEngine.MaterialPropertyBlock$$.ctor -> UnityEngine.MaterialPropertyBlock$$.ctor"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x760a72c",
+    "new": "0x72dce70",
+    "evidence": "UnityEngine.MaterialPropertyBlock$$Dispose -> UnityEngine.MaterialPropertyBlock$$Dispose"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x75e44e8",
+    "new": "0x72f536c",
+    "evidence": "UnityEngine.MaterialPropertyBlock$$get_isEmpty -> UnityEngine.MaterialPropertyBlock$$get_isEmpty"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x75f6f24",
+    "new": "0x72d585c",
+    "evidence": "UnityEngine.Shader$$GetPropertyCount -> UnityEngine.Shader$$GetPropertyCount"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x75f3b24",
+    "new": "0x72f8468",
+    "evidence": "UnityEngine.Shader$$GetPropertyName -> UnityEngine.Shader$$GetPropertyName"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x75e34b0",
+    "new": "0x72db4cc",
+    "evidence": "UnityEngine.Shader$$GetPropertyType -> UnityEngine.Shader$$GetPropertyType"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x7601eb8",
+    "new": "0x72db358",
+    "evidence": "UnityEngine.Shader$$GetPropertyNameId -> UnityEngine.Shader$$GetPropertyNameId"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x75e89c0",
+    "new": "0x72e7478",
+    "evidence": "UnityEngine.Material$$GetColor -> UnityEngine.Material$$GetColor"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x7613bd8",
+    "new": "0x72fe3ec",
+    "evidence": "UnityEngine.MaterialPropertyBlock$$GetColor -> UnityEngine.MaterialPropertyBlock$$GetColor"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x75eeee8",
+    "new": "0x72e5738",
+    "evidence": "UnityEngine.MaterialPropertyBlock$$SetColor -> UnityEngine.MaterialPropertyBlock$$SetColor"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x68014d0",
+    "new": "0x694117c",
+    "evidence": "UnityEngine.Object$$FindObjectsOfType -> UnityEngine.Object$$FindObjectsOfType"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x67f6b6c",
+    "new": "0x6951a28",
+    "evidence": "UnityEngine.Object$$Destroy -> UnityEngine.Object$$Destroy"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x6844044",
+    "new": "0x72ad628",
+    "evidence": "UnityEngine.RenderTexture$$set_active -> UnityEngine.RenderTexture$$set_active"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x684d614",
+    "new": "0x72a7c9c",
+    "evidence": "UnityEngine.RenderTexture$$ReleaseTemporary -> UnityEngine.RenderTexture$$ReleaseTemporary"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x683c980",
+    "new": "0x72a9444",
+    "evidence": "UnityEngine.RenderTexture$$GetTemporary -> UnityEngine.RenderTexture$$GetTemporary"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x685099c",
+    "new": "0x72b7828",
+    "evidence": "UnityEngine.RenderTexture$$get_active -> UnityEngine.RenderTexture$$get_active"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x6844044",
+    "new": "0x72ad628",
+    "evidence": "UnityEngine.RenderTexture$$set_active -> UnityEngine.RenderTexture$$set_active"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x684d614",
+    "new": "0x72a7c9c",
+    "evidence": "UnityEngine.RenderTexture$$ReleaseTemporary -> UnityEngine.RenderTexture$$ReleaseTemporary"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x7604c30",
+    "new": "0x72e9074",
+    "evidence": "UnityEngine.Graphics$$Blit -> UnityEngine.Graphics$$Blit"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x684d31c",
+    "new": "0x72b5fdc",
+    "evidence": "UnityEngine.Texture2D$$ReadPixels -> UnityEngine.Texture2D$$ReadPixels"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x75eb8a0",
+    "new": "0x72ff268",
+    "evidence": "UnityEngine.Renderer$$set_sharedMaterials -> UnityEngine.Renderer$$set_sharedMaterials"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x63af0b0",
+    "new": "0x680ac58",
+    "evidence": "System.Array$$Clone -> System.Array$$Clone"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x639eb18",
+    "new": "0x6805abc",
+    "evidence": "System.Array$$SetValue -> System.Array$$SetValue"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x67ee62c",
+    "new": "0x6947414",
+    "evidence": "UnityEngine.Object$$Instantiate -> UnityEngine.Object$$Instantiate"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x6849404",
+    "new": "0x72b6cfc",
+    "evidence": "UnityEngine.Texture2D$$get_isReadable -> UnityEngine.Texture2D$$get_isReadable"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x684fd04",
+    "new": "0x72aa7fc",
+    "evidence": "UnityEngine.Texture2D$$GetPixels32 -> UnityEngine.Texture2D$$GetPixels32"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x684b6ac",
+    "new": "0x72bb754",
+    "evidence": "UnityEngine.Texture2D$$SetPixels32 -> UnityEngine.Texture2D$$SetPixels32"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x684592c",
+    "new": "0x72b243c",
+    "evidence": "UnityEngine.Texture2D$$Apply -> UnityEngine.Texture2D$$Apply"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x7611648",
+    "new": "0x72e1034",
+    "evidence": "UnityEngine.Material$$set_mainTexture -> UnityEngine.Material$$set_mainTexture"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x75eb8a0",
+    "new": "0x72ff268",
+    "evidence": "UnityEngine.Renderer$$set_sharedMaterials -> UnityEngine.Renderer$$set_sharedMaterials"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x683f94c",
+    "new": "0x72ae698",
+    "evidence": "UnityEngine.Texture$$get_width -> UnityEngine.Texture$$get_width"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x6845ad4",
+    "new": "0x72aa300",
+    "evidence": "UnityEngine.Texture$$get_height -> UnityEngine.Texture$$get_height"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x68014d0",
+    "new": "0x694117c",
+    "evidence": "UnityEngine.Object$$FindObjectsOfType -> UnityEngine.Object$$FindObjectsOfType"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x67f6b6c",
+    "new": "0x6951a28",
+    "evidence": "UnityEngine.Object$$Destroy -> UnityEngine.Object$$Destroy"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x6847e68",
+    "new": "0x72b75a4",
+    "evidence": "UnityEngine.Texture2D$$.ctor -> UnityEngine.Texture2D$$.ctor"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x67f6b6c",
+    "new": "0x6951a28",
+    "evidence": "UnityEngine.Object$$Destroy -> UnityEngine.Object$$Destroy"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x67f6b6c",
+    "new": "0x6951a28",
+    "evidence": "UnityEngine.Object$$Destroy -> UnityEngine.Object$$Destroy"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x6847e68",
+    "new": "0x72b75a4",
+    "evidence": "UnityEngine.Texture2D$$.ctor -> UnityEngine.Texture2D$$.ctor"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night_diag.hpp",
+    "old": "0x68014d0",
+    "new": "0x694117c",
+    "evidence": "UnityEngine.Object$$FindObjectsOfType -> UnityEngine.Object$$FindObjectsOfType"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_camera_test.hpp",
+    "old": "0x98c9ef8",
+    "new": "0xa58d414",
+    "evidence": "xmt$$syzn -> kmc$$nnns"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_camera_test.hpp",
+    "old": "0x67ef458",
+    "new": "0x6937790",
+    "evidence": "UnityEngine.Transform$$get_position -> UnityEngine.Transform$$get_position"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_camera_test.hpp",
+    "old": "0x67f1268",
+    "new": "0x69378bc",
+    "evidence": "UnityEngine.Transform$$set_position -> UnityEngine.Transform$$set_position"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_camera_test.hpp",
+    "old": "0x67f967c",
+    "new": "0x694b74c",
+    "evidence": "UnityEngine.Transform$$get_forward -> UnityEngine.Transform$$get_forward"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_camera_test.hpp",
+    "old": "0x9492bc4",
+    "new": "0x9c90b68",
+    "evidence": "ake$$iwqc -> odq$$gyrx"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x651292c",
+    "new": "0x6a06570",
+    "evidence": "System.Runtime.InteropServices.GCHandle$$Alloc -> System.Runtime.InteropServices.GCHandle$$Alloc"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x65017e0",
+    "new": "0x6a089b4",
+    "evidence": "System.Runtime.InteropServices.GCHandle$$GetTarget -> System.Runtime.InteropServices.GCHandle$$GetTarget"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x64febf4",
+    "new": "0x6a025d0",
+    "evidence": "System.Runtime.InteropServices.GCHandle$$FreeHandle -> System.Runtime.InteropServices.GCHandle$$FreeHandle"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x75fe000",
+    "new": "0x72f3e20",
+    "evidence": "UnityEngine.RenderSettings$$get_ambientIntensity -> UnityEngine.RenderSettings$$get_ambientIntensity"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x75f05f4",
+    "new": "0x72eef68",
+    "evidence": "UnityEngine.RenderSettings$$set_ambientIntensity -> UnityEngine.RenderSettings$$set_ambientIntensity"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x7609c24",
+    "new": "0x72e54e0",
+    "evidence": "UnityEngine.RenderSettings$$get_reflectionIntensity -> UnityEngine.RenderSettings$$get_reflectionIntensity"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x7604704",
+    "new": "0x730387c",
+    "evidence": "UnityEngine.RenderSettings$$set_reflectionIntensity -> UnityEngine.RenderSettings$$set_reflectionIntensity"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x760b964",
+    "new": "0x73065f4",
+    "evidence": "UnityEngine.RenderSettings$$get_ambientMode -> UnityEngine.RenderSettings$$get_ambientMode"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x760a254",
+    "new": "0x72d8708",
+    "evidence": "UnityEngine.RenderSettings$$get_ambientLight -> UnityEngine.RenderSettings$$get_ambientLight"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x75f8a00",
+    "new": "0x72f6b70",
+    "evidence": "UnityEngine.RenderSettings$$set_ambientLight -> UnityEngine.RenderSettings$$set_ambientLight"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x760a064",
+    "new": "0x72dd8f8",
+    "evidence": "UnityEngine.RenderSettings$$get_sun -> UnityEngine.RenderSettings$$get_sun"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x75fec9c",
+    "new": "0x72f92fc",
+    "evidence": "UnityEngine.Light$$get_intensity -> UnityEngine.Light$$get_intensity"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x7613524",
+    "new": "0x72d67f0",
+    "evidence": "UnityEngine.Light$$set_intensity -> UnityEngine.Light$$set_intensity"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x651292c",
+    "new": "0x6a06570",
+    "evidence": "System.Runtime.InteropServices.GCHandle$$Alloc -> System.Runtime.InteropServices.GCHandle$$Alloc"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x65017e0",
+    "new": "0x6a089b4",
+    "evidence": "System.Runtime.InteropServices.GCHandle$$GetTarget -> System.Runtime.InteropServices.GCHandle$$GetTarget"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x64febf4",
+    "new": "0x6a025d0",
+    "evidence": "System.Runtime.InteropServices.GCHandle$$FreeHandle -> System.Runtime.InteropServices.GCHandle$$FreeHandle"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x7613524",
+    "new": "0x72d67f0",
+    "evidence": "UnityEngine.Light$$set_intensity -> UnityEngine.Light$$set_intensity"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x75f05f4",
+    "new": "0x72eef68",
+    "evidence": "UnityEngine.RenderSettings$$set_ambientIntensity -> UnityEngine.RenderSettings$$set_ambientIntensity"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x7604704",
+    "new": "0x730387c",
+    "evidence": "UnityEngine.RenderSettings$$set_reflectionIntensity -> UnityEngine.RenderSettings$$set_reflectionIntensity"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x75f8a00",
+    "new": "0x72f6b70",
+    "evidence": "UnityEngine.RenderSettings$$set_ambientLight -> UnityEngine.RenderSettings$$set_ambientLight"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x75fe000",
+    "new": "0x72f3e20",
+    "evidence": "UnityEngine.RenderSettings$$get_ambientIntensity -> UnityEngine.RenderSettings$$get_ambientIntensity"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x7609c24",
+    "new": "0x72e54e0",
+    "evidence": "UnityEngine.RenderSettings$$get_reflectionIntensity -> UnityEngine.RenderSettings$$get_reflectionIntensity"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x760b964",
+    "new": "0x73065f4",
+    "evidence": "UnityEngine.RenderSettings$$get_ambientMode -> UnityEngine.RenderSettings$$get_ambientMode"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x760a254",
+    "new": "0x72d8708",
+    "evidence": "UnityEngine.RenderSettings$$get_ambientLight -> UnityEngine.RenderSettings$$get_ambientLight"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x75f05f4",
+    "new": "0x72eef68",
+    "evidence": "UnityEngine.RenderSettings$$set_ambientIntensity -> UnityEngine.RenderSettings$$set_ambientIntensity"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x7604704",
+    "new": "0x730387c",
+    "evidence": "UnityEngine.RenderSettings$$set_reflectionIntensity -> UnityEngine.RenderSettings$$set_reflectionIntensity"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x75f8a00",
+    "new": "0x72f6b70",
+    "evidence": "UnityEngine.RenderSettings$$set_ambientLight -> UnityEngine.RenderSettings$$set_ambientLight"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x760a064",
+    "new": "0x72dd8f8",
+    "evidence": "UnityEngine.RenderSettings$$get_sun -> UnityEngine.RenderSettings$$get_sun"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x75fec9c",
+    "new": "0x72f92fc",
+    "evidence": "UnityEngine.Light$$get_intensity -> UnityEngine.Light$$get_intensity"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x7613524",
+    "new": "0x72d67f0",
+    "evidence": "UnityEngine.Light$$set_intensity -> UnityEngine.Light$$set_intensity"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x75fe000",
+    "new": "0x72f3e20",
+    "evidence": "UnityEngine.RenderSettings$$get_ambientIntensity -> UnityEngine.RenderSettings$$get_ambientIntensity"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x7609c24",
+    "new": "0x72e54e0",
+    "evidence": "UnityEngine.RenderSettings$$get_reflectionIntensity -> UnityEngine.RenderSettings$$get_reflectionIntensity"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x760a254",
+    "new": "0x72d8708",
+    "evidence": "UnityEngine.RenderSettings$$get_ambientLight -> UnityEngine.RenderSettings$$get_ambientLight"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_night.hpp",
+    "old": "0x75fec9c",
+    "new": "0x72f92fc",
+    "evidence": "UnityEngine.Light$$get_intensity -> UnityEngine.Light$$get_intensity"
+  },
+  {
+    "file": "jni/src/features/visuals/astra_hitlog.hpp",
+    "old": "0x74cdc70",
+    "new": "0x7e30f90",
+    "evidence": "mfc$$dxpm -> wwv$$wutn"
+  }
+]

@@ -1,0 +1,6 @@
+Third-person GUI/integration V2 applied
+Existing V1 camera runtime retained; no new body or collision implementation.
+Source edits only; build NOT executed.
+Backup: /storage/emulated/0/AInternal/Astra/patch_backups/thirdperson_v2_1792086914828841362
+/storage/emulated/0/AInternal/Astra/jni/src/ui/premium.hpp
+/storage/emulated/0/AInternal/Astra/jni/src/features/visuals/astra_camera_test.hpp

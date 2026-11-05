@@ -1,0 +1,90 @@
+[
+  {
+    "key": "kShotEmit",
+    "rva": "0x9ca6a0c",
+    "words": [
+      "0xd10183ff",
+      "0xa9035ffe",
+      "0xa90457f6",
+      "0xa9054ff4"
+    ]
+  },
+  {
+    "key": "kColliderBounds",
+    "rva": "0x92de468",
+    "words": [
+      "0xa9be57fe",
+      "0xa9014ff4",
+      "0x9001ef95",
+      "0xaa0103f3"
+    ]
+  },
+  {
+    "key": "kNativeRaycast",
+    "rva": "0x92de930",
+    "words": [
+      "0xfc1c0fe8",
+      "0xf90007fe",
+      "0xa9015ff8",
+      "0xa90257f6"
+    ]
+  },
+  {
+    "key": "kDefaultPhysicsScene",
+    "rva": "0x92d6bcc",
+    "words": [
+      "0xaa1f03e0",
+      "0xd65f03c0"
+    ]
+  },
+  {
+    "key": "kObjectEntityId",
+    "rva": "0x6951ffc",
+    "words": [
+      "0xf81e0ffe",
+      "0xa9014ff4",
+      "0xb0033b54",
+      "0xaa0003f3"
+    ]
+  },
+  {
+    "key": "kCommandLook",
+    "rva": "0x7ff899c",
+    "words": [
+      "0xd10103ff",
+      "0xa90257fe",
+      "0xa9034ff4",
+      "0xf0028675"
+    ]
+  },
+  {
+    "key": "kCommandGate",
+    "rva": "0x9c83188",
+    "words": [
+      "0xa9be57fe",
+      "0xa9014ff4",
+      "0xb001a295",
+      "0xaa0103f4"
+    ]
+  },
+  {
+    "key": "kCommandEnd",
+    "rva": "0x9c8f244",
+    "words": [
+      "0xa9be57fe",
+      "0xa9014ff4",
+      "0xb001a233",
+      "0xaa0003f4"
+    ]
+  },
+  {
+    "key": "kCommandLook",
+    "rva": "0x7ff899c",
+    "words": [
+      "0xd10103ff",
+      "0xa90257fe",
+      "0xa9034ff4",
+      "0xf0028675"
+    ]
+  }
+]

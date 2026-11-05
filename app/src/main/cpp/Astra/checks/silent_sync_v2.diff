@@ -1,0 +1,376 @@
+--- v1/Astra/checks/verify_silent_110.py
++++ sync-v2/Astra/checks/verify_silent_110.py
+@@ -27,7 +27,9 @@
+  assert re.search(r'// RVA: 0x'+format(a,'X')+r' .*\n\s*(?:private|public).*?\b'+method+r'\(',cs)
+ assert 'public Transform HitTransform; // 0x18' in cs and 'public jrx ActiveWeapon; // 0x50' in cs
+ runtime=(src/'features/aim/runtime.hpp').read_text();cmd=(src/'features/aim/command_phase_runtime.hpp').read_text()
+-assert 'object(ctx,0x50)==local.activeWeapon' in runtime and 'object(ctx,0x18),origin' in runtime
++assert 'object(ctx,0x50)==local.activeWeapon' in runtime
++assert 'silentShotPlan(p,world,local.activeWeapon,first.origin' in runtime
++assert 'offsets::field::nrk::kHitTransform),origin,forward' in (src/'features/aim/automation_runtime.hpp').read_text()
+ assert 'else silentCommandSpoof(cmd)' in cmd and 'if(!installLookHook())return' in cmd
+ print('PASS: binary hash, Silent guards, four BL targets, method identities, context layout, independent command route.')
+ print('LIMIT: static validation; Android build and live game test are still required.')
+--- v1/Astra/checks/verify_silent_sync.py
++++ sync-v2/Astra/checks/verify_silent_sync.py
+@@ -0,0 +1,76 @@
++"""Regression: execute real command identity/plan policy and commandLookWrite.
++No Android SDK needed. Uses g++ and a temporary Android log declaration.
++"""
++from pathlib import Path
++import subprocess,tempfile
++root=Path(__file__).resolve().parents[1];src=root/'jni/src'
++s=(src/'features/aim/automation_runtime.hpp').read_text()
++def function(name):
++ start=s.index('inline ',s.index(name)-50) if False else s.rfind('inline ',0,s.index(name+'('))
++ body=s.index('{',start);level=1;end=body+1
++ while level:
++  level+=(s[end]=='{')-(s[end]=='}');end+=1
++ return s[start:end]
++cpp=r'''
++#include "features/aim/silent_command.hpp"
++#include "features/aim/debug.hpp"
++#include <cstring>
++#include <cassert>
++using namespace astra::aim;
++namespace ed {struct PlayerSnapshot{void* activeWeapon=nullptr;};inline bool isUnityMainCallback(){return true;}}
++struct CommandLook {std::uint8_t has=1,padding[3]{};float pitch=0,yaw=0;};
++alignas(16) unsigned char cmd[128]{};
++void* player=reinterpret_cast<void*>(0x2000);void* worldValue=reinterpret_cast<void*>(0x3000);
++void* weapon=reinterpret_cast<void*>(0x4000);double milliseconds=100;
++silent_command::Plan g_silentPlan{};
++void* localPlayer(){return player;}
++bool localAlive(void*,ed::PlayerSnapshot& local,void*& world){local.activeWeapon=weapon;world=worldValue;return true;}
++bool named(void* p,const char*){return p==cmd;}
++template<class T>bool field(void* p,size_t off,T& out){if(p!=cmd||off+sizeof(T)>sizeof(cmd))return false;std::memcpy(&out,cmd+off,sizeof(T));return true;}
++double autoNow(){return milliseconds;}
++CommandLook received{};unsigned calls=0;
++void setter(void*,CommandLook v,const void*){received=v;++calls;}
++inline auto g_commandLook=&setter;
++'''
++cpp+='\n'.join(function(n) for n in ['silentIdentity','currentSilentPlan','commandLookWrite'])
++cpp+=r'''
++void prepare(std::uint32_t token=7){
++ std::memcpy(cmd+0x10,&token,4);milliseconds=100;
++ auto c=Configuration{};c.silent.enabled=true;c.pauseInMenu=true;publish(c);g_menuOpen=false;
++ g_silentPlan={};g_silentPlan.valid=true;
++ g_silentPlan.identity=silentIdentity(cmd,player,worldValue,weapon);
++ g_silentPlan.captured=100;g_silentPlan.angle={10,20};
++}
++void write(){unsigned before=calls;commandLookWrite(cmd,CommandLook{1,{},1,2},nullptr);assert(calls==before+1);}
++void unchanged(){write();assert(received.pitch==1&&received.yaw==2);}
++int main(){
++ prepare();write();assert(received.pitch==10&&received.yaw==20);
++ // Same address, different command generation must forward the incoming camera angle.
++ prepare();std::uint32_t next=8;std::memcpy(cmd+0x10,&next,4);unchanged();assert(!g_silentPlan.valid);
++ prepare();milliseconds=161;unchanged();
++ prepare();milliseconds=99;unchanged();
++ prepare();g_menuOpen=true;unchanged();
++ prepare();auto c=configuration();c.silent.enabled=false;publish(c);unchanged();
++ prepare();weapon=reinterpret_cast<void*>(0x5000);unchanged();weapon=reinterpret_cast<void*>(0x4000);
++ prepare();worldValue=reinterpret_cast<void*>(0x6000);unchanged();worldValue=reinterpret_cast<void*>(0x3000);
++ prepare();player=reinterpret_cast<void*>(0x7000);unchanged();player=reinterpret_cast<void*>(0x2000);
++ prepare(0);write();assert(received.pitch==10); // zero is a valid generation
++ assert(silent_command::originMatches({1,2,3},{1.01f,2,3}));
++ assert(!silent_command::originMatches({1,2,3},{2,2,3}));
++ for(Vec3 point: {Vec3{2,3,40},Vec3{-20,10,3},Vec3{0,-10,5}}){
++  auto a=anglesFor(point);auto direction=forwardFor(a);
++  assert(dot(direction,normalized(point))>.99999f);
++ }
++}
++'''
++# Integration guard: the actual ray hook consumes the command plan and has no
++# independent target-selection or prediction fallback anymore.
++runtime=(src/'features/aim/runtime.hpp').read_text();emit=runtime[runtime.index('inline void emitRays('):runtime.index('inline bool bytesMatch(',runtime.index('inline void emitRays('))]
++assert 'silentShotPlan(' in emit and 'selectSilent(' not in emit and 'predictPoint(' not in emit
++assert emit.count('g_emitOriginal(self,ctx,rays,span)')==1
++with tempfile.TemporaryDirectory() as td:
++ td=Path(td);(td/'android').mkdir();(td/'android/log.h').write_text('#define ANDROID_LOG_INFO 4\nextern "C" int __android_log_print(int,const char*,const char*,...);\n')
++ (td/'sync.cpp').write_text(cpp)
++ subprocess.run(['g++','-std=c++17','-Wall','-Wextra','-I',str(src),'-I',str(td),str(td/'sync.cpp'),'-o',str(td/'test')],check=True)
++ subprocess.run([str(td/'test')],check=True)
++print('PASS: actual look hook: recycled command, time bounds, pause, disable, owner/world/weapon switch, zero token, original forwarding; direction agreement; ray-hook routing.')
+--- v1/Astra/jni/src/features/aim/automation_runtime.hpp
++++ sync-v2/Astra/jni/src/features/aim/automation_runtime.hpp
+@@ -40,9 +40,7 @@
+ inline bool ownedCommandValid(){return named(g_ownedCommand,"ubz")&&ed::writable(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(g_ownedCommand)+0x32),3);}
+ inline void releaseOwnedCommand(){if(ownedCommandValid()){if(g_ownedAttack&&g_commandAttack)g_commandAttack(g_ownedCommand,g_previousAttack!=0,nullptr);if(g_ownedScope&&g_commandScope)g_commandScope(g_ownedCommand,g_previousScope!=0,nullptr);if(g_ownedScopeHold&&g_commandScopeHold)g_commandScopeHold(g_ownedCommand,g_previousScopeHold!=0,nullptr);}g_ownedAttack=g_ownedScope=g_ownedScopeHold=false;g_ownedCommand=nullptr;}
+ // Commands are leased only between early/late consumers of one producer generation.
+-struct CommandPhaseLease {void* self=nullptr;void* cmd=nullptr;void* player=nullptr;void* world=nullptr;std::uint32_t token=0;CommandLook look{};CommandLook spoof{};bool lookValid=false,lookOwned=false,spoofValid=false;double spoofAt=0;};inline CommandPhaseLease g_phaseLease{};// Last look we forced into a command, kept independently of the phase lease so
+-// a camera re-write after the spoof is still substituted.
+-inline void* g_spoofCmd=nullptr;inline CommandLook g_spoofValue{};inline double g_spoofValueAt=0;
++struct CommandPhaseLease {void* self=nullptr;void* cmd=nullptr;void* player=nullptr;void* world=nullptr;std::uint32_t token=0;CommandLook look{};CommandLook spoof{};bool lookValid=false,lookOwned=false,spoofValid=false;double spoofAt=0;};inline CommandPhaseLease g_phaseLease{};// Silent plan owns both command identity and the shot direction.
+ inline void discardCommandPhase(){g_ownedAttack=g_ownedScope=g_ownedScopeHold=false;g_ownedCommand=nullptr;g_phaseLease={};}
+ 
+ // Writes the silent target angle into the command that goes to the server.
+@@ -50,38 +48,71 @@
+ // the local rays on every shot, so if this only ran while a phase was captured
+ // the server would shoot at the real camera on the other ticks, giving a
+ // client hitmarker with no damage.
++inline silent_command::Identity silentIdentity(void* cmd,void* p,void* world,void* weapon){
++ std::uint32_t token=0;
++ if(!named(cmd,"ubz")||!field(cmd,0x10,token))return {};
++ return {reinterpret_cast<std::uintptr_t>(cmd),reinterpret_cast<std::uintptr_t>(p),
++  reinterpret_cast<std::uintptr_t>(world),reinterpret_cast<std::uintptr_t>(weapon),token};
++}
++inline bool currentSilentPlan(void* cmd,void* p,void* world,void* weapon){
++ auto c=configuration();
++ return g_silentPlan.matches(silentIdentity(cmd,p,world,weapon),autoNow(),c.silent.enabled,
++  c.pauseInMenu&&g_menuOpen.load());
++}
+ inline void silentCommandSpoof(void* cmd){
+- auto c=configuration();if(!c.silent.enabled||g_menuOpen.load()||!g_commandLook||!cmd)return;
+- if(!ed::writable(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(cmd)+0x1c),12)){debug::silentCommandRejected.fetch_add(1);return;}
++ g_silentPlan.valid=false;
++ auto c=configuration();if(!c.silent.enabled||(c.pauseInMenu&&g_menuOpen.load())||!g_commandLook||!cmd)return;
+  void* p=localPlayer();void* world=nullptr;ed::PlayerSnapshot local{};
+- if(!localAlive(p,local,world)){debug::silentCommandRejected.fetch_add(1);return;}
++ auto reject=[](){debug::silentCommandRejected.fetch_add(1);};
++ if(!localAlive(p,local,world)){reject();return;}
++ auto identity=silentIdentity(cmd,p,world,local.activeWeapon);
++ if(!identity.command||!ed::writable(reinterpret_cast<void*>(identity.command+0x1c),12)){reject();return;}
+  std::uint8_t raw=255;const bool firing=field(local.weaponPart,offsets::field::nrk::kWeaponState,raw)&&raw==aim_offsets::kAttackState;
+  std::uint8_t attack=0;field(cmd,0x32,attack);
+  debug::silentCommandAttempts.fetch_add(1);if(firing)debug::silentFiringSeen.fetch_add(1);debug::silentAttackRaw.store(int(raw));
+  if(!(firing||attack==1))return;
+- Vec3 so{},sf{};
+- if(!transformPose(object(local.weaponPart,offsets::field::nrk::kHitTransform),so,sf)){debug::silentCommandRejected.fetch_add(1);return;}
+- auto st=selectSilent(c.silent,world,local.team,so,sf,g_lastSilent);
+- if(!st.valid){debug::silentCommandRejected.fetch_add(1);return;}
+- Vec3 point{};std::int32_t liveCollider=0;
+- if(!silentLivePoint(st,c.silent,so,sf,point,liveCollider)){debug::silentCommandRejected.fetch_add(1);return;}
+- auto a=anglesFor(sub(point,so));
+- if(!std::isfinite(a.pitch)||!std::isfinite(a.yaw)){debug::silentCommandRejected.fetch_add(1);return;}
+- g_commandLook(cmd,CommandLook{1,{0,0,0},a.pitch,a.yaw},nullptr);
+- g_spoofCmd=cmd;g_spoofValue=CommandLook{1,{0,0,0},a.pitch,a.yaw};g_spoofValueAt=autoNow();
+- if(g_phaseLease.cmd==cmd){g_phaseLease.spoof=CommandLook{1,{0,0,0},a.pitch,a.yaw};g_phaseLease.spoofValid=true;g_phaseLease.spoofAt=autoNow();g_phaseLease.lookOwned=true;}
+- debug::silentCommandPitch.store(a.pitch);debug::silentCommandYaw.store(a.yaw);debug::silentCommandTarget.store(st.player);
++ Vec3 origin{},forward{};
++ if(!transformPose(object(local.weaponPart,offsets::field::nrk::kHitTransform),origin,forward)){reject();return;}
++ auto selected=selectSilent(c.silent,world,local.team,origin,forward,g_lastSilent);
++ if(!selected.valid){reject();return;}
++ Vec3 point{};std::int32_t collider=0;
++ if(!silentLivePoint(selected,c.silent,origin,forward,point,collider)){reject();return;}
++ auto angle=anglesFor(sub(point,origin));
++ if(!std::isfinite(angle.pitch)||!std::isfinite(angle.yaw)){reject();return;}
++ CommandLook value{1,{0,0,0},angle.pitch,angle.yaw};g_commandLook(cmd,value,nullptr);
++ CommandLook actual{};
++ if(!field(cmd,0x1c,actual)||actual.has!=1||actual.pitch!=value.pitch||actual.yaw!=value.yaw){debug::silentLookReadbackFailed.fetch_add(1);reject();return;}
++ g_silentPlan={true,identity,autoNow(),selected,origin,point,angle,collider};
++ if(g_phaseLease.cmd==cmd&&g_phaseLease.token==identity.token){g_phaseLease.spoof=value;g_phaseLease.spoofValid=true;g_phaseLease.spoofAt=autoNow();g_phaseLease.lookOwned=true;}
++ debug::silentCommandPitch.store(angle.pitch);debug::silentCommandYaw.store(angle.yaw);debug::silentCommandTarget.store(selected.player);
+  debug::silentCommands.fetch_add(1);
+ }
+-// Re-assert the silent look from the ray hook, using the exact shot origin.
+-inline void silentSpoofSeen(void* cmd,Vec3 origin,Vec3 point){
+- if(!cmd||!g_commandLook)return;auto c=configuration();if(!c.silent.enabled||g_menuOpen.load())return;
+- if(autoNow()-g_liveCommandAt>25.0)return;
+- if(!ed::writable(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(cmd)+0x1c),12))return;
+- auto a=anglesFor(sub(point,origin));if(!std::isfinite(a.pitch)||!std::isfinite(a.yaw))return;
+- g_commandLook(cmd,CommandLook{1,{0,0,0},a.pitch,a.yaw},nullptr);
+- g_spoofCmd=cmd;g_spoofValue=CommandLook{1,{0,0,0},a.pitch,a.yaw};g_spoofValueAt=autoNow();
+- debug::silentShotSpoof.fetch_add(1);
++inline bool silentShotPlan(void* p,void* world,void* weapon,Vec3 origin,const Settings& settings,Vec3& direction){
++ if(!g_inputHookReady.load()||!debug::commandLookHookReady.load()||!g_commandLook||
++    !currentSilentPlan(g_liveCommand,p,world,weapon)){debug::silentPlanRejected.fetch_add(1);return false;}
++ if(!silent_command::originMatches(g_silentPlan.origin,origin)){debug::silentOriginMismatch.fetch_add(1);return false;}
++ // The target and point are those already put into the command. Refresh only
++ // their validity, never retarget this shot independently of that command.
++ HitVolume volume{};std::int32_t collider=0;
++ auto& plan=g_silentPlan;
++ auto* target=reinterpret_cast<void*>(plan.selection.player);
++ ed::PlayerSnapshot targetState{},localState{};
++ if(object(target,offsets::field::mfc::kWorld)!=world||!ed::readPlayerSnapshot(target,targetState)||
++    !ed::readPlayerSnapshot(p,localState)||!targetState.statsValid||!targetState.hp||targetState.team==localState.team){
++  debug::silentPlanTargetRejected.fetch_add(1);return false;
++ }
++ if(!liveSilentVolume(plan.selection,volume,collider)){debug::silentPlanTargetRejected.fetch_add(1);return false;}
++ auto delta=sub(plan.point,volume.center);
++ if(std::fabs(delta.x)>volume.extents.x||std::fabs(delta.y)>volume.extents.y||std::fabs(delta.z)>volume.extents.z||
++    (settings.visibleCheck&&!silentHitsBone(origin,plan.point,collider))){debug::silentPlanTargetRejected.fetch_add(1);return false;}
++ auto* cmd=reinterpret_cast<void*>(plan.identity.command);
++ if(!ed::writable(reinterpret_cast<void*>(plan.identity.command+0x1c),12)){debug::silentPlanRejected.fetch_add(1);return false;}
++ CommandLook value{1,{0,0,0},plan.angle.pitch,plan.angle.yaw},actual{};
++ g_commandLook(cmd,value,nullptr);
++ if(!field(cmd,0x1c,actual)||actual.has!=1||actual.pitch!=value.pitch||actual.yaw!=value.yaw){debug::silentLookReadbackFailed.fetch_add(1);return false;}
++ direction=forwardFor(plan.angle);
++ if(!finite(direction)||length(direction)<.9f)return false;
++ debug::silentShotSpoof.fetch_add(1);debug::silentPlanMatched.fetch_add(1);return true;
+ }
+ inline bool beginCommandPhase(void* self,void* cmd){
+  if(!ed::isUnityMainCallback()||!named(self,"eyc")||object(self,0x18)!=localPlayer())return false;
+@@ -109,8 +140,16 @@
+ }
+ // Reached through the patched BL at ios::lxcq: x0=owv command, x1/x2=Nullable<Vector2>.
+ inline void commandLookWrite(void* self,CommandLook value,const void* method){
+- if(self&&self==g_phaseLease.cmd&&g_phaseLease.spoofValid&&autoNow()-g_phaseLease.spoofAt<60.0){value=g_phaseLease.spoof;debug::commandLookSubstitutions.fetch_add(1);}
+- else if(self&&self==g_spoofCmd&&g_spoofValueAt!=0&&autoNow()-g_spoofValueAt<60.0){value=g_spoofValue;debug::commandLookSubstitutions.fetch_add(1);}
++ // Both the pooled address AND generation, owner, world and weapon must match.
++ if(ed::isUnityMainCallback()&&g_silentPlan.valid){
++  auto* p=localPlayer();void* world=nullptr;ed::PlayerSnapshot local{};
++  if(localAlive(p,local,world)&&currentSilentPlan(self,p,world,local.activeWeapon)){
++   value=CommandLook{1,{0,0,0},g_silentPlan.angle.pitch,g_silentPlan.angle.yaw};
++   debug::commandLookSubstitutions.fetch_add(1);
++  }else if(reinterpret_cast<std::uintptr_t>(self)==g_silentPlan.identity.command){
++   g_silentPlan.valid=false;debug::silentStaleLookRejected.fetch_add(1);
++  }
++ }
+  if(g_commandLook)g_commandLook(self,value,method);
+ }
+ inline void autoShotObserved(void* self,void* ctx,Ray* rays,int count){if(!ed::isUnityMainCallback()||!g_autoCycle.active()||g_autoCycle.stage!=automation::Stage::WaitingShot||!g_ownedAttack||g_autoShotSerial>g_autoStartSerial||!stackSpan(rays,count))return;auto* p=localPlayer();void* world=nullptr;ed::PlayerSnapshot local{};std::uint64_t owner=0,id=0;if(localAlive(p,local,world)&&reinterpret_cast<std::uintptr_t>(p)==g_autoCycle.player&&reinterpret_cast<std::uintptr_t>(world)==g_autoCycle.world&&reinterpret_cast<std::uintptr_t>(local.activeWeapon)==g_autoCycle.weapon&&object(self,0x18)==world&&field(ctx,0,owner)&&field(p,0x10,id)&&id==owner&&object(ctx,0x48)==local.activeWeapon){++g_autoShotSerial;debug::autoShots.fetch_add(1);auto restores=debug::autoRestores.load();restoreAutoView();if(debug::autoRestores.load()>restores)g_cameraLeaseUntil=autoNow()+std::min(configuration().autoFire.intervalMs,120.f);}}
+--- v1/Astra/jni/src/features/aim/command_phase_runtime.hpp
++++ sync-v2/Astra/jni/src/features/aim/command_phase_runtime.hpp
+@@ -8,7 +8,7 @@
+ inline bool commandGate(void* self,void* cmd,const void* method){
+  debug::commandGateCalls.fetch_add(1);
+  bool ours=ed::isUnityMainCallback()&&named(self,"eyc")&&object(self,0x18)==localPlayer();
+- if(ours){debug::commandOurs.fetch_add(1);g_liveCommand=cmd;g_liveCommandAt=autoNow();}
++ if(ours){g_silentPlan.valid=false;debug::commandOurs.fetch_add(1);g_liveCommand=cmd;g_liveCommandAt=autoNow();}
+  if(ours&&g_inputHookReady.load()){
+   std::uint32_t token=0;field(cmd,0x10,token);
+   if(g_phaseLease.cmd){if(g_phaseLease.self==self&&g_phaseLease.cmd==cmd&&g_phaseLease.token==token)finishCommandPhase(self);else discardCommandPhase();}
+@@ -17,6 +17,7 @@
+  }
+  auto original=g_commandGateOriginal.load(std::memory_order_acquire);
+  bool accepted=original?original(self,cmd,method):false;
++ if(ours&&!accepted)g_silentPlan.valid=false;
+  if(ours&&!accepted&&g_ownedAttack)debug::commandRejected.fetch_add(1);
+  return accepted;
+ }
+--- v1/Astra/jni/src/features/aim/debug.hpp
++++ sync-v2/Astra/jni/src/features/aim/debug.hpp
+@@ -21,6 +21,7 @@
+ inline Count commandLookSubstitutions{0};
+ inline std::atomic<int> silentAttackRaw{-1};
+ inline Count silentLiveRefresh{0},silentCenterFallback{0},silentPointRejected{0},silentBodyFallback{0};
++inline Count silentPlanMatched{0},silentPlanRejected{0},silentStaleLookRejected{0},silentOriginMismatch{0},silentPlanTargetRejected{0},silentLookReadbackFailed{0};
+ inline Count silentCommands{0},silentCommandRejected{0},silentRecoilComp{0},silentNoPhase{0},silentShotSpoof{0};
+ inline std::atomic<float> silentCommandPitch{0},silentCommandYaw{0};
+ inline std::atomic<std::uintptr_t> silentCommandTarget{0};
+@@ -41,7 +42,7 @@
+ inline std::atomic<float> nearestAngle{180},nearestDistance{0};
+ inline bool due(Count& c){auto n=c.fetch_add(1,std::memory_order_relaxed)+1;return n<=2||n%300==0;}
+ inline void log(const char* fmt,...){char text[1152];va_list a;va_start(a,fmt);vsnprintf(text,sizeof(text),fmt,a);va_end(a);__android_log_print(ANDROID_LOG_INFO,"Astra","AIM DEBUG %s",text);}
+-inline const char* reason(int r){switch(r){case 0:return "not-called";case 1:return "disabled";case 2:return "menu-paused";case 3:return "empty-body-mask";case 4:return "wrong-thread";case 5:return "functions-not-valid";case 6:return "no-local-player";case 7:return "camera-context-rejected";case 8:return "not-attacking";case 9:return "hit-transform-rejected";case 10:return "no-target";case 11:return "applied";case 12:return "ray-span-not-current-stack";case 13:return "foreign-shooter-or-world";case 14:return "non-finite-angles";case 15:return "visibility-not-ready";case 16:return "recoil-only";case 17:return "automation-camera-owner";case 18:return "live-silent-hitbox-rejected";default:return "unknown";}}
++inline const char* reason(int r){switch(r){case 0:return "not-called";case 1:return "disabled";case 2:return "menu-paused";case 3:return "empty-body-mask";case 4:return "wrong-thread";case 5:return "functions-not-valid";case 6:return "no-local-player";case 7:return "camera-context-rejected";case 8:return "not-attacking";case 9:return "hit-transform-rejected";case 10:return "no-target";case 11:return "applied";case 12:return "ray-span-not-current-stack";case 13:return "foreign-shooter-or-world";case 14:return "non-finite-angles";case 15:return "visibility-not-ready";case 16:return "recoil-only";case 17:return "automation-camera-owner";case 18:return "live-silent-hitbox-rejected";case 19:return "command-shot-plan-rejected";default:return "unknown";}}
+ inline const char* installReason(int r){switch(r){case 0:return "not-attempted";case 1:return "ready";case 2:return "camera-class-missing";case 3:return "vtable-scan-miss";case 4:return "vtable-write-probe-denied";case 5:return "callsite-word-mismatch";case 6:return "page-size-invalid";case 7:return "near-relay-allocation-failed";case 8:return "relay-RX-denied";case 9:return "text-RWX-denied";case 10:return "restore-RX-failed";case 11:return "unsupported-architecture";case 12:return "slot-verify-failed";case 13:return "profile-not-validated";default:return "unknown";}}
+ inline void boundsBone(int bone){auto lo=boneMin.load();while(bone<lo&&!boneMin.compare_exchange_weak(lo,bone)){}auto hi=boneMax.load();while(bone>hi&&!boneMax.compare_exchange_weak(hi,bone)){}}
+ inline void report(){auto c=configuration();log("heartbeat build=v16-command-phase-hitbox pid=%d enabled[angle=%d silent=%d] menu=%d pause=%d attackOnly=%d bodyMask[%02x,%02x] fov[%.2f,%.2f] range[%.1f,%.1f] threadTid=%d base=%p",getpid(),c.normal.enabled,c.silent.enabled,g_menuOpen.load(),c.pauseInMenu,c.normal.onAttack,c.normal.bodies,c.silent.bodies,c.normal.fov,c.silent.fov,c.normal.maxDistance,c.silent.maxDistance,callbackTid.load(),reinterpret_cast<void*>(mainBase.load()));
+--- v1/Astra/jni/src/features/aim/runtime.hpp
++++ sync-v2/Astra/jni/src/features/aim/runtime.hpp
+@@ -2,6 +2,7 @@
+ #include "features/aim/core.hpp"
+ #include "features/aim/prediction.hpp"
+ #include "features/aim/silent_accuracy.hpp"
++#include "features/aim/silent_command.hpp"
+ #include "features/aim/native_pair.hpp"
+ #include "features/aim/offsets.hpp"
+ #include "features/aim/silent_offsets.hpp"
+@@ -24,7 +25,8 @@
+ // Current player command (owv) seen by the gate, used to re-assert the silent
+ // look at the exact moment the shot is emitted.
+ inline void* g_liveCommand=nullptr;inline double g_liveCommandAt=0;
+-inline void silentSpoofSeen(void* cmd,Vec3 origin,Vec3 point);
++inline silent_command::Plan g_silentPlan{};
++inline bool silentShotPlan(void*,void*,void*,Vec3,const Settings&,Vec3&);
+ struct Actor{void* player=nullptr;void* world=nullptr;float hp=0;int team=0;std::array<HitVolume,32> volumes{};unsigned count=0;std::array<std::int32_t,33> colliderIds{};unsigned colliderCount=0;Clock::time_point captured{};prediction::Motion motion{};};inline std::array<Actor,128> g_actors{};
+ inline bool unityCode(std::uintptr_t p){auto b=ed::g_runtime.unityBase;return b&&p>=b+offsets::elf::kTextBegin&&p<b+offsets::elf::kTextEnd;}
+ template<class T> inline bool field(void* o,std::size_t off,T& out){return o&&ed::readValue(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(o)+off),out);}
+@@ -109,8 +111,17 @@
+  if(ed::isUnityMainCallback()&&g_functionsValid&&rays&&stackSpan(rays,count)&&gate(c,s,g_silentState)){
+   void* p=localPlayer();void* world=nullptr;ed::PlayerSnapshot local{};std::uint64_t owner=0,id=0;
+   if(localAlive(p,local,world)&&object(self,0x18)==world&&field(ctx,0,owner)&&field(p,0x10,id)&&owner==id&&object(ctx,0x50)==local.activeWeapon){
+-   Vec3 origin{},forward{};Ray ray{};if(ed::readValue(rays,ray)&&transformPose(object(ctx,0x18),origin,forward)){auto target=selectSilent(s,world,local.team,ray.origin,forward,g_lastSilent);if(target.valid){unsigned changed=0;Vec3 point{};std::int32_t colliderId=0;bool resolved=silentLivePoint(target,s,ray.origin,forward,point,colliderId);
+-if(!resolved&&!g_visibilityReady.load()){point=predictPoint(target,s,ray.origin,false);resolved=finite(point)&&length(sub(point,ray.origin))>.2f;}if(resolved){silentSpoofSeen(g_liveCommand,ray.origin,point);for(int i=0;i<count;++i){Ray r{};if(!ed::readValue(rays+i,r))continue;auto d=sub(point,r.origin);float dist=length(d);if(!std::isfinite(dist)||dist<.2f||dist>s.maxDistance)continue;if(!silent_accuracy::inFov(r.origin,point,forward,s))continue;if(s.visibleCheck&&colliderId&&!silentHitsBone(r.origin,point,colliderId))continue;auto direction=normalized(d);if(length(direction)<.9f)continue;Ray patched{r.origin,direction};std::memcpy(&rays[i],&patched,sizeof(Ray));++changed;}}g_silentApplications.fetch_add(changed);debug::silentReason.store(changed?11:18);g_silentState.store(changed?6:5);}else{debug::silentReason.store(10);g_silentState.store(5);}}else{debug::silentReason.store(9);g_silentState.store(3);}
++   Ray first{};Vec3 direction{};unsigned changed=0;
++   if(ed::readValue(rays,first)&&silentShotPlan(p,world,local.activeWeapon,first.origin,s,direction)){
++    // Use exactly the angle written to this command. Do not select a second target.
++    // Validate the whole span before changing it, so a partial patch cannot escape.
++    bool coherent=true;
++    for(int i=0;i<count;++i){Ray r{};if(!ed::readValue(rays+i,r)||!silent_command::originMatches(g_silentPlan.origin,r.origin)){coherent=false;break;}}
++    if(coherent){for(int i=0;i<count;++i)rays[i].direction=direction;changed=unsigned(count);}
++    else debug::silentOriginMismatch.fetch_add(1);
++   }
++   g_silentApplications.fetch_add(changed);
++   debug::silentReason.store(changed?11:19);g_silentState.store(changed?6:5);
+   }else{debug::silentReason.store(13);g_silentState.store(3);}
+  }
+  // Forward once; bounded prediction changes only the selected direction. Automation observes local emission.
+--- v1/Astra/jni/src/features/aim/silent_command.hpp
++++ sync-v2/Astra/jni/src/features/aim/silent_command.hpp
+@@ -0,0 +1,22 @@
++#pragma once
++#include "features/aim/core.hpp"
++namespace astra::aim::silent_command {
++// Command memory is pooled: its address alone is never an identity.
++struct Identity {
++ std::uintptr_t command=0,player=0,world=0,weapon=0;
++ std::uint32_t token=0;
++};
++inline bool same(const Identity& a,const Identity& b){
++ return a.command&&a.player&&a.world&&a.weapon&&a.command==b.command&&
++ a.token==b.token&&a.player==b.player&&a.world==b.world&&a.weapon==b.weapon;
++}
++struct Plan {
++ bool valid=false;Identity identity{};double captured=0;
++ Selection selection{};Vec3 origin{},point{};Angles angle{};std::int32_t collider=0;
++ bool matches(const Identity& current,double now,bool enabled,bool paused)const{
++  return valid&&enabled&&!paused&&std::isfinite(now)&&std::isfinite(captured)&&
++   now>=captured&&now-captured<=60.0&&same(identity,current);
++ }
++};
++inline bool originMatches(Vec3 a,Vec3 b){return finite(a)&&finite(b)&&length(sub(a,b))<=.1f;}
++}
+--- v1/Astra/jni/src/features/aim/silent_diagnostics.hpp
++++ sync-v2/Astra/jni/src/features/aim/silent_diagnostics.hpp
+@@ -20,7 +20,7 @@
+     auto c = astra::aim::configuration();
+     char report[8192];
+     std::snprintf(report, sizeof(report),
+-        "AstraSilent / 1.1.0 ARM64 / shot+command\n"
++        "AstraSilent / 1.1.0 ARM64 / shot+command / sync-v2\n"
+         "enabled=%d fov=%.2f maxDistance=%.1f bodies=%02x multipoints=%d pointScale=%.2f\n"
+         "visibleCheck=%d prediction=%d predictionMs=%.0f smoothing=%.3f lockTarget=%d pauseInMenu=%d\n"
+         "hook[ready=%d attempts=%llu installReason=%s] state=%d reason=%s(%d) applications=%llu\n"
+@@ -30,7 +30,8 @@
+         "input[ready=%d attempts=%llu reason=%s] commandsCompleted=%llu commandRejected=%llu gate[calls=%llu ours=%llu begin=%llu end=%llu] skmi=%d beginReason=%d look[hook=%d subs=%llu] beginFail[owv=%llu world=%llu token=%llu ro=%llu look=%llu]\n"
+         "actors[fresh=%d volumes=%d] selection[calls=%llu actors=%llu fresh=%llu live=%llu volumes=%llu accepted=%llu fovReject=%llu rangeReject=%llu]\n"
+         "visibility[ready=%d rays=%llu clear=%llu target=%llu blocked=%llu unknown=%llu]\n"
+-        "capture[calls=%llu hitboxes=%llu storedActors=%llu storedVolumes=%llu]\n",
++        "capture[calls=%llu hitboxes=%llu storedActors=%llu storedVolumes=%llu]\n"
++        "sync[matched=%llu missingOrStale=%llu staleLook=%llu originMismatch=%llu targetMoved=%llu lookReadbackFailed=%llu]\n",
+         c.silent.enabled, c.silent.fov, c.silent.maxDistance, c.silent.bodies,
+         c.silent.multipoints, c.silent.pointScale,
+         c.silent.visibleCheck, c.silent.prediction, c.silent.predictionMs,
+@@ -105,7 +106,13 @@
+         (unsigned long long)astra::aim::debug::captureCalls.load(),
+         (unsigned long long)astra::aim::debug::hitboxes.load(),
+         (unsigned long long)astra::aim::debug::storedActors.load(),
+-        (unsigned long long)astra::aim::debug::storedVolumes.load());
++        (unsigned long long)astra::aim::debug::storedVolumes.load(),
++        (unsigned long long)astra::aim::debug::silentPlanMatched.load(),
++        (unsigned long long)astra::aim::debug::silentPlanRejected.load(),
++        (unsigned long long)astra::aim::debug::silentStaleLookRejected.load(),
++        (unsigned long long)astra::aim::debug::silentOriginMismatch.load(),
++        (unsigned long long)astra::aim::debug::silentPlanTargetRejected.load(),
++        (unsigned long long)astra::aim::debug::silentLookReadbackFailed.load());
+     __android_log_print(ANDROID_LOG_INFO, "AstraSilent", "%s", report);
+ 
+     char path[260];
+--- v1/Astra/jni/src/ui/kazakh/menu.hpp
++++ sync-v2/Astra/jni/src/ui/kazakh/menu.hpp
+@@ -583,6 +583,14 @@
+     ImGui::Text("Targets: %d | hitboxes: %d | profile failures: %llu",
+         astra::aim::debug::freshActors.load(), astra::aim::debug::freshVolumes.load(),
+         (unsigned long long)astra::aim::debug::validationFailures.load());
++    ImGui::Text("Sync: %llu | missing/stale: %llu | stale look: %llu",
++        (unsigned long long)astra::aim::debug::silentPlanMatched.load(),
++        (unsigned long long)astra::aim::debug::silentPlanRejected.load(),
++        (unsigned long long)astra::aim::debug::silentStaleLookRejected.load());
++    ImGui::Text("Origin mismatch: %llu | moved target: %llu | look write failure: %llu",
++        (unsigned long long)astra::aim::debug::silentOriginMismatch.load(),
++        (unsigned long long)astra::aim::debug::silentPlanTargetRejected.load(),
++        (unsigned long long)astra::aim::debug::silentLookReadbackFailed.load());
+     if (ImGui::Button("Save silent diagnostics##config")) silent_diag::save();
+     ImGui::TextWrapped("%s", silent_diag::status);
+     ImGui::Text("Frame: %.1f ms", 1000.0f / std::max(1.0f, ImGui::GetIO().Framerate));

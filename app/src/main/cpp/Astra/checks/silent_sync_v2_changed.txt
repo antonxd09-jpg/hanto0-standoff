@@ -1,0 +1,9 @@
+checks/verify_silent_110.py
+checks/verify_silent_sync.py
+jni/src/features/aim/automation_runtime.hpp
+jni/src/features/aim/command_phase_runtime.hpp
+jni/src/features/aim/debug.hpp
+jni/src/features/aim/runtime.hpp
+jni/src/features/aim/silent_command.hpp
+jni/src/features/aim/silent_diagnostics.hpp
+jni/src/ui/kazakh/menu.hpp

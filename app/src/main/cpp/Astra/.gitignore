@@ -1,0 +1,13 @@
+/build/
+/out/
+/obj/
+/libs/
+/backups/
+/diagnostics/
+/reference/dumps/
+/dump 1.0.0
+*.log
+*.pid
+*.exit
+*.bak
+__pycache__/

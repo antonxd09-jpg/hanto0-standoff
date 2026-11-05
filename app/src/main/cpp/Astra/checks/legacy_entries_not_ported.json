@@ -1,0 +1,102 @@
+[
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "unity::kAnimatorGetBoneTransform",
+    "rva": "0x539569c"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "unity::kColliderGetBounds",
+    "rva": "0x538b650"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "unity::kGameObjectGetComponentsInternal",
+    "rva": "0x5372370"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "unity::kPhysicsRaycastTest",
+    "rva": "0x538bcf4"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "unity::kPhysicsRaycast",
+    "rva": "0x538bd0c"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "unity::kPhysicsRaycastNonAlloc",
+    "rva": "0x538bd24"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "unity::kPhysicsSphereCast",
+    "rva": "0x538bdbc"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "unity::kPhysicsBoxCast",
+    "rva": "0x538be40"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kCharacterBindings",
+    "rva": "0xc1f4440"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kBonesDictionary",
+    "rva": "0xc1f3e28"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kGunParameters",
+    "rva": "0xc1f8010"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kGlobalOptions",
+    "rva": "0xc1f7b70"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kModeNbs",
+    "rva": "0xc206188"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kModeXlm",
+    "rva": "0xc2097f8"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kModeYmn",
+    "rva": "0xc209d68"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kModeQin",
+    "rva": "0xc207208"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typeinfo::kModeHog",
+    "rva": "0xc2044e8"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typevar::kCharacterBindings",
+    "rva": "0xc1d6c38"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typevar::kWeaponContext",
+    "rva": "0xc1daf50"
+  },
+  {
+    "file": "jni/src/game/offsets.hpp",
+    "key": "typevar::kGlobalOptions",
+    "rva": "0xc1d8328"
+  }
+]

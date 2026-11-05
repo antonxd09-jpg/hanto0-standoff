@@ -1,0 +1,515 @@
+--- before/Astra/README_VISUALS_110_RU.txt
++++ after/Astra/README_VISUALS_110_RU.txt
+@@ -1,3 +1,5 @@
++Обновление Silent: см. README_SILENT_110.txt. Ниже сохранено описание предыдущего этапа Visuals.
++
+ ASTRA: ТЕСТОВЫЙ ПОРТ VISUALS НА 1.1.0 ARM64
+ 
+ Это исходный проект для самостоятельной сборки и проверки в игре.
+--- before/Astra/README_SILENT_110.txt
++++ after/Astra/README_SILENT_110.txt
+@@ -0,0 +1,33 @@
++ASTRA — SILENT 1.1.0 ARM64
++
++Added Silent tab beside Visuals / Config. Normal Aim, Anti-Aim and automation remain hidden.
++Silent uses separate features/aim/silent_offsets.hpp; normal Aim offsets are unchanged.
++Shot emission: kaa.tfqa, BL inside kaa.edjj.
++Command: eyc.uduz / eyc.dfee, ubz.syha; camera mzox call to syha.
++Hitbox collection: bis / mtc. WeaponContext HitTransform +0x18, ActiveWeapon +0x50.
++Collider bounds / raycast use verified managed injected wrappers, preserving native pointer ABI.
++PhysicsScene: 8 bytes; RaycastHit: 44 bytes; EntityId: 4 bytes.
++Silent validation no longer depends on unported normal camera functions.
++Command look must be installed before the command backend can report ready.
++Normal automation is bypassed on the Silent-only path.
++Recoil compensation and no-recoil/spread controls are deliberately unavailable pending their separate port.
++Config exposes shot, command and look hooks, visibility, last result, callbacks, rays,
++commands, targets, hitboxes, validation failures and Save silent diagnostics.
++Counters describe local execution; they are not server damage confirmation.
++
++Verification completed:
++- host g++ C++17 syntax check of the actual runtime with ARM64 code paths enabled;
++- host syntax check of actual Silent / Config / routing functions;
++- verify_silent_110.py: input hash, method identities, exact guards, four BL targets, layout;
++- verify_offsets_110.py: existing Visuals profile checks;
++- verify_gui.py: actual Dear ImGui watermark interaction and three-tab route checks.
++No Android build or on-device test was performed; no new libastra.so is supplied.
++The input's obj binary is omitted so an old build cannot be mistaken for this revision.
++The original build.sh references absent scripts/build.sh; use Android NDK directly:
++    ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=jni/Android.mk NDK_APPLICATION_MK=jni/Application.mk
++Checks:
++    python checks/verify_silent_110.py /path/to/1.1.0/dump
++    python checks/verify_offsets_110.py /path/to/1.1.0/dump
++    python checks/verify_gui.py
++
++Dumps are unchanged and not duplicated in this source-only archive.
+--- before/Astra/checks/verify_offsets_110.py
++++ after/Astra/checks/verify_offsets_110.py
+@@ -53,7 +53,7 @@
+ core=(src/'core/entry.cpp').read_text();gui=(src/'ui/kazakh/menu.hpp').read_text()
+ assert 'unityProfileMatches(base)' in core and 'actual == expected' in core
+ assert 'Binary profile: %s' in gui and 'waiting libunity.so' in gui and 'Camera cache: %s' in gui
+-assert 'kTabs[] = {"visuals", "config"}' in gui
++assert 'kTabs[] = {"visuals", "silent", "config"}' in gui
+ assert 'kProfileName[] = "Standoff2-1.1.0-arm64-visuals"' in header
+ # Execute the actual profile matcher against a bounded host memory reader.
+ start=core.index('bool unityProfileMatches(');end=core.index('\nvoid configureImGuiStyle()',start)
+--- before/Astra/checks/verify_gui.py
++++ after/Astra/checks/verify_gui.py
+@@ -13,10 +13,10 @@
+         end += 1
+     return source[start:end]
+ assert 'static constexpr int g_openStyle = 1;' in source
+-assert 'kTabs[] = {"visuals", "config"}' in source
++assert 'kTabs[] = {"visuals", "silent", "config"}' in source
+ assert 'menu-open-style' not in source
+ page = function('astraPage')
+-assert 'aimLeft' not in page and 'silentLeft' not in page and 'antiAimLeft' not in page
++assert 'aimLeft' not in page and 'silentLeft() : silentRight()' in page and 'antiAimLeft' not in page
+ for name in ['aimLeft','aimRight','silentLeft','silentRight','antiAimLeft','antiAimRight','commit']:
+     assert function(name)
+ assert 'unload modification' in function('configLeft')
+@@ -70,5 +70,5 @@
+     td=Path(td); (td/'test.cpp').write_text(cpp)
+     subprocess.run(['g++','-std=c++17','-O0','-g','-I',str(imgui),str(td/'test.cpp'),*[str(imgui/f) for f in ['imgui.cpp','imgui_draw.cpp','imgui_tables.cpp','imgui_widgets.cpp']],'-o',str(td/'test')],check=True)
+     subprocess.run([str(td/'test')],check=True)
+-print('PASS: real watermark opens/closes; outside taps; rotation; two tab routing; hidden page functions retained.')
++print('PASS: real watermark opens/closes; outside taps; rotation; three tab routing; hidden page functions retained.')
+ print('LIMIT: unload is unavailable and explicitly reported. No Android build or on-device test performed.')
+--- before/Astra/checks/verify_silent_110.py
++++ after/Astra/checks/verify_silent_110.py
+@@ -0,0 +1,33 @@
++"""Verify Silent-specific 1.1.0 addresses, instruction guards, BL targets and layout evidence.
++Usage: python checks/verify_silent_110.py /path/to/dump
++"""
++from pathlib import Path
++import argparse, json, re, struct, hashlib
++p=argparse.ArgumentParser();p.add_argument('dump',type=Path);d=p.parse_args().dump
++root=Path(__file__).resolve().parents[1];src=root/'jni/src';b=(d/'libunity.so').read_bytes()
++assert hashlib.sha256(b).hexdigest()=='ba0966976204fa3f7a2755c9588d32299fe7eb794b712c9f1a444e046cbe7c13'
++off=struct.unpack_from('<Q',b,32)[0];size,count=struct.unpack_from('<HH',b,54)
++loads=[struct.unpack_from('<IIQQQQQQ',b,off+i*size) for i in range(count)]
++def raw(a,n):
++ for t,f,o,v,_,fs,ms,_ in loads:
++  if t==1 and f&1 and v<=a and a+n<=v+fs:return b[o+a-v:o+a-v+n]
++ raise AssertionError(hex(a))
++h=(src/'features/aim/silent_offsets.hpp').read_text();vals={k:int(v,16) for k,v in re.findall(r'uintptr_t (\w+)=(0x[\da-fA-F]+)',h)}
++for record in json.loads((root/'checks/silent_110_guards.json').read_text()):
++ a=vals[record['key']];words=[int(w,16) for w in record['words']]
++ assert a==int(record['rva'],16) and raw(a,4*len(words))==struct.pack('<'+'I'*len(words),*words)
++for site,target in [('kShotCallsite','kShotEmit'),('kCommandGateSite','kCommandGate'),('kCommandEndSite','kCommandEnd'),('kCameraLookWrite','kCommandLook')]:
++ a=vals[site];w=struct.unpack('<I',raw(a,4))[0];assert w>>26==0b100101
++ imm=w&0x3ffffff;imm=imm-(1<<26) if imm&(1<<25) else imm
++ assert a+imm*4==vals[target]
++ assert int(re.search(site+r'Word=(0x[\da-f]+)',h)[1],16)==w
++cs=(d/'dump.cs').read_text()
++for cls in ['kaa','eyc','ubz','bis','mtc']:assert re.search(r'public class '+cls+r'\b',cs)
++for method,a in [('tfqa',vals['kShotEmit']),('uduz',vals['kCommandGate']),('dfee',vals['kCommandEnd']),('syha',vals['kCommandLook'])]:
++ assert re.search(r'// RVA: 0x'+format(a,'X')+r' .*\n\s*(?:private|public).*?\b'+method+r'\(',cs)
++assert 'public Transform HitTransform; // 0x18' in cs and 'public jrx ActiveWeapon; // 0x50' in cs
++runtime=(src/'features/aim/runtime.hpp').read_text();cmd=(src/'features/aim/command_phase_runtime.hpp').read_text()
++assert 'object(ctx,0x50)==local.activeWeapon' in runtime and 'object(ctx,0x18),origin' in runtime
++assert 'else silentCommandSpoof(cmd)' in cmd and 'if(!installLookHook())return' in cmd
++print('PASS: binary hash, Silent guards, four BL targets, method identities, context layout, independent command route.')
++print('LIMIT: static validation; Android build and live game test are still required.')
+--- before/Astra/checks/silent_110_guards.json
++++ after/Astra/checks/silent_110_guards.json
+@@ -0,0 +1,90 @@
++[
++  {
++    "key": "kShotEmit",
++    "rva": "0x9ca6a0c",
++    "words": [
++      "0xd10183ff",
++      "0xa9035ffe",
++      "0xa90457f6",
++      "0xa9054ff4"
++    ]
++  },
++  {
++    "key": "kColliderBounds",
++    "rva": "0x92de468",
++    "words": [
++      "0xa9be57fe",
++      "0xa9014ff4",
++      "0x9001ef95",
++      "0xaa0103f3"
++    ]
++  },
++  {
++    "key": "kNativeRaycast",
++    "rva": "0x92de930",
++    "words": [
++      "0xfc1c0fe8",
++      "0xf90007fe",
++      "0xa9015ff8",
++      "0xa90257f6"
++    ]
++  },
++  {
++    "key": "kDefaultPhysicsScene",
++    "rva": "0x92d6bcc",
++    "words": [
++      "0xaa1f03e0",
++      "0xd65f03c0"
++    ]
++  },
++  {
++    "key": "kObjectEntityId",
++    "rva": "0x6951ffc",
++    "words": [
++      "0xf81e0ffe",
++      "0xa9014ff4",
++      "0xb0033b54",
++      "0xaa0003f3"
++    ]
++  },
++  {
++    "key": "kCommandLook",
++    "rva": "0x7ff899c",
++    "words": [
++      "0xd10103ff",
++      "0xa90257fe",
++      "0xa9034ff4",
++      "0xf0028675"
++    ]
++  },
++  {
++    "key": "kCommandGate",
++    "rva": "0x9c83188",
++    "words": [
++      "0xa9be57fe",
++      "0xa9014ff4",
++      "0xb001a295",
++      "0xaa0103f4"
++    ]
++  },
++  {
++    "key": "kCommandEnd",
++    "rva": "0x9c8f244",
++    "words": [
++      "0xa9be57fe",
++      "0xa9014ff4",
++      "0xb001a233",
++      "0xaa0003f4"
++    ]
++  },
++  {
++    "key": "kCommandLook",
++    "rva": "0x7ff899c",
++    "words": [
++      "0xd10103ff",
++      "0xa90257fe",
++      "0xa9034ff4",
++      "0xf0028675"
++    ]
++  }
++]--- before/Astra/jni/src/features/aim/command_phase_runtime.hpp
++++ after/Astra/jni/src/features/aim/command_phase_runtime.hpp
+@@ -7,13 +7,13 @@
+ inline bool g_lookHookReady=false;
+ inline bool commandGate(void* self,void* cmd,const void* method){
+  debug::commandGateCalls.fetch_add(1);
+- bool ours=ed::isUnityMainCallback()&&named(self,"ltc")&&object(self,0x18)==localPlayer();
++ bool ours=ed::isUnityMainCallback()&&named(self,"eyc")&&object(self,0x18)==localPlayer();
+  if(ours){debug::commandOurs.fetch_add(1);g_liveCommand=cmd;g_liveCommandAt=autoNow();}
+  if(ours&&g_inputHookReady.load()){
+   std::uint32_t token=0;field(cmd,0x10,token);
+   if(g_phaseLease.cmd){if(g_phaseLease.self==self&&g_phaseLease.cmd==cmd&&g_phaseLease.token==token)finishCommandPhase(self);else discardCommandPhase();}
+-  if(beginCommandPhase(self,cmd)){debug::commandBegin.fetch_add(1);debug::inputCalls.fetch_add(1);processAutomation(self,cmd);}
+-  else if(named(cmd,"owv")){debug::silentNoPhase.fetch_add(1);silentCommandSpoof(cmd);}
++  if(beginCommandPhase(self,cmd)){debug::commandBegin.fetch_add(1);debug::inputCalls.fetch_add(1);if(configuration().autoFire.enabled)processAutomation(self,cmd);else silentCommandSpoof(cmd);}
++  else if(named(cmd,"ubz")){debug::silentNoPhase.fetch_add(1);silentCommandSpoof(cmd);}
+  }
+  auto original=g_commandGateOriginal.load(std::memory_order_acquire);
+  bool accepted=original?original(self,cmd,method):false;
+@@ -32,9 +32,9 @@
+ #if defined(__aarch64__)
+  if(g_lookHookReady)return true;
+  auto b=ed::g_runtime.unityBase;
+- if(!bytesMatch(b+aim_offsets::kCommandLook,{0xd10103ff,0xa90257fe,0xa9034ff4,0x90018a35})){debug::log("look hook: setter signature mismatch");return false;}
+- auto site=b+aim_offsets::kCameraLookWrite;std::uint32_t word=0;
+- if(!ed::readValue(reinterpret_cast<void*>(site),word)||word!=0x97cedd11){debug::log("look hook: call-site mismatch %08x",word);return false;}
++ if(!bytesMatch(b+silent_offsets::kCommandLook,{0xd10103ff,0xa90257fe,0xa9034ff4,0xf0028675})){debug::log("look hook: setter signature mismatch");return false;}
++ auto site=b+silent_offsets::kCameraLookWrite;std::uint32_t word=0;
++ if(!ed::readValue(reinterpret_cast<void*>(site),word)||word!=silent_offsets::kCameraLookWriteWord){debug::log("look hook: call-site mismatch %08x",word);return false;}
+  long rawPage=sysconf(_SC_PAGESIZE);if(rawPage<=0||!hook_support::pageSizeValid(std::uintptr_t(rawPage)))return false;
+  auto pageSize=std::uintptr_t(rawPage);hook_support::AllocationStats stats{};void* relay=hook_support::allocateNear(site,pageSize,stats);
+  if(relay==MAP_FAILED){debug::log("look hook: relay allocation failed errno=%d",errno);return false;}
+@@ -62,18 +62,18 @@
+ #if defined(__aarch64__)
+  ed::PlayerSnapshot local{};void* world=nullptr;if(!localAlive(p,local,world))return result(input_init::InvalidLocal);
+  auto b=ed::g_runtime.unityBase;
+- if(!bytesMatch(b+aim_offsets::kCommandGate,{0xa9be57fe,0xa9014ff4,0xf0018755,0xaa0103f4})||!bytesMatch(b+aim_offsets::kCommandEnd,{0xa9be57fe,0xa9014ff4,0xb0018773,0xaa0003f4})||!bytesMatch(b+aim_offsets::kCommandGateSite-8,{0xaa1303e0,0xaa1403e1,0x97fff58f,0x360000c0})||!bytesMatch(b+aim_offsets::kCommandEndSite-4,{0xaa1303e0,0x97ffe0af,0xa9464ff4})||!bytesMatch(b+aim_offsets::kCommandAttack,{0x3900c801,0xd65f03c0})||!bytesMatch(b+aim_offsets::kCommandScope,{0x3900cc01,0xd65f03c0})||!bytesMatch(b+aim_offsets::kCommandScopeHold,{0x3900d001,0xd65f03c0})||!bytesMatch(b+aim_offsets::kCommandLook,{0xd10103ff,0xa90257fe,0xa9034ff4,0x90018a35}))return result(input_init::SignatureRejected);
+- if(!scopeEnumProfile()&&(attempt<=3||attempt%10==0))debug::log("scope enum unavailable: only Auto scope paused; Triggerbot and Back camera remain independent");
++ if(!(bytesMatch(b+silent_offsets::kCommandGate,{0xa9be57fe,0xa9014ff4,0xb001a295,0xaa0103f4})&&bytesMatch(b+silent_offsets::kCommandEnd,{0xa9be57fe,0xa9014ff4,0xb001a233,0xaa0003f4})&&bytesMatch(b+silent_offsets::kCommandLook,{0xd10103ff,0xa90257fe,0xa9034ff4,0xf0028675})))return result(input_init::SignatureRejected);
++ if(!installLookHook())return result(input_init::CallsiteRejected);
+  long raw=sysconf(_SC_PAGESIZE);if(raw<=0||!hook_support::pageSizeValid(std::uintptr_t(raw)))return result(input_init::TextProtectionFailed);
+  auto pageSize=std::uintptr_t(raw);
+- std::array<std::uintptr_t,2> sites{b+aim_offsets::kCommandGateSite,b+aim_offsets::kCommandEndSite};
+- std::array<std::uint32_t,2> old{0x97fff58f,0x97ffe0af},branches{};
++ std::array<std::uintptr_t,2> sites{b+silent_offsets::kCommandGateSite,b+silent_offsets::kCommandEndSite};
++ std::array<std::uint32_t,2> old{silent_offsets::kCommandGateSiteWord,silent_offsets::kCommandEndSiteWord},branches{};
+  std::array<std::uintptr_t,2> destinations{reinterpret_cast<std::uintptr_t>(&commandGate),reinterpret_cast<std::uintptr_t>(&commandEnd)};
+  std::array<void*,2> relays{};
+  auto drop=[&](){for(auto* r:relays)if(r&&r!=MAP_FAILED)munmap(r,pageSize);};
+  for(unsigned i=0;i<2;++i){hook_support::AllocationStats stats{};relays[i]=hook_support::allocateNear(sites[i],pageSize,stats);if(relays[i]==MAP_FAILED){drop();return result(input_init::RelayAllocationFailed);}if(!hook_support::branchWord(sites[i],reinterpret_cast<std::uintptr_t>(relays[i]),branches[i])){drop();return result(input_init::RelayAllocationFailed);}std::uint32_t instructions[2]{0x58000051,0xd61f0220};std::memcpy(relays[i],instructions,8);std::memcpy(static_cast<char*>(relays[i])+8,&destinations[i],8);__builtin___clear_cache(static_cast<char*>(relays[i]),static_cast<char*>(relays[i])+16);if(mprotect(relays[i],pageSize,PROT_READ|PROT_EXEC)){drop();return result(input_init::RelayProtectionFailed);}}
+-  g_commandAttack=reinterpret_cast<CommandBoolFn>(b+aim_offsets::kCommandAttack);g_commandScope=reinterpret_cast<CommandBoolFn>(b+aim_offsets::kCommandScope);g_commandScopeHold=reinterpret_cast<CommandBoolFn>(b+aim_offsets::kCommandScopeHold);g_commandLook=reinterpret_cast<CommandLookFn>(b+aim_offsets::kCommandLook);
+-  g_commandGateOriginal.store(reinterpret_cast<CommandGateFn>(b+aim_offsets::kCommandGate),std::memory_order_release);g_commandEndOriginal.store(reinterpret_cast<CommandEndFn>(b+aim_offsets::kCommandEnd),std::memory_order_release);
++  g_commandLook=reinterpret_cast<CommandLookFn>(b+silent_offsets::kCommandLook);
++  g_commandGateOriginal.store(reinterpret_cast<CommandGateFn>(b+silent_offsets::kCommandGate),std::memory_order_release);g_commandEndOriginal.store(reinterpret_cast<CommandEndFn>(b+silent_offsets::kCommandEnd),std::memory_order_release);
+  struct Ops {bool read(std::uintptr_t p,std::uint32_t& v){return ed::readValue(reinterpret_cast<void*>(p),v);}bool rwx(std::uintptr_t p,std::uintptr_t n){return mprotect(reinterpret_cast<void*>(p),n,PROT_READ|PROT_WRITE|PROT_EXEC)==0;}bool rx(std::uintptr_t p,std::uintptr_t n){return mprotect(reinterpret_cast<void*>(p),n,PROT_READ|PROT_EXEC)==0;}void write(std::uintptr_t p,std::uint32_t v){__atomic_store_n(reinterpret_cast<std::uint32_t*>(p),v,__ATOMIC_RELEASE);}void flush(std::uintptr_t p){__builtin___clear_cache(reinterpret_cast<char*>(p),reinterpret_cast<char*>(p+4));}} ops;
+  auto installed=native_pair::apply(ops,sites,old,branches,pageSize);
+  if(installed!=native_pair::Ready){
+--- before/Astra/jni/src/features/aim/runtime.hpp
++++ after/Astra/jni/src/features/aim/runtime.hpp
+@@ -4,6 +4,7 @@
+ #include "features/aim/silent_accuracy.hpp"
+ #include "features/aim/native_pair.hpp"
+ #include "features/aim/offsets.hpp"
++#include "features/aim/silent_offsets.hpp"
+ #include "features/aim/debug.hpp"
+ #include "features/aim/hook_support.hpp"
+ #include "features/aim/assists.hpp"
+@@ -38,11 +39,11 @@
+ inline void capture(void* p,bool collectIds=false){debug::captureCalls.fetch_add(1);
+  ed::PlayerSnapshot s{};if(!ed::readPlayerSnapshot(p,s)||!s.statsValid||!s.hp||!ed::validTeam(s.team)){debug::captureSnapshot.fetch_add(1);return;}if(s.localOwned){debug::captureLocal.fetch_add(1);return;}
+  Actor a{};a.player=p;a.world=object(p,offsets::field::mfc::kWorld);a.hp=s.hp;a.team=s.team;a.captured=Clock::now();if(!a.world){debug::captureWorld.fetch_add(1);return;}
+- void* arr=object(part(p,"jgi"),offsets::field::jgi::kHitBoxColliders);std::uintptr_t count=0;if(!field(arr,0x18,count)||!count||count>64){debug::captureArray.fetch_add(1);return;}
++ void* arr=object(part(p,"bis"),offsets::field::jgi::kHitBoxColliders);std::uintptr_t count=0;if(!field(arr,0x18,count)||!count||count>64){debug::captureArray.fetch_add(1);return;}
+  esp::Vec3 root{};if(!ed::readPlayerPoseSnapshot(p,root)){debug::capturePose.fetch_add(1);return;}
+- for(std::uintptr_t i=0;i<count&&a.count<a.volumes.size();++i){void* hb=object(arr,0x20+i*8);debug::hitboxes.fetch_add(1);if(!named(hb,"HitBoxCollider")){debug::badClass.fetch_add(1);continue;}int bone=-1;if(!field(hb,0x20,bone)){debug::unknownBone.fetch_add(1);continue;}debug::boundsBone(bone);if(bodyForBone(bone)<0){debug::unknownBone.fetch_add(1);continue;}void* c=object(hb,0x28);if(!named(c,"BoxCollider")&&!named(c,"CapsuleCollider")&&!named(c,"SphereCollider")){debug::badCollider.fetch_add(1);continue;}auto ptr=native(c);if(!ptr){debug::badNative.fetch_add(1);continue;}std::uintptr_t vt=0,fn=0;if(!ed::readValue(reinterpret_cast<void*>(ptr),vt)||!ed::readValue(reinterpret_cast<void*>(vt+0xf0),fn)||!unityCode(fn)){debug::badVirtual.fetch_add(1);continue;}
++ for(std::uintptr_t i=0;i<count&&a.count<a.volumes.size();++i){void* hb=object(arr,0x20+i*8);debug::hitboxes.fetch_add(1);if(!named(hb,"HitBoxCollider")){debug::badClass.fetch_add(1);continue;}int bone=-1;if(!field(hb,0x20,bone)){debug::unknownBone.fetch_add(1);continue;}debug::boundsBone(bone);if(bodyForBone(bone)<0){debug::unknownBone.fetch_add(1);continue;}void* c=object(hb,0x28);if(!named(c,"BoxCollider")&&!named(c,"CapsuleCollider")&&!named(c,"SphereCollider")){debug::badCollider.fetch_add(1);continue;}auto ptr=native(c);if(!ptr){debug::badNative.fetch_add(1);continue;}std::uintptr_t vt=0,fn=0;if(!ed::readValue(reinterpret_cast<void*>(ptr),vt)||!ed::readValue(reinterpret_cast<void*>(vt),fn)||!unityCode(fn)){debug::badVirtual.fetch_add(1);continue;}
+   Bounds b{};g_bounds(ptr,&b);HitVolume v{b.center,b.extents,bone};if(!validVolume(v)){debug::badBounds.fetch_add(1);continue;}if(length(sub(v.center,{root.x,root.y,root.z}))>4){debug::farBounds.fetch_add(1);continue;}a.volumes[a.count++]=v;if(collectIds&&g_entityId&&a.colliderCount<a.colliderIds.size())a.colliderIds[a.colliderCount++]=g_entityId(c,nullptr);}
+- if(collectIds&&g_entityId&&a.colliderCount<a.colliderIds.size()){void* bindings=object(part(p,"dwc"),0x38);void* capsule=object(bindings,0x28);if(named(bindings,"PlayerBindings")&&(named(capsule,"CapsuleCollider")||named(capsule,"CharacterController"))&&native(capsule))a.colliderIds[a.colliderCount++]=g_entityId(capsule,nullptr);}
++ if(collectIds&&g_entityId&&a.colliderCount<a.colliderIds.size()){void* bindings=object(part(p,"mtc"),0x38);void* capsule=object(bindings,0x28);if(named(bindings,"PlayerBindings")&&(named(capsule,"CapsuleCollider")||named(capsule,"CharacterController"))&&native(capsule))a.colliderIds[a.colliderCount++]=g_entityId(capsule,nullptr);}
+  Actor* dst=nullptr;for(auto& slot:g_actors){if(slot.player==p){dst=&slot;break;}if(!dst&&(!slot.player||a.captured-slot.captured>std::chrono::seconds(1)))dst=&slot;}if(dst){if(dst->player==p&&dst->world==a.world&&dst->team==a.team&&dst->hp>0)a.motion=dst->motion;{std::lock_guard<std::mutex> lock(ed::g_playerPoseMutex);for(const auto& pose:ed::g_playerPoses)if(pose.player==p&&pose.world==a.world){a.motion.update({pose.position.x,pose.position.y,pose.position.z},std::chrono::duration<double>(pose.captured.time_since_epoch()).count(),reinterpret_cast<std::uintptr_t>(a.world),a.team);break;}}*dst=a;debug::storedActors.fetch_add(1);debug::storedVolumes.fetch_add(a.count);}
+  int actors=0,volumes=0;for(const auto& slot:g_actors)if(slot.count&&a.captured-slot.captured<std::chrono::milliseconds(100)){++actors;volumes+=slot.count;}debug::freshActors.store(actors);debug::freshVolumes.store(volumes);
+ }
+@@ -107,17 +108,26 @@
+  debug::silentReason.store(!s.enabled?1:(!ed::isUnityMainCallback()?4:(!g_functionsValid?5:(!rays||!stackSpan(rays,count)?12:(c.pauseInMenu&&g_menuOpen.load()?2:(!s.bodies?3:0))))));
+  if(ed::isUnityMainCallback()&&g_functionsValid&&rays&&stackSpan(rays,count)&&gate(c,s,g_silentState)){
+   void* p=localPlayer();void* world=nullptr;ed::PlayerSnapshot local{};std::uint64_t owner=0,id=0;
+-  if(localAlive(p,local,world)&&object(self,0x18)==world&&field(ctx,0,owner)&&field(p,0x10,id)&&owner==id&&object(ctx,0x48)==local.activeWeapon){
+-   Vec3 origin{},forward{};Ray ray{};if(ed::readValue(rays,ray)&&transformPose(object(ctx,0x10),origin,forward)){auto target=selectSilent(s,world,local.team,ray.origin,forward,g_lastSilent);if(target.valid){unsigned changed=0;Vec3 point{};std::int32_t colliderId=0;bool resolved=silentLivePoint(target,s,ray.origin,forward,point,colliderId);
++  if(localAlive(p,local,world)&&object(self,0x18)==world&&field(ctx,0,owner)&&field(p,0x10,id)&&owner==id&&object(ctx,0x50)==local.activeWeapon){
++   Vec3 origin{},forward{};Ray ray{};if(ed::readValue(rays,ray)&&transformPose(object(ctx,0x18),origin,forward)){auto target=selectSilent(s,world,local.team,ray.origin,forward,g_lastSilent);if(target.valid){unsigned changed=0;Vec3 point{};std::int32_t colliderId=0;bool resolved=silentLivePoint(target,s,ray.origin,forward,point,colliderId);
+ if(!resolved&&!g_visibilityReady.load()){point=predictPoint(target,s,ray.origin,false);resolved=finite(point)&&length(sub(point,ray.origin))>.2f;}if(resolved){silentSpoofSeen(g_liveCommand,ray.origin,point);for(int i=0;i<count;++i){Ray r{};if(!ed::readValue(rays+i,r))continue;auto d=sub(point,r.origin);float dist=length(d);if(!std::isfinite(dist)||dist<.2f||dist>s.maxDistance)continue;if(!silent_accuracy::inFov(r.origin,point,forward,s))continue;if(s.visibleCheck&&colliderId&&!silentHitsBone(r.origin,point,colliderId))continue;auto direction=normalized(d);if(length(direction)<.9f)continue;Ray patched{r.origin,direction};std::memcpy(&rays[i],&patched,sizeof(Ray));++changed;}}g_silentApplications.fetch_add(changed);debug::silentReason.store(changed?11:18);g_silentState.store(changed?6:5);}else{debug::silentReason.store(10);g_silentState.store(5);}}else{debug::silentReason.store(9);g_silentState.store(3);}
+   }else{debug::silentReason.store(13);g_silentState.store(3);}
+  }
+  // Forward once; bounded prediction changes only the selected direction. Automation observes local emission.
+  if(g_emitOriginal)g_emitOriginal(self,ctx,rays,span);
+- autoShotObserved(self,ctx,rays,count);
++ if(c.autoFire.enabled)autoShotObserved(self,ctx,rays,count);
+ }
+ inline bool bytesMatch(std::uintptr_t addr,std::initializer_list<std::uint32_t> words){unsigned i=0;for(auto expected:words){std::uint32_t actual=0;if(!ed::readValue(reinterpret_cast<void*>(addr+4*i++),actual)||actual!=expected){static thread_local Clock::time_point last{};auto now=Clock::now();if(now-last>std::chrono::seconds(5)){last=now;debug::log("signature mismatch rva=0x%llx word=%u got=%08x expected=%08x",(unsigned long long)(addr-ed::g_runtime.unityBase),i-1,actual,expected);}return false;}}return true;}
+-inline bool validateFunctions(){auto b=ed::g_runtime.unityBase;if(!b)return false;bool ok=bytesMatch(b+aim_offsets::kCameraApply,{0xd10103ff,0xfd000bea})&&bytesMatch(b+aim_offsets::kCameraClamp,{0x6dbb33ed,0x6d012beb})&&bytesMatch(b+aim_offsets::kCameraTick,{0xa9bf4ffe,0xaa0003f3})&&bytesMatch(b+aim_offsets::kCameraRefresh,{0xd100c3ff,0xa900fbff})&&bytesMatch(b+aim_offsets::kShotEmit,{0xd10183ff,0xa9035ffe,0xa90457f6,0xa9054ff4})&&bytesMatch(b+offsets::unity::kColliderGetBounds,{0xd100c3ff,0xa9024ffe});if(!ok)return false;g_bounds=reinterpret_cast<BoundsFn>(b+offsets::unity::kColliderGetBounds);g_clamp=reinterpret_cast<ClampFn>(b+aim_offsets::kCameraClamp);g_apply=reinterpret_cast<ApplyFn>(b+aim_offsets::kCameraApply);g_refresh=reinterpret_cast<RefreshFn>(b+aim_offsets::kCameraRefresh);g_emitOriginal=reinterpret_cast<EmitFn>(b+aim_offsets::kShotEmit);return true;}
++inline bool validateFunctions(){
++ auto b=ed::g_runtime.unityBase;if(!b)return false;
++ // Silent has no dependency on the unported normal-camera addresses.
++ bool ok=bytesMatch(b+silent_offsets::kShotEmit,{0xd10183ff,0xa9035ffe,0xa90457f6,0xa9054ff4})&&bytesMatch(b+silent_offsets::kColliderBounds,{0xa9be57fe,0xa9014ff4,0x9001ef95,0xaa0103f3});
++ if(!ok)return false;
++ g_bounds=reinterpret_cast<BoundsFn>(b+silent_offsets::kColliderBounds);
++ g_emitOriginal=reinterpret_cast<EmitFn>(b+silent_offsets::kShotEmit);
++ return true;
++}
++
+ inline bool installCamera(){
+ #if defined(__aarch64__)
+  bool trace=debug::due(debug::cameraAttempts);if(g_normalHookReady.load())return true;
+@@ -146,8 +156,8 @@
+ #if defined(__aarch64__)
+  bool trace=debug::due(debug::silentAttempts);if(g_silentHookReady.load())return true;
+  if(!g_functionsValid){debug::silentInstallReason.store(13);return false;}
+- auto site=ed::g_runtime.unityBase+aim_offsets::kShotCallsite;std::uint32_t word=0;
+- if(!ed::readValue(reinterpret_cast<void*>(site),word)||word!=0x97fffd71){debug::silentInstallReason.store(5);return false;}
++ auto site=ed::g_runtime.unityBase+silent_offsets::kShotCallsite;std::uint32_t word=0;
++ if(!ed::readValue(reinterpret_cast<void*>(site),word)||word!=silent_offsets::kShotCallsiteWord){debug::silentInstallReason.store(5);return false;}
+  long rawPage=sysconf(_SC_PAGESIZE);if(rawPage<=0||!hook_support::pageSizeValid(std::uintptr_t(rawPage))){debug::silentInstallReason.store(6);return false;}
+  auto pageSize=std::uintptr_t(rawPage);hook_support::AllocationStats stats{};void* relay=hook_support::allocateNear(site,pageSize,stats);
+  if(trace)debug::log("silent relay search candidates=%u attempts=%u relocated=%u errno=%d pageSize=%lu selected=%p",stats.candidates,stats.attempts,stats.relocated,stats.lastError,(unsigned long)pageSize,relay==MAP_FAILED?nullptr:relay);
+@@ -172,6 +182,6 @@
+  debug::playerCalls.fetch_add(1);if(!g_active.load(std::memory_order_acquire)){debug::inactive.fetch_add(1);return;}if(!ed::g_runtime.ready){debug::runtimeNotReady.fetch_add(1);return;}if(!ed::isUnityMainCallback()){debug::wrongThread.fetch_add(1);return;}
+  debug::mainCalls.fetch_add(1);debug::mainBase.store(ed::g_runtime.unityBase);debug::callbackTid.store(int(syscall(SYS_gettid)));debug::lastPlayer.store(reinterpret_cast<std::uintptr_t>(p));
+  if(!g_functionsValid){debug::validationAttempts.fetch_add(1);g_functionsValid=validateFunctions();if(!g_functionsValid){debug::validationFailures.fetch_add(1);g_normalState.store(7);g_silentState.store(7);return;}debug::log("function signatures validated on UnityMain");}
+- auto now=Clock::now();auto c=configuration();if(now-g_lastInstall>std::chrono::seconds(1)){g_lastInstall=now;if((c.normal.enabled||c.autoFire.enabled)&&!installCamera())g_normalState.store(1);if((c.silent.enabled||c.autoFire.enabled)&&!installSilent())g_silentState.store(1);}auto* local=localPlayer();const bool needInput=c.autoFire.enabled||c.silent.enabled;if(g_inputRetry.due(autoNow(),needInput,g_inputHookReady.load(),reinterpret_cast<std::uintptr_t>(local)))installInput(local);else if(needInput&&!g_inputHookReady.load()&&!local)g_inputInstallReason.store(input_init::NoLocal);bool visibility=c.normal.visibleCheck||c.silent.enabled||c.autoFire.enabled;setNoRecoilPatch(c.silent.noRecoil);prepareAssists(c.normal.rcs||c.silent.enabled,visibility);capture(p,visibility&&g_visibilityReady.load());
++ auto now=Clock::now();auto c=configuration();if(now-g_lastInstall>std::chrono::seconds(1)){g_lastInstall=now;if((c.silent.enabled||c.autoFire.enabled)&&!installSilent())g_silentState.store(1);}auto* local=localPlayer();const bool needInput=c.autoFire.enabled||c.silent.enabled;if(g_inputRetry.due(autoNow(),needInput,g_inputHookReady.load(),reinterpret_cast<std::uintptr_t>(local)))installInput(local);else if(needInput&&!g_inputHookReady.load()&&!local)g_inputInstallReason.store(input_init::NoLocal);bool visibility=c.normal.visibleCheck||c.silent.enabled||c.autoFire.enabled;prepareAssists(false,visibility);capture(p,visibility&&g_visibilityReady.load());
+ }
+ }
+--- before/Astra/jni/src/features/aim/assist_runtime.hpp
++++ after/Astra/jni/src/features/aim/assist_runtime.hpp
+@@ -13,8 +13,8 @@
+   g_rcsReady.store(ok);if(ok)debug::log("RCS profile validated: ActualPoint/Multiplier and native ray-builder axes");
+  }
+  if(visibility&&!g_visibilityReady.load()){
+-  bool ok=bytesMatch(b+aim_offsets::kNativeRaycast,{0xf81f0ffe,0xf9400000,0x9407c92c,0x12000000})&&bytesMatch(b+aim_offsets::kDefaultPhysicsScene,{0xaa1f03e0,0xd65f03c0})&&bytesMatch(b+aim_offsets::kObjectEntityId,{0xf81e0ffe,0xa9014ff4});
+-  if(ok){g_raycast=reinterpret_cast<RaycastFn>(b+aim_offsets::kNativeRaycast);g_defaultScene=reinterpret_cast<DefaultSceneFn>(b+aim_offsets::kDefaultPhysicsScene);g_entityId=reinterpret_cast<EntityIdFn>(b+aim_offsets::kObjectEntityId);g_visibilityReady.store(true);debug::log("visibility profile validated: 8-byte PhysicsScene, 44-byte RaycastHit, first collider ownership");}
++  bool ok=bytesMatch(b+silent_offsets::kNativeRaycast,{0xfc1c0fe8,0xf90007fe,0xa9015ff8,0xa90257f6})&&bytesMatch(b+silent_offsets::kDefaultPhysicsScene,{0xaa1f03e0,0xd65f03c0})&&bytesMatch(b+silent_offsets::kObjectEntityId,{0xf81e0ffe,0xa9014ff4,0xb0033b54,0xaa0003f3});
++  if(ok){g_raycast=reinterpret_cast<RaycastFn>(b+silent_offsets::kNativeRaycast);g_defaultScene=reinterpret_cast<DefaultSceneFn>(b+silent_offsets::kDefaultPhysicsScene);g_entityId=reinterpret_cast<EntityIdFn>(b+silent_offsets::kObjectEntityId);g_visibilityReady.store(true);debug::log("visibility profile validated: 8-byte PhysicsScene, 44-byte RaycastHit, first collider ownership");}
+  }
+ }
+ inline bool g_noRecoilPatch=false;inline std::uint32_t g_noRecoilOriginal=0;
+--- before/Astra/jni/src/features/aim/silent_offsets.hpp
++++ after/Astra/jni/src/features/aim/silent_offsets.hpp
+@@ -0,0 +1,21 @@
++#pragma once
++#include <cstdint>
++namespace astra::silent_offsets {
++// Supplied 1.1.0 ARM64 binary; Build ID gated by entry.cpp.
++inline constexpr std::uintptr_t kShotEmit=0x9CA6A0C;
++inline constexpr std::uintptr_t kShotCallsite=0x9CA6638;
++inline constexpr std::uintptr_t kColliderBounds=0x92DE468;
++inline constexpr std::uintptr_t kNativeRaycast=0x92DE930;
++inline constexpr std::uintptr_t kDefaultPhysicsScene=0x92D6BCC;
++inline constexpr std::uintptr_t kObjectEntityId=0x6951FFC;
++inline constexpr std::uintptr_t kCommandLook=0x7FF899C;
++inline constexpr std::uintptr_t kCameraLookWrite=0xAA73FE4;
++inline constexpr std::uintptr_t kCommandGate=0x9C83188;
++inline constexpr std::uintptr_t kCommandGateSite=0x9C82F28;
++inline constexpr std::uintptr_t kCommandEnd=0x9C8F244;
++inline constexpr std::uintptr_t kCommandEndSite=0x9C90E98;
++inline constexpr std::uint32_t kShotCallsiteWord=0x940000f5;
++inline constexpr std::uint32_t kCameraLookWriteWord=0x9756126e;
++inline constexpr std::uint32_t kCommandGateSiteWord=0x94000098;
++inline constexpr std::uint32_t kCommandEndSiteWord=0x97fff8eb;
++}
+--- before/Astra/jni/src/features/aim/silent_runtime.hpp
++++ after/Astra/jni/src/features/aim/silent_runtime.hpp
+@@ -2,9 +2,9 @@
+ inline bool liveSilentVolume(const Selection& selected,HitVolume& volume,std::int32_t& colliderId){
+  if(!selected.valid||!g_bounds||!ed::isUnityMainCallback())return false;
+  auto* p=reinterpret_cast<void*>(selected.player);if(ed::objectClass(p)!=ed::g_runtime.playerClass)return false;
+- auto* arr=object(part(p,"jgi"),offsets::field::jgi::kHitBoxColliders);std::uintptr_t count=0;
++ auto* arr=object(part(p,"bis"),offsets::field::jgi::kHitBoxColliders);std::uintptr_t count=0;
+  if(!field(arr,0x18,count)||!count||count>64)return false;
+- for(std::uintptr_t i=0;i<count;++i){auto* hb=object(arr,0x20+i*8);int bone=-1;if(!named(hb,"HitBoxCollider")||!field(hb,0x20,bone)||bone!=selected.bone)continue;auto* c=object(hb,0x28);if(!named(c,"BoxCollider")&&!named(c,"CapsuleCollider")&&!named(c,"SphereCollider"))continue;auto ptr=native(c);std::uintptr_t vt=0,fn=0;if(!ptr||!ed::readValue(reinterpret_cast<void*>(ptr),vt)||!ed::readValue(reinterpret_cast<void*>(vt+0xf0),fn)||!unityCode(fn))continue;
++ for(std::uintptr_t i=0;i<count;++i){auto* hb=object(arr,0x20+i*8);int bone=-1;if(!named(hb,"HitBoxCollider")||!field(hb,0x20,bone)||bone!=selected.bone)continue;auto* c=object(hb,0x28);if(!named(c,"BoxCollider")&&!named(c,"CapsuleCollider")&&!named(c,"SphereCollider"))continue;auto ptr=native(c);std::uintptr_t vt=0,fn=0;if(!ptr||!ed::readValue(reinterpret_cast<void*>(ptr),vt)||!ed::readValue(reinterpret_cast<void*>(vt),fn)||!unityCode(fn))continue;
+   Bounds b{};g_bounds(ptr,&b);volume={b.center,b.extents,bone};if(!validVolume(volume))continue;
+   esp::Vec3 root{};if(!ed::readPlayerPoseSnapshot(p,root)||length(sub(volume.center,{root.x,root.y,root.z}))>4)continue;
+   colliderId=g_visibilityReady.load()&&g_entityId?g_entityId(c,nullptr):0;debug::silentLiveRefresh.fetch_add(1);return true;
+--- before/Astra/jni/src/features/aim/silent_diagnostics.hpp
++++ after/Astra/jni/src/features/aim/silent_diagnostics.hpp
+@@ -20,7 +20,7 @@
+     auto c = astra::aim::configuration();
+     char report[8192];
+     std::snprintf(report, sizeof(report),
+-        "AstraSilent\n"
++        "AstraSilent / 1.1.0 ARM64 / shot+command\n"
+         "enabled=%d fov=%.2f maxDistance=%.1f bodies=%02x multipoints=%d pointScale=%.2f\n"
+         "visibleCheck=%d prediction=%d predictionMs=%.0f smoothing=%.3f lockTarget=%d pauseInMenu=%d\n"
+         "hook[ready=%d attempts=%llu installReason=%s] state=%d reason=%s(%d) applications=%llu\n"
+--- before/Astra/jni/src/features/aim/automation_runtime.hpp
++++ after/Astra/jni/src/features/aim/automation_runtime.hpp
+@@ -37,7 +37,7 @@
+ inline void restoreAutoView(){if(!g_savedAutoView.valid)return;auto save=g_savedAutoView;g_savedAutoView.valid=false;ed::PlayerSnapshot local{};void* world=nullptr;auto* p=localPlayer();if(p==save.player&&localAlive(p,local,world)&&world==save.world){auto* camera=component(p,"ios");if(autoCameraValid(camera,p,world)&&autoApply(camera,save.angle))debug::autoRestores.fetch_add(1);}}
+ inline int autoGunKind(void* weapon){if(!named(weapon,"qjf"))return 0;auto* definition=object(weapon,0x60);if(named(definition,"GunDefinition"))definition=object(definition,0x38);if(named(definition,"GunWithScopeParameters"))return 2;if(named(definition,"GunParameters")||named(definition,"ShotGunParameters"))return 1;return 0;}
+ inline bool autoAligned(const Selection& target,void* world,int team,Vec3 origin,Vec3 forward,float range){if(!target.valid||!g_visibilityReady.load()||!g_raycast||!g_defaultScene||!ed::isUnityMainCallback())return false;forward=normalized(forward);if(!finite(origin)||length(forward)<.9f)return false;auto scene=g_defaultScene(nullptr);Ray ray{origin,forward};assists::RaycastHit hit{};debug::autoRayChecks.fetch_add(1);if(!g_raycast(&scene,&ray,&hit,range,-5,2)||!hit.collider||!std::isfinite(hit.distance)||hit.distance<.2f||hit.distance>range+.1f||!finite(hit.point))return false;auto now=Clock::now();for(const auto& a:g_actors)if(reinterpret_cast<std::uintptr_t>(a.player)==target.player&&a.world==world&&a.team!=team&&a.hp>0&&now-a.captured<std::chrono::milliseconds(100)){for(unsigned i=0;i<a.colliderCount;++i)if(a.colliderIds[i]&&a.colliderIds[i]==hit.collider)return true;}return false;}
+-inline bool ownedCommandValid(){return named(g_ownedCommand,"owv")&&ed::writable(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(g_ownedCommand)+0x32),3);}
++inline bool ownedCommandValid(){return named(g_ownedCommand,"ubz")&&ed::writable(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(g_ownedCommand)+0x32),3);}
+ inline void releaseOwnedCommand(){if(ownedCommandValid()){if(g_ownedAttack&&g_commandAttack)g_commandAttack(g_ownedCommand,g_previousAttack!=0,nullptr);if(g_ownedScope&&g_commandScope)g_commandScope(g_ownedCommand,g_previousScope!=0,nullptr);if(g_ownedScopeHold&&g_commandScopeHold)g_commandScopeHold(g_ownedCommand,g_previousScopeHold!=0,nullptr);}g_ownedAttack=g_ownedScope=g_ownedScopeHold=false;g_ownedCommand=nullptr;}
+ // Commands are leased only between early/late consumers of one producer generation.
+ struct CommandPhaseLease {void* self=nullptr;void* cmd=nullptr;void* player=nullptr;void* world=nullptr;std::uint32_t token=0;CommandLook look{};CommandLook spoof{};bool lookValid=false,lookOwned=false,spoofValid=false;double spoofAt=0;};inline CommandPhaseLease g_phaseLease{};// Last look we forced into a command, kept independently of the phase lease so
+@@ -64,13 +64,8 @@
+  auto st=selectSilent(c.silent,world,local.team,so,sf,g_lastSilent);
+  if(!st.valid){debug::silentCommandRejected.fetch_add(1);return;}
+  Vec3 point{};std::int32_t liveCollider=0;
+- if(!silentLivePoint(st,c.silent,so,sf,point,liveCollider))point=predictPoint(st,c.silent,so,false);
++ if(!silentLivePoint(st,c.silent,so,sf,point,liveCollider)){debug::silentCommandRejected.fetch_add(1);return;}
+  auto a=anglesFor(sub(point,so));
+- Angles recoil{};bool haveRecoil=readRecoil(local.weaponPart,recoil);
+- if(haveRecoil&&std::fabs(recoil.pitch)+std::fabs(recoil.yaw)>.001f)debug::recoilNonZero.fetch_add(1);
+- if(c.silent.rcs&&haveRecoil){a=assists::compensate(a,recoil,100);debug::silentRecoilComp.fetch_add(1);}
+- setNoRecoilPatch(c.silent.noRecoil);
+- applyWeaponNoRecoil(c.silent.noRecoil,local.weaponPart);
+  if(!std::isfinite(a.pitch)||!std::isfinite(a.yaw)){debug::silentCommandRejected.fetch_add(1);return;}
+  g_commandLook(cmd,CommandLook{1,{0,0,0},a.pitch,a.yaw},nullptr);
+  g_spoofCmd=cmd;g_spoofValue=CommandLook{1,{0,0,0},a.pitch,a.yaw};g_spoofValueAt=autoNow();
+@@ -89,8 +84,8 @@
+  debug::silentShotSpoof.fetch_add(1);
+ }
+ inline bool beginCommandPhase(void* self,void* cmd){
+- if(!ed::isUnityMainCallback()||!named(self,"ltc")||object(self,0x18)!=localPlayer())return false;
+- if(!named(cmd,"owv")){debug::commandBeginReason.store(1);debug::beginFailOwv.fetch_add(1);return false;}
++ if(!ed::isUnityMainCallback()||!named(self,"eyc")||object(self,0x18)!=localPlayer())return false;
++ if(!named(cmd,"ubz")){debug::commandBeginReason.store(1);debug::beginFailOwv.fetch_add(1);return false;}
+  CommandPhaseLease phase{};phase.self=self;phase.cmd=cmd;phase.player=object(self,0x18);phase.world=object(self,0x20);
+  std::uint8_t local=0;field(self,0x28,local);debug::commandSkmi.store(local);
+  if(!phase.world||phase.world!=object(phase.player,offsets::field::mfc::kWorld)){debug::commandBeginReason.store(2);debug::beginFailWorld.fetch_add(1);return false;}
+@@ -106,7 +101,7 @@
+ inline void finishCommandPhase(void* self){
+  if(!g_phaseLease.cmd||self!=g_phaseLease.self||!ed::isUnityMainCallback())return;
+  auto phase=g_phaseLease;std::uint32_t token=0;
+- if(named(phase.cmd,"owv")&&field(phase.cmd,0x10,token)&&token==phase.token&&object(self,0x18)==phase.player&&object(self,0x20)==phase.world){
++ if(named(phase.cmd,"ubz")&&field(phase.cmd,0x10,token)&&token==phase.token&&object(self,0x18)==phase.player&&object(self,0x20)==phase.world){
+   releaseOwnedCommand();
+   debug::commandCompleted.fetch_add(1);
+  }
+@@ -122,7 +117,7 @@
+ inline void processAutomation(void* self,void* cmd){
+  if(!ed::isUnityMainCallback()||object(self,0x18)!=localPlayer())return;
+  auto c=configuration();auto options=c.autoFire;automation::Observation o{};automation::Actions actions{};ed::PlayerSnapshot local{};void* world=nullptr;auto* p=object(self,0x18);std::uint8_t raw=255,scope=255,attack=0,alt=0,held=0,ammo=0;
+- bool identity=p==localPlayer()&&named(self,"ltc")&&localAlive(p,local,world)&&object(self,0x20)==world&&object(self,0x50)==local.weaponPart&&named(cmd,"owv");
++ bool identity=p==localPlayer()&&named(self,"eyc")&&localAlive(p,local,world)&&object(self,0x20)==world&&object(self,0x50)==local.weaponPart&&named(cmd,"ubz");
+  bool data=identity&&field(local.weaponPart,0x80,raw)&&field(local.weaponPart,0x8c,scope)&&field(local.activeWeapon,0x52,ammo)&&field(cmd,0x32,attack)&&field(cmd,0x33,alt)&&field(cmd,0x34,held)&&attack<=1&&alt<=1&&held<=1;
+  auto* camera=identity?component(p,"ios"):nullptr;int kind=data?autoGunKind(local.activeWeapon):0;options.autoScope=options.autoScope&&g_autoScopeReady.load()&&kind==2;debug::autoSafetyMask.store((identity?1:0)|(data?2:0)|(kind?4:0)|(ammo?8:0)|(g_visibilityReady.load()?16:0)|(g_autoScopeReady.load()?32:0));
+  bool safe=data&&g_functionsValid&&g_inputHookReady.load()&&g_silentHookReady.load()&&g_visibilityReady.load()&&!g_menuOpen.load()&&c.normal.bodies&&(ammo>0||g_autoShotSerial>g_autoStartSerial)&&kind&&(!options.autoScope||(g_scopeNone<16&&(scope==g_scopeNone||scope==g_scopeIn||scope==g_scopeSwitch||scope==g_scopeReload)))&&(raw<=1)&&autoCameraValid(camera,p,world);
+--- before/Astra/jni/src/ui/kazakh/menu.hpp
++++ after/Astra/jni/src/ui/kazakh/menu.hpp
+@@ -66,7 +66,7 @@
+ };
+ static KwB g_b;
+ 
+-static const char* kTabs[] = {"visuals", "config"};
++static const char* kTabs[] = {"visuals", "silent", "config"};
+ static constexpr int kTabCount = sizeof(kTabs) / sizeof(kTabs[0]);
+ 
+ #include "ui/premium_esp_extra.hpp"
+@@ -389,8 +389,7 @@
+         mark(ImGui::SliderFloat("Max distance##silent", &edit.silent.maxDistance, 10.f, 300.f, "%.0f"));
+         mark(ImGui::Checkbox("Visible check##silent", &edit.silent.visibleCheck));
+         mark(ImGui::Checkbox("Lock target##silent", &edit.silent.lockTarget));
+-        mark(ImGui::Checkbox("Recoil comp##silent", &edit.silent.rcs));
+-        mark(ImGui::Checkbox("No recoil + spread##silent", &edit.silent.noRecoil));
++        ImGui::TextDisabled("Recoil options await a separate 1.1.0 port.");
+     }
+     if (ImGui::CollapsingHeader("Accuracy", ImGuiTreeNodeFlags_DefaultOpen)) {
+         mark(ImGui::Checkbox("Multipoints##silent", &edit.silent.multipoints));
+@@ -569,6 +568,23 @@
+     ImGui::Text("Aim hook: %s", astra::aim::g_normalHookReady.load() ? "ready" : "waiting");
+     ImGui::Text("ESP hook: %s", astra::esp::g_playerUpdateHookReady.load() ? "ready" : "waiting");
+     ImGui::Text("Hitlog hook: %d", astra_hitlog::state.load());
++    ImGui::Separator();
++    ImGui::TextDisabled("Silent / 1.1.0 ARM64");
++    ImGui::Text("State: %s", astra::aim::stateText(astra::aim::g_silentState.load()));
++    ImGui::Text("Shot hook: %s", astra::aim::debug::installReason(astra::aim::debug::silentInstallReason.load()));
++    ImGui::Text("Command hook: %s", astra::aim::input_init::reasonText(astra::aim::g_inputInstallReason.load()));
++    ImGui::Text("Look hook: %s", astra::aim::debug::commandLookHookReady.load() ? "ready" : "waiting");
++    ImGui::Text("Visibility: %s", astra::aim::g_visibilityReady.load() ? "ready" : "waiting");
++    ImGui::Text("Last result: %s", astra::aim::debug::reason(astra::aim::debug::silentReason.load()));
++    ImGui::Text("Calls: %llu | rays: %llu | commands: %llu",
++        (unsigned long long)astra::aim::debug::silentCalls.load(),
++        (unsigned long long)astra::aim::g_silentApplications.load(),
++        (unsigned long long)astra::aim::debug::silentCommands.load());
++    ImGui::Text("Targets: %d | hitboxes: %d | profile failures: %llu",
++        astra::aim::debug::freshActors.load(), astra::aim::debug::freshVolumes.load(),
++        (unsigned long long)astra::aim::debug::validationFailures.load());
++    if (ImGui::Button("Save silent diagnostics##config")) silent_diag::save();
++    ImGui::TextWrapped("%s", silent_diag::status);
+     ImGui::Text("Frame: %.1f ms", 1000.0f / std::max(1.0f, ImGui::GetIO().Framerate));
+     ImGui::Separator();
+     ImGui::TextDisabled("GUI: KazakhDLC shell");
+@@ -578,6 +594,7 @@
+ static void astraPage(int tab, int column) {
+     switch (tab) {
+         case 0: column == 1 ? visualsLeft() : visualsRight(); break;
++        case 1: column == 1 ? silentLeft() : silentRight(); break;
+         default: column == 1 ? configLeft() : configRight(); break;
+     }
+ }
+@@ -863,6 +880,7 @@
+     c.normal.rcs = edit.normal.rcs;
+     c.normal.rcsStrength = edit.normal.rcsStrength;
+     c.silent = edit.silent;
++    c.silent.rcs = false; c.silent.noRecoil = false;
+     c.autoFire.enabled = false;
+     astra::aim::publish(c);
+     dirty = false;

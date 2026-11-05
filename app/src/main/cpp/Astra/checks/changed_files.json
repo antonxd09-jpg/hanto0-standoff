@@ -1,0 +1,12 @@
+[
+  "jni/src/game/offsets.hpp",
+  "jni/src/game/il2cpp_meta.hpp",
+  "jni/src/core/entry.cpp",
+  "jni/src/features/visuals/astra_night_diag.hpp",
+  "jni/src/features/visuals/astra_camera_test.hpp",
+  "jni/src/features/visuals/astra_skeleton.hpp",
+  "jni/src/features/visuals/astra_night.hpp",
+  "jni/src/features/visuals/esp_runtime.hpp",
+  "jni/src/features/visuals/astra_hitlog.hpp",
+  "jni/src/ui/kazakh/menu.hpp"
+]
