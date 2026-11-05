@@ -8,6 +8,7 @@ jobs:
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with: { java-version: '17', distribution: 'zulu' }
+      
     - name: Setup NDK r21e
       uses: nttld/setup-ndk@v1
       id: setup-ndk
@@ -17,10 +18,7 @@ jobs:
       run: |
         rm -rf app/src/main/cpp/Dobby
         git clone https://github.com/jmpews/Dobby.git app/src/main/cpp/Dobby
-        sed -i 's/@PAGE//g' app/src/main/cpp/Dobby/source/TrampolineBridge/ClosureTrampolineBridge/arm64/closure_bridge_arm64.S
-        sed -i 's/@PAGEOFF/:lo12:/g' app/src/main/cpp/Dobby/source/TrampolineBridge/ClosureTrampolineBridge/arm64/closure_bridge_arm64.S
-        sed -i 's/@PAGE//g' app/src/main/cpp/Dobby/source/TrampolineBridge/Trampoline/arm64/trampoline_arm64.S
-        sed -i 's/@PAGEOFF/:lo12:/g' app/src/main/cpp/Dobby/source/TrampolineBridge/Trampoline/arm64/trampoline_arm64.S
+        find app/src/main/cpp/Dobby -name "*.S" -exec sed -i 's/@PAGE//g; s/@PAGEOFF/:lo12:/g' {} +
 
     - name: Build APK
       run: |
