@@ -18,14 +18,12 @@ jobs:
       run: |
         rm -rf app/src/main/cpp/Dobby
         git clone https://github.com/jmpews/Dobby.git app/src/main/cpp/Dobby
-        echo "Patch started..."
-        grep -rl '@PAGEOFF' app/src/main/cpp/Dobby | while read file; do
-            sed -i 's/\([a-zA-Z0-9_]*\)@PAGEOFF/:lo12:\1/g' "$file"
-        done
-        grep -rl '@PAGE' app/src/main/cpp/Dobby | while read file; do
-            sed -i 's/@PAGE//g' "$file"
-        done
-        echo "Patch done. Checking file..."
+        
+        # ЖЕЛЕЗОБЕТОННЫЙ ПАТЧ (ставит :lo12: В НАЧАЛО символа)
+        find app/src/main/cpp/Dobby -type f -name "*.S" -exec sed -i 's/\([a-zA-Z0-9_]*\)@PAGEOFF/:lo12:\1/g' {} +
+        find app/src/main/cpp/Dobby -type f -name "*.S" -exec sed -i 's/@PAGE//g' {} +
+
+        echo "=== PATCH CHECK ==="
         grep -n "common_closure_bridge_handler" app/src/main/cpp/Dobby/source/TrampolineBridge/ClosureTrampolineBridge/arm64/closure_bridge_arm64.S || true
 
     - name: Build APK
