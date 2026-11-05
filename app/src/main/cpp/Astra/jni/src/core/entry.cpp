@@ -1244,6 +1244,3 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
     return JNI_VERSION_1_6;
 }
 
-__attribute__((constructor)) static void Api_OnLoad() {
-    start();
-}
