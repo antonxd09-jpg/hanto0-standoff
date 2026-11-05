@@ -14,13 +14,13 @@ jobs:
       id: setup-ndk
       with: { ndk-version: r21e, add-to-path: false }
       
-    - name: Patch Dobby (Bulletproof Perl)
+    - name: Patch Dobby
       run: |
         rm -rf app/src/main/cpp/Dobby
         git clone https://github.com/jmpews/Dobby.git app/src/main/cpp/Dobby
-        find app/src/main/cpp/Dobby -name "*.S" -type f -exec perl -pi -e 's/(\w+)@PAGEOFF/:lo12:$1/g' {} +
-        find app/src/main/cpp/Dobby -name "*.S" -type f -exec perl -pi -e 's/@PAGE//g' {} +
-        echo "=== PATCH APPLIED ==="
+        python3 patch_dobby.py
+        echo "=== ПРОВЕРКА КОДА ПОСЛЕ ПАТЧА ==="
+        grep -n "common_closure_bridge_handler" app/src/main/cpp/Dobby/source/TrampolineBridge/ClosureTrampolineBridge/arm64/closure_bridge_arm64.S || true
 
     - name: Build APK
       run: |
