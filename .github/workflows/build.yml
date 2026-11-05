@@ -18,21 +18,9 @@ jobs:
       run: |
         rm -rf app/src/main/cpp/Dobby
         git clone https://github.com/jmpews/Dobby.git app/src/main/cpp/Dobby
-        cat << 'PYEOF' > patch.py
-        import os, re
-        for root, dirs, files in os.walk('app/src/main/cpp/Dobby'):
-            for file in files:
-                if file.endswith('.S'):
-                    p = os.path.join(root, file)
-                    with open(p, 'r') as f:
-                        text = f.read()
-                    text = re.sub(r'([a-zA-Z0-9_]+)@PAGEOFF', r':lo12:\1', text)
-                    text = text.replace('@PAGE', '')
-                    with open(p, 'w') as f:
-                        f.write(text)
-        print("Patch done!")
-        PYEOF
-        python3 patch.py
+        find app/src/main/cpp/Dobby -name "*.S" -exec sed -i 's/\([a-zA-Z0-9_]*\)@PAGEOFF/:lo12:\1/g' {} +
+        find app/src/main/cpp/Dobby -name "*.S" -exec sed -i 's/@PAGE//g' {} +
+        echo "=== PATCH DONE ==="
 
     - name: Build APK
       run: |
