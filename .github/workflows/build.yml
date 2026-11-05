@@ -18,10 +18,27 @@ jobs:
       run: |
         rm -rf app/src/main/cpp/Dobby
         git clone https://github.com/jmpews/Dobby.git app/src/main/cpp/Dobby
-        find app/src/main/cpp/Dobby -type f -name "*.S" -exec sed -i 's/@PAGE//g' {} +
-        find app/src/main/cpp/Dobby -type f -name "*.S" -exec sed -i -E 's/([a-zA-Z0-9_]+)@PAGEOFF/:lo12:\1/g' {} +
-        echo "=== PATCH CHECK ==="
-        grep "common_closure_bridge_handler" app/src/main/cpp/Dobby/source/TrampolineBridge/ClosureTrampolineBridge/arm64/closure_bridge_arm64.S || true
+        
+        cat << 'PYEOF' > patch.py
+        import os, re
+        for root, dirs, files in os.walk('app/src/main/cpp/Dobby'):
+            for file in files:
+                if file.endswith('.S'):
+                    p = os.path.join(root, file)
+                    with open(p, 'r') as f:
+                        text = f.read()
+                    text = text.replace('@PAGEOFF', ':lo12:')
+                    text = text.replace('@PAGE', '')
+                    text = re.sub(r'([a-zA-Z0-9_]+):lo12:', r':lo12:\1', text)
+                    with open(p, 'w') as f:
+                        f.write(text)
+        print("Patched successfully!")
+        PYEOF
+        
+        python3 patch.py
+        
+        echo "=== CHECKING PATCH ==="
+        sed -n '50,56p' app/src/main/cpp/Dobby/source/TrampolineBridge/ClosureTrampolineBridge/arm64/closure_bridge_arm64.S
 
     - name: Build APK
       run: |
