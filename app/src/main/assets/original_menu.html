@@ -1,0 +1,84 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+*{margin:0;padding:0;box-sizing:border-box;user-select:none}
+body{background:transparent;font-family:sans-serif;height:100vh;overflow:hidden}
+#esp{position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:10}
+#tab{position:fixed;left:260px;top:18px;width:22px;height:68px;background:#8b5cf6;border-radius:0 6px 6px 0;color:#fff;display:flex;align-items:center;justify-content:center;z-index:100;font-weight:700}
+#menu{position:fixed;left:0;top:0;width:260px;height:100vh;background:#13131a;border-right:1px solid #2a2a3a;display:flex;flex-direction:column;z-index:50}
+#menu.hidden{transform:translateX(-260px)}
+.hdr{background:#0f0f18;padding:12px;border-bottom:1px solid #1e1e2e;color:#e2e8f0;font-weight:700}
+.sub{font-size:10px;color:#8b5cf6}
+.tabs{display:flex;gap:2px;margin-top:8px}
+.tb{flex:1;padding:5px;font-size:10px;color:#9ca3af;background:#1a1a28;border:none;border-radius:4px}
+.tb.act{color:#fff;background:#8b5cf6}
+.bdy{flex:1;overflow-y:auto;padding:8px}
+.row{display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:6px;margin-bottom:4px;background:#1a1a24;color:#cbd5e1;font-size:12px}
+.row.on{border:1px solid #8b5cf6;background:#1e1b2e}
+.pg{display:none}.pg.act{display:block}
+.sl{padding:6px;color:#cbd5e1;font-size:11px}
+input[type=range]{width:100%;accent-color:#8b5cf6}
+</style></head><body>
+<canvas id="esp"></canvas>
+<div id="tab" onclick="tgl()">≡</div>
+<div id="menu">
+  <div class="hdr">HantoO v2.4.1 <div class="sub">Standoff 2 — Root Internal</div>
+    <div class="tabs">
+      <button class="tb act" onclick="tab('aim',this)">Aim</button>
+      <button class="tb" onclick="tab('vis',this)">ESP</button>
+      <button class="tb" onclick="tab('msc',this)">Misc</button>
+    </div>
+  </div>
+  <div class="bdy">
+    <div id="p-aim" class="pg act">
+      <div id="l-aim"></div>
+      <div class="sl">FOV: <span id="vf">45</span><input type="range" min="5" max="180" value="45" oninput="vf.textContent=this.value;cmd('fov',this.value)"></div>
+      <div class="sl">Smooth: <span id="vs">5</span><input type="range" min="1" max="20" value="5" oninput="vs.textContent=this.value;cmd('smooth',this.value)"></div>
+    </div>
+    <div id="p-vis" class="pg"><div id="l-vis"></div></div>
+    <div id="p-msc" class="pg"><div id="l-msc"></div></div>
+  </div>
+</div>
+<script>
+var open=true,st={};
+var cfg={
+  'l-aim':[['aimbot','Aimbot'],['silentaim','Silent Aim'],['triggerbot','Triggerbot'],['prediction','Prediction']],
+  'l-vis':[['esp','Box ESP'],['skeleton','Skeleton'],['healthbar','Health Bar'],['nametag','Name Tag'],['distance','Distance'],['radar','2D Radar']],
+  'l-msc':[['bunny','Bunny Hop'],['speed','Speed Hack'],['norecoil','No Recoil'],['nospread','No Spread'],['rapidfire','Rapid Fire'],['nofog','No Fog']]
+};
+Object.keys(cfg).forEach(k=>{
+  var d=document.getElementById(k);
+  cfg[k].forEach(x=>{d.innerHTML+='<div class="row" onclick="sw(this,\''+x[0]+'\')"><span>'+x[1]+'</span><b id="s-'+x[0]+'">OFF</b></div>';});
+});
+function cmd(k,v){if(window.HantoBridge)window.HantoBridge.sendCommand(k+'='+v);}
+function tgl(){
+  open=!open;
+  document.getElementById('menu').classList.toggle('hidden',!open);
+  document.getElementById('tab').style.left=open?'260px':'0';
+  if(window.HantoBridge)window.HantoBridge.setMenuExpanded(open);
+}
+function tab(n,b){
+  document.querySelectorAll('.tb').forEach(x=>x.classList.remove('act'));
+  document.querySelectorAll('.pg').forEach(x=>x.classList.remove('act'));
+  b.classList.add('act');document.getElementById('p-'+n).classList.add('act');
+}
+function sw(r,id){
+  st[id]=!st[id];r.classList.toggle('on',st[id]);
+  document.getElementById('s-'+id).textContent=st[id]?'ON':'OFF';
+  cmd(id,st[id]?1:0);
+}
+var c=document.getElementById('esp'),g=c.getContext('2d');
+function rs(){c.width=innerWidth;c.height=innerHeight;}onresize=rs;rs();
+setInterval(()=>{
+  if(!window.HantoBridge)return;
+  if(!st.esp&&!st.healthbar&&!st.distance){g.clearRect(0,0,c.width,c.height);return;}
+  try{
+    var d=JSON.parse(window.HantoBridge.fetchEsp()),H=c.height;
+    g.clearRect(0,0,c.width,c.height);
+    d.players.forEach(p=>{
+      var t=H-p.y1,b=H-p.y2,h=Math.abs(b-t),w=h*0.52,x=p.x1-w/2;
+      if(st.esp){g.strokeStyle='#8b5cf6';g.lineWidth=1.5;g.strokeRect(x,t,w,h);}
+      if(st.healthbar){var hp=Math.max(0,Math.min(1,p.hp/100));g.fillStyle='#22c55e';g.fillRect(x-5,t+h*(1-hp),3,h*hp);}
+      if(st.distance){g.fillStyle='#fff';g.font='10px sans-serif';g.fillText(p.dist.toFixed(0)+'m',x,b+11);}
+    });
+  }catch(e){}
+},33);
+</script></body></html>

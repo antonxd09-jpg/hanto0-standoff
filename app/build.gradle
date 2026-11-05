@@ -1,35 +1,40 @@
 plugins {
     id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
 }
 
 android {
-    namespace 'com.hanto.client'
-    compileSdk 33
-    ndkVersion "21.4.7075529"
-    
+    namespace 'com.hanto0.loader'
+    compileSdk 34
+    ndkVersion '25.2.9519653'
+
     defaultConfig {
-        applicationId "com.hanto.client"
+        applicationId 'com.hanto0.loader'
         minSdk 24
-        targetSdk 33
-        externalNativeBuild { 
-            cmake { 
-                cppFlags "-std=c++17 -fno-exceptions -fno-rtti" 
-            } 
+        targetSdk 34
+        versionCode 1
+        versionName '2.4.1'
+        ndk { abiFilters 'arm64-v8a' }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions { jvmTarget = '17' }
+
+    externalNativeBuild {
+        cmake {
+            path 'src/main/cpp/CMakeLists.txt'
+            version '3.22.1'
         }
-        ndk { 
-            abiFilters 'arm64-v8a' 
-        }
     }
-    
-    externalNativeBuild { 
-        cmake { 
-            path "src/main/cpp/CMakeLists.txt" 
-        } 
+
+    packaging {
+        jniLibs { useLegacyPackaging = true }
     }
-    
-    packagingOptions { 
-        jniLibs { 
-            useLegacyPackaging = true 
-        } 
-    }
+}
+
+dependencies {
 }
