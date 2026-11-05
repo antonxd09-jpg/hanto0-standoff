@@ -24,8 +24,8 @@ import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends Activity {
     private WindowManager wm;
-    private WebView overlayView;
-    private WindowManager.LayoutParams overlayParams;
+    private WebView wv;
+    private WindowManager.LayoutParams lp;
 
     @Override
     protected void onCreate(Bundle s) {
@@ -35,7 +35,7 @@ public class MainActivity extends Activity {
         r.setGravity(Gravity.CENTER);
         r.setBackgroundColor(Color.parseColor("#0d0d0f"));
         TextView tv = new TextView(this);
-        tv.setText("HantoO v2.4.1 — Standoff 2 (50s Root Auto-Inject)");
+        tv.setText("HantoO v2.4.1 — Standoff 2 (50s Root Auto-Launcher)");
         tv.setTextColor(Color.WHITE);
         tv.setGravity(Gravity.CENTER);
         r.addView(tv);
@@ -47,20 +47,20 @@ public class MainActivity extends Activity {
                 return;
             }
             b.setEnabled(false);
-            tv.setText("Launching Standoff 2... Menu in 50s");
-            startFlow();
+            tv.setText("Starting Standoff 2... Menu will appear in 50s");
+            runRootFlow();
         });
         r.addView(b);
         setContentView(r);
     }
 
-    private void startFlow() {
+    private void runRootFlow() {
         new Thread(() -> {
             try {
-                String dir = getApplicationInfo().nativeLibraryDir;
+                String d = getApplicationInfo().nativeLibraryDir;
                 Runtime.getRuntime().exec(new String[]{"su", "-c",
-                    "cp -f " + dir + "/libhanto0.so /data/local/tmp/libhanto0.so && " +
-                    "cp -f " + dir + "/libinjector.so /data/local/tmp/injector && " +
+                    "cp -f " + d + "/libhanto0.so /data/local/tmp/libhanto0.so && " +
+                    "cp -f " + d + "/libinjector.so /data/local/tmp/injector && " +
                     "chmod 755 /data/local/tmp/injector /data/local/tmp/libhanto0.so && " +
                     "monkey -p com.axlebolt.standoff2 -c android.intent.category.LAUNCHER 1"
                 }).waitFor();
@@ -75,21 +75,21 @@ public class MainActivity extends Activity {
                     }).waitFor();
                 } catch (Exception ignored) {}
             }).start();
-            showOverlay();
+            spawnMenu();
         }, 50000);
     }
 
-    private void showOverlay() {
+    private void spawnMenu() {
         wm = (WindowManager) getSystemService(WINDOW_SERVICE);
         int t = Build.VERSION.SDK_INT >= 26 ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : WindowManager.LayoutParams.TYPE_PHONE;
-        overlayParams = new WindowManager.LayoutParams(-1, -1, t, 8 | 256, PixelFormat.TRANSLUCENT);
-        overlayParams.gravity = Gravity.TOP | Gravity.START;
-        overlayView = new WebView(getApplicationContext());
-        overlayView.setBackgroundColor(Color.TRANSPARENT);
-        overlayView.getSettings().setJavaScriptEnabled(true);
-        overlayView.addJavascriptInterface(new Bridge(), "HantoBridge");
-        overlayView.loadUrl("file:///android_asset/menu.html");
-        wm.addView(overlayView, overlayParams);
+        lp = new WindowManager.LayoutParams(-1, -1, t, 8 | 256, PixelFormat.TRANSLUCENT);
+        lp.gravity = Gravity.TOP | Gravity.START;
+        wv = new WebView(getApplicationContext());
+        wv.setBackgroundColor(Color.TRANSPARENT);
+        wv.getSettings().setJavaScriptEnabled(true);
+        wv.addJavascriptInterface(new Bridge(), "HantoBridge");
+        wv.loadUrl("file:///android_asset/menu.html");
+        wm.addView(wv, lp);
     }
 
     public class Bridge {
@@ -101,8 +101,8 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void setMenuExpanded(boolean e) {
             new Handler(Looper.getMainLooper()).post(() -> {
                 float d = getResources().getDisplayMetrics().density;
-                overlayParams.width = e ? -1 : (int)(36 * d);
-                wm.updateViewLayout(overlayView, overlayParams);
+                lp.width = e ? -1 : (int)(32 * d);
+                wm.updateViewLayout(wv, lp);
             });
         }
         private String ipc(String p) {
