@@ -18,14 +18,15 @@ jobs:
       run: |
         rm -rf app/src/main/cpp/Dobby
         git clone https://github.com/jmpews/Dobby.git app/src/main/cpp/Dobby
-        find app/src/main/cpp/Dobby -type f -name "*.S" | xargs -r perl -pi -e 's/([a-zA-Z0-9_]+)@PAGEOFF/:lo12:$1/g'
-        find app/src/main/cpp/Dobby -type f -name "*.S" | xargs -r perl -pi -e 's/@PAGE//g'
-        echo "=== CHECKING PATCH ==="
+        find app/src/main/cpp/Dobby -type f -name "*.S" -exec sed -i 's/@PAGE//g' {} +
+        find app/src/main/cpp/Dobby -type f -name "*.S" -exec sed -i -E 's/([a-zA-Z0-9_]+)@PAGEOFF/:lo12:\1/g' {} +
+        echo "=== PATCH CHECK ==="
         grep "common_closure_bridge_handler" app/src/main/cpp/Dobby/source/TrampolineBridge/ClosureTrampolineBridge/arm64/closure_bridge_arm64.S || true
 
     - name: Build APK
       run: |
         chmod +x gradlew
+        rm -rf app/.cxx
         ./gradlew clean assembleDebug
 
     - name: Upload APK
