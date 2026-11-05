@@ -18,20 +18,10 @@ jobs:
       run: |
         rm -rf app/src/main/cpp/Dobby
         git clone https://github.com/jmpews/Dobby.git app/src/main/cpp/Dobby
-        python3 - << 'PYEOF'
-        import os, re
-        for root, dirs, files in os.walk('app/src/main/cpp/Dobby'):
-            for file in files:
-                if file.endswith('.S'):
-                    path = os.path.join(root, file)
-                    with open(path, 'r') as f: c = f.read()
-                    c = re.sub(r'([a-zA-Z0-9_]+)@PAGEOFF', r':lo12:\1', c)
-                    c = c.replace('@PAGE', '')
-                    with open(path, 'w') as f: f.write(c)
-        print("PATCH APPLIED SUCCESSFULLY")
-        PYEOF
-        echo "=== PATCH CHECK ==="
-        grep -n "common_closure_bridge_handler" app/src/main/cpp/Dobby/source/TrampolineBridge/ClosureTrampolineBridge/arm64/closure_bridge_arm64.S || true
+        find app/src/main/cpp/Dobby -type f -name "*.S" | xargs -r perl -pi -e 's/([a-zA-Z0-9_]+)@PAGEOFF/:lo12:$1/g'
+        find app/src/main/cpp/Dobby -type f -name "*.S" | xargs -r perl -pi -e 's/@PAGE//g'
+        echo "=== CHECKING PATCH ==="
+        grep "common_closure_bridge_handler" app/src/main/cpp/Dobby/source/TrampolineBridge/ClosureTrampolineBridge/arm64/closure_bridge_arm64.S || true
 
     - name: Build APK
       run: |
