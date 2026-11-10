@@ -14,14 +14,19 @@ jobs:
       - name: Build libnl_menu.so
         run: |
           cd src
+          
+          # ПРИМУСОВО ЗМІНЮЄМО EXECUTABLE НА SHARED LIBRARY (.so)
+          sed -i 's/add_executable(menu_smoke/add_library(menu_smoke SHARED/' CMakeLists.txt
+          sed -i 's/add_library(durow_menu STATIC/add_library(durow_menu SHARED/' CMakeLists.txt
+          sed -i 's/add_library(durow_menu /add_library(durow_menu SHARED /' CMakeLists.txt
+          
           rm -rf build && mkdir build && cd build
-          cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-24 -DCMAKE_BUILD_TYPE=Release ..
+          cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-24 -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON ..
           make -j$(nproc)
           
           echo "=== Searching for .so files ==="
           find . -name "*.so*"
           
-          # Знаходимо перший .so файл і копіюємо його в корінь робочої папки GitHub
           find . -name "*.so" | head -n 1 | xargs -I {} cp {} $GITHUB_WORKSPACE/libnl_menu.so
           
           echo "=== Checking root ==="
