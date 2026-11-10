@@ -1,7 +1,6 @@
 name: Build APK
 on: [push, workflow_dispatch]
 
-# ДОДАНО ДОЗВІЛ НА ЗАПИС ДЛЯ GITHUB ACTIONS
 permissions:
   contents: write
 
@@ -39,11 +38,19 @@ jobs:
           cp $GITHUB_WORKSPACE/injector app/assets/
           cp -r src/assets/* app/assets/ 2>/dev/null || true
           
+          # ВИПРАВЛЕНО: Додано <uses-sdk> для сумісності з телефонами
           echo '<?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.hanto0.standoff">
-              <application android:label="Hanto0"><activity android:name=".MainActivity" android:exported="true">
-                  <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
-              </activity></application>
+              <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="33" />
+              <uses-permission android:name="android.permission.INTERNET"/>
+              <application android:label="Hanto0" android:usesCleartextTraffic="true">
+                  <activity android:name=".MainActivity" android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN"/>
+                          <category android:name="android.intent.category.LAUNCHER"/>
+                      </intent-filter>
+                  </activity>
+              </application>
           </manifest>' > app/AndroidManifest.xml
           
           mkdir -p app/res/values
@@ -53,11 +60,21 @@ jobs:
           javac -source 8 -target 8 -cp $ANDROID_HOME/platforms/android-34/android.jar -d obj src/com/hanto0/standoff/*.java
           
           $ANDROID_HOME/build-tools/34.0.0/d8 --output . obj/com/hanto0/standoff/*.class
+          
+          # ВИПРАВЛЕНО: пакуємо без ресурсів, потім додаємо classes.dex БЕЗ СТИСНЕННЯ (-0)
           $ANDROID_HOME/build-tools/34.0.0/aapt package -f -M AndroidManifest.xml -S res -A assets -I $ANDROID_HOME/platforms/android-34/android.jar -F unsigned.apk
-          zip -q unsigned.apk classes.dex
+          zip -q -0 unsigned.apk classes.dex
+          
           $ANDROID_HOME/build-tools/34.0.0/zipalign -f 4 unsigned.apk aligned.apk
           keytool -genkey -v -keystore k.keystore -alias h -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=H" > /dev/null 2>&1
           $ANDROID_HOME/build-tools/34.0.0/apksigner sign --ks k.keystore --ks-pass pass:123456 --out hanto0-standoff.apk aligned.apk
+
+      # НОВИЙ КРОК: Зберігаємо APK як артефакт у вкладці Actions
+      - name: Upload APK as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Hanto0-APK
+          path: app/hanto0-standoff.apk
 
       - name: Upload APK to Repo
         run: |
