@@ -1,0 +1,60 @@
+name: Build APK
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { java-version: '17', distribution: 'temurin' }
+      - uses: nttld/setup-ndk@v1
+        with: { ndk-version: r26d }
+
+      - name: Build libnl_menu.so
+        run: |
+          cd src
+          rm -rf build && mkdir build && cd build
+          cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-24 -DCMAKE_BUILD_TYPE=Release ..
+          make -j$(nproc)
+          find . -name "*.so" -exec cp {} ../../libnl_menu.so \;
+
+      - name: Build Injector
+        run: |
+          $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang -O2 injector.c -o injector -static
+
+      - name: Compile APK
+        run: |
+          mkdir -p app/assets
+          cp libnl_menu.so app/assets/
+          cp injector app/assets/
+          cp -r src/assets/* app/assets/ 2>/dev/null || true
+          
+          echo '<?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.hanto0.standoff">
+              <application android:label="Hanto0"><activity android:name=".MainActivity" android:exported="true">
+                  <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
+              </activity></application>
+          </manifest>' > app/AndroidManifest.xml
+          
+          mkdir -p app/res/values
+          echo '<resources><string name="app_name">Hanto0</string></resources>' > app/res/values/strings.xml
+          
+          cd app
+          $ANDROID_HOME/build-tools/34.0.0/aapt package -f -m -J gen -M AndroidManifest.xml -S res -I $ANDROID_HOME/platforms/android-34/android.jar
+          javac -cp $ANDROID_HOME/platforms/android-34/android.jar -d obj src/com/hanto0/standoff/*.java gen/com/hanto0/standoff/R.java
+          $ANDROID_HOME/build-tools/34.0.0/d8 --output . obj/com/hanto0/standoff/*.class
+          $ANDROID_HOME/build-tools/34.0.0/aapt package -f -M AndroidManifest.xml -S res -A assets -I $ANDROID_HOME/platforms/android-34/android.jar -F unsigned.apk
+          zip -q unsigned.apk classes.dex
+          zipalign -f 4 unsigned.apk aligned.apk
+          keytool -genkey -v -keystore k.keystore -alias h -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=H" > /dev/null 2>&1
+          $ANDROID_HOME/build-tools/34.0.0/apksigner sign --ks k.keystore --ks-pass pass:123456 --out hanto0-standoff.apk aligned.apk
+
+      - name: Upload APK to Repo
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          cp app/hanto0-standoff.apk ./hanto0-standoff.apk
+          git add hanto0-standoff.apk
+          git commit -m "auto: compiled APK build" || exit 0
+          git push
