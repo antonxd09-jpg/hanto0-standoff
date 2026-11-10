@@ -1,8 +1,6 @@
 name: Build APK
 on: [push, workflow_dispatch]
-
-permissions:
-  contents: write
+permissions: { contents: write }
 
 jobs:
   build:
@@ -20,11 +18,9 @@ jobs:
           sed -i 's/add_executable(menu_smoke/add_library(menu_smoke SHARED/' CMakeLists.txt
           sed -i 's/add_library(durow_menu STATIC/add_library(durow_menu SHARED/' CMakeLists.txt
           sed -i 's/add_library(durow_menu /add_library(durow_menu SHARED /' CMakeLists.txt
-          
           rm -rf build && mkdir build && cd build
           cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-24 -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON ..
           make -j$(nproc)
-          
           find . -name "*.so" | head -n 1 | xargs -I {} cp {} $GITHUB_WORKSPACE/libnl_menu.so
 
       - name: Build Injector
@@ -38,17 +34,12 @@ jobs:
           cp $GITHUB_WORKSPACE/injector app/assets/
           cp -r src/assets/* app/assets/ 2>/dev/null || true
           
-          # ВИПРАВЛЕНО: Додано <uses-sdk> для сумісності з телефонами
           echo '<?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.hanto0.standoff">
               <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="33" />
-              <uses-permission android:name="android.permission.INTERNET"/>
-              <application android:label="Hanto0" android:usesCleartextTraffic="true">
+              <application android:label="Hanto0">
                   <activity android:name=".MainActivity" android:exported="true">
-                      <intent-filter>
-                          <action android:name="android.intent.action.MAIN"/>
-                          <category android:name="android.intent.category.LAUNCHER"/>
-                      </intent-filter>
+                      <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
                   </activity>
               </application>
           </manifest>' > app/AndroidManifest.xml
@@ -58,23 +49,12 @@ jobs:
           
           cd app
           javac -source 8 -target 8 -cp $ANDROID_HOME/platforms/android-34/android.jar -d obj src/com/hanto0/standoff/*.java
-          
           $ANDROID_HOME/build-tools/34.0.0/d8 --output . obj/com/hanto0/standoff/*.class
-          
-          # ВИПРАВЛЕНО: пакуємо без ресурсів, потім додаємо classes.dex БЕЗ СТИСНЕННЯ (-0)
           $ANDROID_HOME/build-tools/34.0.0/aapt package -f -M AndroidManifest.xml -S res -A assets -I $ANDROID_HOME/platforms/android-34/android.jar -F unsigned.apk
           zip -q -0 unsigned.apk classes.dex
-          
           $ANDROID_HOME/build-tools/34.0.0/zipalign -f 4 unsigned.apk aligned.apk
           keytool -genkey -v -keystore k.keystore -alias h -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=H" > /dev/null 2>&1
           $ANDROID_HOME/build-tools/34.0.0/apksigner sign --ks k.keystore --ks-pass pass:123456 --out hanto0-standoff.apk aligned.apk
-
-      # НОВИЙ КРОК: Зберігаємо APK як артефакт у вкладці Actions
-      - name: Upload APK as Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Hanto0-APK
-          path: app/hanto0-standoff.apk
 
       - name: Upload APK to Repo
         run: |
@@ -82,5 +62,9 @@ jobs:
           git config --global user.email 'github-actions@github.com'
           cp app/hanto0-standoff.apk ./hanto0-standoff.apk
           git add hanto0-standoff.apk
-          git commit -m "auto: compiled APK build" || exit 0
+          git commit -m "auto: compiled APK with real injector and logs" || exit 0
           git push
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with: { name: Hanto0-APK, path: app/hanto0-standoff.apk }
