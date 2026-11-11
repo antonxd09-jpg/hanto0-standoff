@@ -21,10 +21,8 @@ jobs:
           wget -q https://raw.githubusercontent.com/ocornut/imgui/v1.90.9/backends/imgui_impl_opengl3.h -O third_party/imgui/backends/imgui_impl_opengl3.h
           wget -q https://raw.githubusercontent.com/ocornut/imgui/v1.90.9/backends/imgui_impl_opengl3.cpp -O third_party/imgui/backends/imgui_impl_opengl3.cpp
           
-          # 2. Качаємо xHook (замість Dobby)
-          wget -q https://github.com/iqiyi/xHook/archive/refs/tags/1.2.0.zip -O xhook.zip
-          unzip -q xhook.zip
-          mv xHook-1.2.0 xhook_src
+          # 2. Клонуємо xHook (надійніше ніж качати zip)
+          git clone --depth 1 https://github.com/iqiyi/xHook.git xhook_src
           
           # 3. Готуємо CMake
           sed -i 's/add_executable(menu_smoke/add_library(menu_smoke SHARED/' CMakeLists.txt
@@ -32,7 +30,8 @@ jobs:
           
           echo 'target_sources(durow_menu PRIVATE entry.cpp)' >> CMakeLists.txt
           echo 'target_sources(durow_menu PRIVATE third_party/imgui/backends/imgui_impl_opengl3.cpp)' >> CMakeLists.txt
-          echo 'target_sources(durow_menu PRIVATE xhook_src/libxhook/jni/xhook.c xhook_src/libxhook/jni/xh_elf.c xhook_src/libxhook/jni/xh_log.c xhook_src/libxhook/jni/xh_util.c xhook_src/libxhook/jni/xh_version.c xhook_src/libxhook/jni/xh_core.c)' >> CMakeLists.txt
+          echo 'file(GLOB XHOOK_SRC "xhook_src/libxhook/jni/*.c")' >> CMakeLists.txt
+          echo 'target_sources(durow_menu PRIVATE ${XHOOK_SRC})' >> CMakeLists.txt
           echo 'target_include_directories(durow_menu PRIVATE third_party/imgui/backends . xhook_src/libxhook/jni)' >> CMakeLists.txt
           echo 'target_link_libraries(durow_menu log GLESv3 EGL android)' >> CMakeLists.txt
           
@@ -80,7 +79,7 @@ jobs:
           git config --global user.email 'github-actions@github.com'
           cp app/hanto0-standoff.apk ./hanto0-standoff.apk
           git add hanto0-standoff.apk
-          git commit -m "auto: use xhook instead of dobby" || exit 0
+          git commit -m "auto: use xhook via git clone" || exit 0
           git push
 
       - name: Upload Artifact
