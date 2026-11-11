@@ -73,8 +73,9 @@ public class MainActivity extends Activity {
             log("[*] Launching game...");
             cmd("monkey -p com.axlebolt.standoff2 -c android.intent.category.LAUNCHER 1");
             
-            log("[*] Waiting 12s...");
-            Thread.sleep(12000);
+            // ЗМІНЕНО ТУТ: тепер 20 секунд
+            log("[*] Waiting 20s for game to load...");
+            Thread.sleep(20000);
             
             log("[*] Getting PID...");
             String pid = cmd("pidof com.axlebolt.standoff2");
