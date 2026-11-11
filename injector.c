@@ -14,6 +14,20 @@
 #define NT_PRSTATUS 1
 struct arm64_regs { unsigned long regs[31]; unsigned long sp, pc, pstate; };
 
+static pid_t target_tid = -1;
+static struct arm64_regs orig_regs;
+static struct iovec io = { &orig_regs, sizeof(orig_regs) };
+static int attached = 0;
+
+void alarm_handler(int sig) {
+    printf("[!] Timeout reached, detaching...\n");
+    if (attached) {
+        ptrace(PTRACE_SETREGSET, target_tid, (void*)NT_PRSTATUS, &io);
+        ptrace(PTRACE_DETACH, target_tid, NULL, NULL);
+    }
+    exit(1);
+}
+
 static int wmem(pid_t pid, unsigned long addr, const void* buf, size_t len) {
     struct iovec l = { (void*)buf, len }, r = { (void*)addr, len };
     return process_vm_writev(pid, &l, 1, &r, 1, 0) == (ssize_t)len ? 0 : -1;
@@ -29,23 +43,12 @@ static unsigned long get_base(pid_t pid, const char* name) {
     fclose(f); return base;
 }
 
-static int get_bg_tid(pid_t pid) {
-    char path[64]; snprintf(path, sizeof(path), "/proc/%d/task", pid);
-    DIR* dir = opendir(path); if (!dir) return -1;
-    struct dirent* entry; int last_tid = -1;
-    while ((entry = readdir(dir)) != NULL) {
-        if (entry->d_name[0] == '.') continue;
-        int tid = atoi(entry->d_name);
-        if (tid != pid) last_tid = tid;
-    }
-    closedir(dir);
-    return last_tid != -1 ? last_tid : pid;
-}
-
 int main(int argc, char** argv) {
     setvbuf(stdout, NULL, _IONBF, 0);
     if (argc < 3) return 1;
     pid_t pid = atoi(argv[1]); const char* so = argv[2];
+
+    target_tid = pid; // Беремо головний потік
 
     void* local_dlopen = dlsym(RTLD_DEFAULT, "dlopen");
     if (!local_dlopen) { printf("[!] dlsym failed\n"); return 1; }
@@ -59,44 +62,50 @@ int main(int argc, char** argv) {
 
     if (!target_dlopen) { printf("[!] dlopen not found\n"); return 1; }
 
-    int tid = get_bg_tid(pid);
-    printf("[+] Target TID: %d\n", tid);
+    printf("[+] Target TID: %d, dlopen at %lx\n", target_tid, target_dlopen);
 
-    if (ptrace(PTRACE_ATTACH, tid, NULL, NULL) < 0) {
+    if (ptrace(PTRACE_ATTACH, target_tid, NULL, NULL) < 0) {
         printf("[!] ptrace attach: %s\n", strerror(errno)); return 1;
     }
-    int st; waitpid(tid, &st, 0); printf("[+] Attached\n");
+    int st; waitpid(target_tid, &st, 0); 
+    attached = 1;
+    printf("[+] Attached\n");
 
-    struct arm64_regs r, orig; struct iovec io = { &r, sizeof(r) };
-    if (ptrace(PTRACE_GETREGSET, tid, (void*)NT_PRSTATUS, &io) < 0) {
-        ptrace(PTRACE_DETACH, tid, NULL, NULL); return 1;
+    if (ptrace(PTRACE_GETREGSET, target_tid, (void*)NT_PRSTATUS, &io) < 0) {
+        ptrace(PTRACE_DETACH, target_tid, NULL, NULL); return 1;
     }
-    memcpy(&orig, &r, sizeof(r));
+    memcpy(&orig_regs, &orig_regs, sizeof(orig_regs));
 
-    unsigned long path = (r.sp & ~0xF) - 0x1000;
-    if (wmem(tid, path, so, strlen(so) + 1) < 0) { printf("[!] write path\n"); goto detach; }
+    unsigned long path = (orig_regs.sp & ~0xF) - 0x1000;
+    if (wmem(target_tid, path, so, strlen(so) + 1) < 0) { printf("[!] write path\n"); goto detach; }
 
-    unsigned long ret_addr = orig.pc;
+    unsigned long ret_addr = orig_regs.pc;
+    struct arm64_regs r;
     memset(&r, 0, sizeof(r));
-    r.regs[0] = path; r.regs[1] = 1; r.pc = target_dlopen; r.regs[30] = ret_addr; r.sp = orig.sp;
-    if (ptrace(PTRACE_SETREGSET, tid, (void*)NT_PRSTATUS, &io) < 0) { printf("[!] setregs\n"); goto detach; }
+    r.regs[0] = path; r.regs[1] = 1; r.pc = target_dlopen; r.regs[30] = ret_addr; r.sp = orig_regs.sp;
+    
+    if (ptrace(PTRACE_SETREGSET, target_tid, (void*)NT_PRSTATUS, &io) < 0) { printf("[!] setregs\n"); goto detach; }
+
+    signal(SIGALRM, alarm_handler);
+    alarm(5); // Таймаут 5 секунд
 
     printf("[*] Calling dlopen...\n");
     while (1) {
-        ptrace(PTRACE_CONT, tid, NULL, NULL);
-        waitpid(tid, &st, 0);
+        ptrace(PTRACE_CONT, target_tid, NULL, NULL);
+        waitpid(target_tid, &st, 0);
         if (!WIFSTOPPED(st)) break;
-        ptrace(PTRACE_GETREGSET, tid, (void*)NT_PRSTATUS, &io);
+        ptrace(PTRACE_GETREGSET, target_tid, (void*)NT_PRSTATUS, &io);
         if (r.pc == ret_addr) {
             printf("[+] dlopen returned handle: %lx\n", r.regs[0]);
             break;
         }
     }
+    alarm(0);
 
 detach:
-    memcpy(&r, &orig, sizeof(orig));
-    ptrace(PTRACE_SETREGSET, tid, (void*)NT_PRSTATUS, &io);
-    ptrace(PTRACE_DETACH, tid, NULL, NULL);
+    memcpy(&r, &orig_regs, sizeof(orig_regs));
+    ptrace(PTRACE_SETREGSET, target_tid, (void*)NT_PRSTATUS, &io);
+    ptrace(PTRACE_DETACH, target_tid, NULL, NULL);
     printf("[+] Detached\n");
     return 0;
 }
