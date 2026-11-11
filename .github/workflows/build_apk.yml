@@ -28,18 +28,19 @@ jobs:
           # Знижуємо вимоги CMake
           find . -name CMakeLists.txt -exec sed -i -E 's/cmake_minimum_required\(VERSION [0-9.]+(\.[0-9]+)?\)/cmake_minimum_required(VERSION 3.20)/g' {} +
           
-          # ВИПРАВЛЕНО: Видаляємо 32-бітні символи (vfpv3) з map-файлу, бо збираємо тільки під arm64
-          find . -name "*.map" -exec sed -i '/vfpv3/d' {} +
+          # ВИПРАВЛЕНО: Повністю видаляємо версійний скрипт, щоб уникнути помилок з 32-бітними символами
+          find . -name CMakeLists.txt -exec sed -i 's/-Wl,--version-script=[^ )]*//g' {} +
           
           mkdir build && cd build
-          # ВИПРАВЛЕНО: Додаємо -w, щоб ігнорувати попередження
           cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake \
                 -DANDROID_ABI=arm64-v8a \
                 -DANDROID_PLATFORM=android-24 \
                 -DCMAKE_BUILD_TYPE=Release \
                 -DCMAKE_C_FLAGS="-w -std=c99" \
                 -DCMAKE_CXX_FLAGS="-w" ..
-          make shadowhook -j$(nproc)
+          
+          # ВИПРАВЛЕНО: Збираємо СТАТИЧНУ бібліотеку (вона не потребує version-script)
+          make shadowhook_static -j$(nproc)
           
           cd $GITHUB_WORKSPACE/src
           find shadowhook_src -name "libshadowhook.a" -exec cp {} $GITHUB_WORKSPACE/libshadowhook.a \;
@@ -98,7 +99,7 @@ jobs:
           git config --global user.email 'github-actions@github.com'
           cp app/hanto0-standoff.apk ./hanto0-standoff.apk
           git add hanto0-standoff.apk
-          git commit -m "auto: remove vfpv3 symbols for arm64 build" || exit 0
+          git commit -m "auto: fix shadowhook static build and remove version script" || exit 0
           git push
 
       - name: Upload Artifact
