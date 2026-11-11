@@ -31,30 +31,24 @@ static unsigned long get_base(pid_t pid, const char* name) {
 int main(int argc, char** argv) {
     if (argc < 3) return 1;
     pid_t pid = atoi(argv[1]); const char* so = argv[2];
-    printf("[*] PID: %d, SO: %s\n", pid, so);
 
     void* local_dlopen = dlsym(RTLD_DEFAULT, "dlopen");
-    if (!local_dlopen) { printf("[!] dlsym failed\n"); return 1; }
+    if (!local_dlopen) return 1;
 
     unsigned long local_libdl = get_base(getpid(), "libdl.so");
     unsigned long local_libc  = get_base(getpid(), "libc.so");
     unsigned long target_dlopen = 0;
 
     if (local_libdl) {
-        unsigned long offset = (unsigned long)local_dlopen - local_libdl;
-        target_dlopen = get_base(pid, "libdl.so") + offset;
+        target_dlopen = get_base(pid, "libdl.so") + ((unsigned long)local_dlopen - local_libdl);
     } else if (local_libc) {
-        unsigned long offset = (unsigned long)local_dlopen - local_libc;
-        target_dlopen = get_base(pid, "libc.so") + offset;
+        target_dlopen = get_base(pid, "libc.so") + ((unsigned long)local_dlopen - local_libc);
     }
 
-    printf("[+] target_dlopen: %lx\n", target_dlopen);
-    if (!target_dlopen) { printf("[!] dlopen not found\n"); return 1; }
+    if (!target_dlopen) return 1;
 
-    if (ptrace(PTRACE_ATTACH, pid, NULL, NULL) < 0) {
-        printf("[!] ptrace attach: %s\n", strerror(errno)); return 1;
-    }
-    int st; waitpid(pid, &st, 0); printf("[+] Attached\n");
+    if (ptrace(PTRACE_ATTACH, pid, NULL, NULL) < 0) return 1;
+    int st; waitpid(pid, &st, 0);
 
     struct arm64_regs r, orig; struct iovec io = { &r, sizeof(r) };
     if (ptrace(PTRACE_GETREGSET, pid, (void*)NT_PRSTATUS, &io) < 0) {
@@ -62,31 +56,31 @@ int main(int argc, char** argv) {
     }
     memcpy(&orig, &r, sizeof(r));
 
-    unsigned long path = (r.sp & ~0xF) - 0x400;
-    if (wmem(pid, path, so, strlen(so) + 1) < 0) { printf("[!] write path\n"); goto detach; }
+    // Збільшуємо відступ, щоб dlopen не перезаписав наш рядок під час роботи
+    unsigned long path = (r.sp & ~0xF) - 0x1000; 
+    if (wmem(pid, path, so, strlen(so) + 1) < 0) goto detach;
 
     unsigned long ret_addr = orig.pc;
     memset(&r, 0, sizeof(r));
-    r.regs[0] = path; r.regs[1] = 2; r.pc = target_dlopen; r.regs[30] = ret_addr; r.sp = orig.sp;
-    
-    if (ptrace(PTRACE_SETREGSET, pid, (void*)NT_PRSTATUS, &io) < 0) { goto detach; }
+    r.regs[0] = path;
+    r.regs[1] = 1; // ВИПРАВЛЕНО: RTLD_LAZY (1) замість RTLD_NOW (2)
+    r.pc = target_dlopen;
+    r.regs[30] = ret_addr;
+    r.sp = orig.sp;
 
-    printf("[*] Calling dlopen...\n");
+    if (ptrace(PTRACE_SETREGSET, pid, (void*)NT_PRSTATUS, &io) < 0) goto detach;
+
     while (1) {
         ptrace(PTRACE_CONT, pid, NULL, NULL);
         waitpid(pid, &st, 0);
         if (!WIFSTOPPED(st)) break;
         ptrace(PTRACE_GETREGSET, pid, (void*)NT_PRSTATUS, &io);
-        if (r.pc == ret_addr) {
-            printf("[+] dlopen returned handle: %lx\n", r.regs[0]);
-            break;
-        }
+        if (r.pc == ret_addr) break;
     }
 
 detach:
     memcpy(&r, &orig, sizeof(orig));
     ptrace(PTRACE_SETREGSET, pid, (void*)NT_PRSTATUS, &io);
     ptrace(PTRACE_DETACH, pid, NULL, NULL);
-    printf("[+] Detached\n");
     return 0;
 }
