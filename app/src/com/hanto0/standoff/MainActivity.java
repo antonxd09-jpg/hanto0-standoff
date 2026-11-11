@@ -68,12 +68,11 @@ public class MainActivity extends Activity {
             cmd("chmod 755 " + gameCache + " /data/local/tmp/injector");
             cmd("chcon u:object_r:app_data_file:s0 " + gameCache + " 2>/dev/null");
             
-            log("[+] Files copied and permissions fixed");
+            log("[+] Files copied");
             
             log("[*] Launching game...");
             cmd("monkey -p com.axlebolt.standoff2 -c android.intent.category.LAUNCHER 1");
             
-            // ЗМІНЕНО ТУТ: тепер 20 секунд
             log("[*] Waiting 20s for game to load...");
             Thread.sleep(20000);
             
@@ -82,11 +81,14 @@ public class MainActivity extends Activity {
             log("> PID: " + pid);
             if (pid == null || pid.trim().isEmpty()) { log("[!] Game not running."); return; }
             
-            log("[*] Injecting...");
-            String res = cmd("/data/local/tmp/injector " + pid.trim() + " " + gameCache + " 2>&1");
-            log("> " + res);
+            log("[*] Injecting in background...");
+            // ВИПРАВЛЕНО: запуск у фоні, щоб не вішати лог
+            cmd("/data/local/tmp/injector " + pid.trim() + " " + gameCache + " > /data/local/tmp/inject_log.txt 2>&1 &");
+            Thread.sleep(2000);
             
-            log("[+] Finished. Check game screen.");
+            log("[+] Injection triggered. Check game screen.");
+            log("[!] If menu doesn't show, check /data/local/tmp/inject_log.txt");
+            
         } catch (Exception e) {
             log("[!] Error: " + e.getMessage());
         } finally {
