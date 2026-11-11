@@ -52,8 +52,8 @@ void on_load() {
     void* target = dlsym(RTLD_DEFAULT, "eglSwapBuffers");
     if (target) {
         LOGI("Found eglSwapBuffers, hooking...");
-        int res = shadowhook_hook_func_addr(target, (void*)hook_eglSwapBuffers, (void**)&orig_eglSwapBuffers);
-        LOGI("ShadowHook result: %d", res);
+        void* res = shadowhook_hook_func_addr(target, (void*)hook_eglSwapBuffers, (void**)&orig_eglSwapBuffers);
+        LOGI("ShadowHook result: %p", res);
     } else {
         LOGI("Failed to find eglSwapBuffers");
     }
