@@ -3,7 +3,7 @@
 #include <EGL/egl.h>
 #include <GLES3/gl3.h>
 #include "imgui.h"
-#include "imgui_impl_opengl3.h"
+#include "backends/imgui_impl_opengl3.h" // ВИПРАВЛЕНО: додано шлях backends/
 #include "menu/menu.h"
 #include "dobby.h"
 
@@ -17,37 +17,38 @@ nl::Menu* g_menu = nullptr;
 bool g_initialized = false;
 
 EGLBoolean hook_eglSwapBuffers(EGLDisplay dpy, EGLSurface surf) {
-    if (g_menu && g_initialized) {
+    if (!g_initialized) {
+        // Ініціалізуємо ImGui в потоці рендеру гри, коли контекст OpenGL вже активний
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGui_ImplOpenGL3_Init("#version 300 es");
+        
+        g_menu = new nl::Menu();
+        g_menu->init(ImVec2(100, 100), 1.0f);
+        g_menu->set_visible(true); // Меню з'явиться одразу
+        
+        g_initialized = true;
+        LOGI("ImGui initialized on GL thread");
+    }
+
+    if (g_initialized) {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui::NewFrame();
-        
-        // Відмальовка меню
-        g_menu->render();
-        
+        g_menu->render(); // Виклик твого меню
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
+    
     return orig_eglSwapBuffers(dpy, surf);
 }
 
 __attribute__((constructor))
 void on_load() {
     LOGI("Menu loaded!");
-    
-    // Ініціалізація ImGui
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    
-    // Налаштування бекенду OpenGL ES 3.0
-    ImGui_ImplOpenGL3_Init("#version 300 es");
-    
-    g_menu = new nl::Menu();
-    g_menu->init(ImVec2(100, 100), 1.0f);
-    g_menu->set_visible(true); // Показуємо меню одразу
-    
-    g_initialized = true;
+    FILE* f = fopen("/data/local/tmp/menu_loaded.txt", "w");
+    if (f) { fputs("Menu loaded!", f); fclose(f); }
 
-    // Ставимо хук на eglSwapBuffers
+    // Ставимо хук
     void* target = DobbySymbolResolver("libEGL.so", "eglSwapBuffers");
     if (target) {
         DobbyHook(target, (void*)hook_eglSwapBuffers, (void**)&orig_eglSwapBuffers);
