@@ -11,7 +11,6 @@
 #include <dlfcn.h>
 
 #define NT_PRSTATUS 1
-
 struct arm64_regs { unsigned long regs[31]; unsigned long sp, pc, pstate; };
 
 static int wmem(pid_t pid, unsigned long addr, const void* buf, size_t len) {
@@ -43,12 +42,10 @@ int main(int argc, char** argv) {
 
     if (local_libdl) {
         unsigned long offset = (unsigned long)local_dlopen - local_libdl;
-        unsigned long target_libdl = get_base(pid, "libdl.so");
-        target_dlopen = target_libdl + offset;
+        target_dlopen = get_base(pid, "libdl.so") + offset;
     } else if (local_libc) {
         unsigned long offset = (unsigned long)local_dlopen - local_libc;
-        unsigned long target_libc = get_base(pid, "libc.so");
-        target_dlopen = target_libc + offset;
+        target_dlopen = get_base(pid, "libc.so") + offset;
     }
 
     printf("[+] target_dlopen: %lx\n", target_dlopen);
@@ -68,31 +65,22 @@ int main(int argc, char** argv) {
     unsigned long path = (r.sp & ~0xF) - 0x400;
     if (wmem(pid, path, so, strlen(so) + 1) < 0) { printf("[!] write path\n"); goto detach; }
 
-    // Налаштовуємо регістри для виклику dlopen
     unsigned long ret_addr = orig.pc;
     memset(&r, 0, sizeof(r));
-    r.regs[0] = path; r.regs[1] = 2; // RTLD_NOW
-    r.pc = target_dlopen; 
-    r.regs[30] = ret_addr; // Куди повертатися після dlopen
-    r.sp = orig.sp;
+    r.regs[0] = path; r.regs[1] = 2; r.pc = target_dlopen; r.regs[30] = ret_addr; r.sp = orig.sp;
     
     if (ptrace(PTRACE_SETREGSET, pid, (void*)NT_PRSTATUS, &io) < 0) { goto detach; }
 
     printf("[*] Calling dlopen...\n");
-    
-    // Чекаємо завершення dlopen, ігноруючи системні сигнали
     while (1) {
         ptrace(PTRACE_CONT, pid, NULL, NULL);
         waitpid(pid, &st, 0);
         if (!WIFSTOPPED(st)) break;
-        
         ptrace(PTRACE_GETREGSET, pid, (void*)NT_PRSTATUS, &io);
         if (r.pc == ret_addr) {
-            // dlopen завершився
             printf("[+] dlopen returned handle: %lx\n", r.regs[0]);
             break;
         }
-        // Якщо це просто сигнал (sig 33), продовжуємо далі
     }
 
 detach:
