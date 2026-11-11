@@ -1,8 +1,8 @@
+#include <stdio.h>
 #include <android/log.h>
-#include <fstream>
 __attribute__((constructor))
 void on_load() {
-    std::ofstream out("/data/data/com.axlebolt.standoff2/cache/loaded.txt");
-    out << "Menu loaded!" << std::endl;
+    FILE* f = fopen("/data/local/tmp/menu_loaded.txt", "w");
+    if (f) { fputs("Menu loaded!", f); fclose(f); }
     __android_log_print(ANDROID_LOG_INFO, "Hanto0", "Menu loaded!");
 }
