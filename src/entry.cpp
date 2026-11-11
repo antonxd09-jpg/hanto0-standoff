@@ -2,6 +2,7 @@
 #include <android/log.h>
 #include <EGL/egl.h>
 #include <GLES3/gl3.h>
+#include <dlfcn.h>
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "menu/menu.h"
@@ -46,6 +47,15 @@ EGLBoolean hook_eglSwapBuffers(EGLDisplay dpy, EGLSurface surf) {
 __attribute__((constructor))
 void on_load() {
     LOGI("Menu loaded!");
-    A64HookFunction((void*)eglSwapBuffers, (void*)hook_eglSwapBuffers, (void**)&orig_eglSwapBuffers);
-    LOGI("Hooked eglSwapBuffers");
+    FILE* f = fopen("/data/local/tmp/menu_loaded.txt", "w");
+    if (f) { fputs("Menu loaded!", f); fclose(f); }
+
+    // ВИПРАВЛЕНО: шукаємо адресу через dlsym
+    void* target = dlsym(RTLD_DEFAULT, "eglSwapBuffers");
+    if (target) {
+        A64HookFunction(target, (void*)hook_eglSwapBuffers, (void**)&orig_eglSwapBuffers);
+        LOGI("Hooked eglSwapBuffers");
+    } else {
+        LOGI("Failed to find eglSwapBuffers");
+    }
 }

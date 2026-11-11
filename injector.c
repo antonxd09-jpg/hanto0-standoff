@@ -29,7 +29,6 @@ static unsigned long get_base(pid_t pid, const char* name) {
     fclose(f); return base;
 }
 
-// Знаходимо фоновий TID, щоб не чіпати головний потік гри
 static int get_bg_tid(pid_t pid) {
     char path[64]; snprintf(path, sizeof(path), "/proc/%d/task", pid);
     DIR* dir = opendir(path); if (!dir) return -1;
@@ -37,14 +36,14 @@ static int get_bg_tid(pid_t pid) {
     while ((entry = readdir(dir)) != NULL) {
         if (entry->d_name[0] == '.') continue;
         int tid = atoi(entry->d_name);
-        if (tid != pid) last_tid = tid; // Беремо будь-який потік, крім головного
+        if (tid != pid) last_tid = tid;
     }
     closedir(dir);
     return last_tid != -1 ? last_tid : pid;
 }
 
 int main(int argc, char** argv) {
-    setvbuf(stdout, NULL, _IONBF, 0); // Вимикаємо буферизацію
+    setvbuf(stdout, NULL, _IONBF, 0);
     if (argc < 3) return 1;
     pid_t pid = atoi(argv[1]); const char* so = argv[2];
 
@@ -88,7 +87,10 @@ int main(int argc, char** argv) {
         waitpid(tid, &st, 0);
         if (!WIFSTOPPED(st)) break;
         ptrace(PTRACE_GETREGSET, tid, (void*)NT_PRSTATUS, &io);
-        if (r.pc == ret_addr) break;
+        if (r.pc == ret_addr) {
+            printf("[+] dlopen returned handle: %lx\n", r.regs[0]);
+            break;
+        }
     }
 
 detach:
