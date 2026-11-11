@@ -17,11 +17,9 @@ public class MainActivity extends Activity {
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setPadding(40, 40, 40, 40);
-        
         status = new TextView(this);
         status.setTextSize(12);
         status.setText("=== Hanto0 Menu Launcher ===\nTap START to begin.\n\n");
-        
         startBtn = new Button(this);
         startBtn.setText("START");
         startBtn.setTextSize(22);
@@ -29,7 +27,6 @@ public class MainActivity extends Activity {
             startBtn.setEnabled(false);
             new Thread(() -> run()).start();
         });
-        
         layout.addView(startBtn);
         layout.addView(status);
         scroll.addView(layout);
@@ -53,23 +50,25 @@ public class MainActivity extends Activity {
             if (id == null || !id.contains("uid=0")) { log("[!] No root!"); return; }
             
             log("[*] Disabling security...");
-            cmd("setenforce 0 2>/dev/null; echo 0 > /proc/sys/kernel/yama/ptrace_scope 2>/dev/null; echo done");
+            cmd("setenforce 0 2>/dev/null; echo 0 > /proc/sys/kernel/yama/ptrace_scope 2>/dev/null");
             
             log("[*] Copying files...");
             File so = new File(getFilesDir(), "libnl_menu.so");
             File inj = new File(getFilesDir(), "injector");
-            
-            // ВИПРАВЛЕНО: Видаляємо старі файли, щоб оновити на нові
             if (so.exists()) so.delete();
             if (inj.exists()) inj.delete();
-            
             copyAsset("libnl_menu.so", so);
             copyAsset("injector", inj);
             
-            cmd("cp " + so.getAbsolutePath() + " /data/local/tmp/");
+            String gameCache = "/data/data/com.axlebolt.standoff2/cache/libnl_menu.so";
+            cmd("cp " + so.getAbsolutePath() + " " + gameCache);
             cmd("cp " + inj.getAbsolutePath() + " /data/local/tmp/");
-            cmd("chmod 755 /data/local/tmp/libnl_menu.so /data/local/tmp/injector");
-            log("[+] Files copied");
+            
+            cmd("chown $(stat -c %u /data/data/com.axlebolt.standoff2) $(stat -c %g /data/data/com.axlebolt.standoff2) " + gameCache);
+            cmd("chmod 755 " + gameCache + " /data/local/tmp/injector");
+            cmd("chcon u:object_r:app_data_file:s0 " + gameCache + " 2>/dev/null");
+            
+            log("[+] Files copied and permissions fixed");
             
             log("[*] Launching game...");
             cmd("monkey -p com.axlebolt.standoff2 -c android.intent.category.LAUNCHER 1");
@@ -83,7 +82,7 @@ public class MainActivity extends Activity {
             if (pid == null || pid.trim().isEmpty()) { log("[!] Game not running."); return; }
             
             log("[*] Injecting...");
-            String res = cmd("/data/local/tmp/injector " + pid.trim() + " /data/local/tmp/libnl_menu.so 2>&1");
+            String res = cmd("/data/local/tmp/injector " + pid.trim() + " " + gameCache + " 2>&1");
             log("> " + res);
             
             log("[+] Finished. Check game screen.");

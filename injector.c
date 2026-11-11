@@ -8,14 +8,10 @@
 #include <sys/ptrace.h>
 #include <sys/wait.h>
 #include <sys/uio.h>
-#include <elf.h>
+#include <dlfcn.h>
 
 struct arm64_regs { unsigned long regs[31]; unsigned long sp, pc, pstate; };
 
-static int rmem(pid_t pid, unsigned long addr, void* buf, size_t len) {
-    struct iovec l = { buf, len }, r = { (void*)addr, len };
-    return process_vm_readv(pid, &l, 1, &r, 1, 0) == (ssize_t)len ? 0 : -1;
-}
 static int wmem(pid_t pid, unsigned long addr, const void* buf, size_t len) {
     struct iovec l = { (void*)buf, len }, r = { (void*)addr, len };
     return process_vm_writev(pid, &l, 1, &r, 1, 0) == (ssize_t)len ? 0 : -1;
@@ -31,72 +27,58 @@ static unsigned long get_base(pid_t pid, const char* name) {
     fclose(f); return base;
 }
 
-static unsigned long find_sym(pid_t pid, unsigned long base, const char* name) {
-    if (!base) return 0;
-    Elf64_Ehdr eh; if (rmem(pid, base, &eh, sizeof(eh)) < 0) return 0;
-    Elf64_Phdr* ph = calloc(eh.e_phnum, sizeof(Elf64_Phdr));
-    rmem(pid, base + eh.e_phoff, ph, eh.e_phnum * sizeof(Elf64_Phdr));
-    unsigned long dyn = 0, dsz = 0;
-    for (int i=0; i<eh.e_phnum; i++) if (ph[i].p_type == PT_DYNAMIC) { dyn = base + ph[i].p_vaddr; dsz = ph[i].p_memsz; break; }
-    free(ph); if (!dyn) return 0;
-    Elf64_Dyn* d = calloc(1, dsz); rmem(pid, dyn, d, dsz);
-    unsigned long str = 0, sym = 0;
-    for (size_t i=0; i<dsz/sizeof(Elf64_Dyn); i++) {
-        if (d[i].d_tag == DT_STRTAB) str = d[i].d_un.d_ptr;
-        else if (d[i].d_tag == DT_SYMTAB) sym = d[i].d_un.d_ptr;
-        else if (d[i].d_tag == DT_NULL) break;
-    }
-    free(d); if (!str || !sym) return 0;
-    char n[256]; Elf64_Sym s;
-    for (int i=1; i<10000; i++) {
-        if (rmem(pid, sym + i * sizeof(Elf64_Sym), &s, sizeof(s)) < 0) break;
-        if (s.st_name == 0) continue;
-        memset(n, 0, sizeof(n)); if (rmem(pid, str + s.st_name, n, 255) < 0) continue;
-        if (strcmp(n, name) == 0) return base + s.st_value;
-    }
-    return 0;
-}
-
 int main(int argc, char** argv) {
-    if (argc < 3) { printf("Usage: %s <pid> <so_path>\n", argv[0]); return 1; }
+    if (argc < 3) return 1;
     pid_t pid = atoi(argv[1]); const char* so = argv[2];
     printf("[*] PID: %d, SO: %s\n", pid, so);
-    
+
+    // Знаходимо dlopen у нашому власному процесі
+    void* local_dlopen = dlsym(RTLD_DEFAULT, "dlopen");
+    if (!local_dlopen) { printf("[!] dlsym failed\n"); return 1; }
+
+    unsigned long local_libdl = get_base(getpid(), "libdl.so");
+    unsigned long local_libc  = get_base(getpid(), "libc.so");
+    unsigned long target_dlopen = 0;
+
+    // Обчислюємо адресу для цільового процесу
+    if (local_libdl) {
+        unsigned long offset = (unsigned long)local_dlopen - local_libdl;
+        unsigned long target_libdl = get_base(pid, "libdl.so");
+        target_dlopen = target_libdl + offset;
+    } else if (local_libc) {
+        unsigned long offset = (unsigned long)local_dlopen - local_libc;
+        unsigned long target_libc = get_base(pid, "libc.so");
+        target_dlopen = target_libc + offset;
+    }
+
+    printf("[+] target_dlopen: %lx\n", target_dlopen);
+    if (!target_dlopen) { printf("[!] dlopen not found\n"); return 1; }
+
     if (ptrace(PTRACE_ATTACH, pid, NULL, NULL) < 0) {
         printf("[!] ptrace attach: %s\n", strerror(errno)); return 1;
     }
     int st; waitpid(pid, &st, 0); printf("[+] Attached\n");
-    
+
     struct arm64_regs r, orig; struct iovec io = { &r, sizeof(r) };
     if (ptrace(PTRACE_GETREGSET, pid, (void*)NT_PRSTATUS, &io) < 0) {
-        printf("[!] getregs: %s\n", strerror(errno)); ptrace(PTRACE_DETACH, pid, NULL, NULL); return 1;
+        ptrace(PTRACE_DETACH, pid, NULL, NULL); return 1;
     }
     memcpy(&orig, &r, sizeof(r));
-    
-    // ВИПРАВЛЕНО: шукаємо dlopen у libdl.so, потім у libc.so
-    unsigned long libdl = get_base(pid, "libdl.so");
-    unsigned long dlopen = find_sym(pid, libdl, "dlopen");
-    if (!dlopen) {
-        unsigned long libc = get_base(pid, "libc.so");
-        dlopen = find_sym(pid, libc, "dlopen");
-        printf("[+] libc: %lx, dlopen: %lx\n", libc, dlopen);
-    } else {
-        printf("[+] libdl: %lx, dlopen: %lx\n", libdl, dlopen);
-    }
-    
-    if (!dlopen) { printf("[!] dlopen not found\n"); goto detach; }
-    
+
     unsigned long path = (r.sp & ~0xF) - 0x400;
     if (wmem(pid, path, so, strlen(so) + 1) < 0) { printf("[!] write path\n"); goto detach; }
-    
+
     memset(&r, 0, sizeof(r));
-    r.regs[0] = path; r.regs[1] = 2; r.pc = dlopen; r.regs[30] = orig.pc; r.sp = orig.sp;
-    if (ptrace(PTRACE_SETREGSET, pid, (void*)NT_PRSTATUS, &io) < 0) { printf("[!] setregs\n"); goto detach; }
-    
+    r.regs[0] = path; r.regs[1] = 2; r.pc = target_dlopen; r.regs[30] = orig.pc; r.sp = orig.sp;
+    if (ptrace(PTRACE_SETREGSET, pid, (void*)NT_PRSTATUS, &io) < 0) { goto detach; }
+
     printf("[*] Calling dlopen...\n");
     ptrace(PTRACE_CONT, pid, NULL, NULL);
     waitpid(pid, &st, 0);
-    if (WIFSTOPPED(st)) printf("[+] Stopped: sig %d\n", WSTOPSIG(st));
+    if (WIFSTOPPED(st)) {
+        ptrace(PTRACE_GETREGSET, pid, (void*)NT_PRSTATUS, &io);
+        printf("[+] Stopped: sig %d, ret: %lx\n", WSTOPSIG(st), r.regs[0]);
+    }
 
 detach:
     memcpy(&r, &orig, sizeof(orig));
