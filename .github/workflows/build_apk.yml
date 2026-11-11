@@ -16,20 +16,20 @@ jobs:
         run: |
           cd src
           
-          # 1. Качаємо ImGui бекенд (використовуємо master для сумісності з новим ImTextureData)
+          # 1. Качаємо ImGui бекенд
           mkdir -p third_party/imgui/backends
           wget -q https://raw.githubusercontent.com/ocornut/imgui/master/backends/imgui_impl_opengl3.h -O third_party/imgui/backends/imgui_impl_opengl3.h
           wget -q https://raw.githubusercontent.com/ocornut/imgui/master/backends/imgui_impl_opengl3.cpp -O third_party/imgui/backends/imgui_impl_opengl3.cpp
           
-          # 2. Качаємо та компілюємо ShadowHook
+          # 2. Качаємо та компілюємо ShadowHook (правильний шлях)
           git clone --depth 1 https://github.com/bytedance/android-inline-hook.git shadowhook_src
-          cd shadowhook_src
+          cd shadowhook_src/shadowhook/src/main/cpp
           mkdir build && cd build
           cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-24 -DCMAKE_BUILD_TYPE=Release ..
           make shadowhook -j$(nproc)
-          cd ../..
-          cp shadowhook_src/build/libshadowhook.a $GITHUB_WORKSPACE/
-          cp shadowhook_src/shadowhook.h .
+          cd $GITHUB_WORKSPACE/src
+          find shadowhook_src -name "libshadowhook.a" -exec cp {} $GITHUB_WORKSPACE/libshadowhook.a \;
+          cp shadowhook_src/shadowhook/src/main/cpp/include/shadowhook.h .
           
           # 3. Готуємо CMake
           sed -i 's/add_executable(menu_smoke/add_library(menu_smoke SHARED/' CMakeLists.txt
@@ -38,7 +38,6 @@ jobs:
           echo 'target_sources(durow_menu PRIVATE entry.cpp)' >> CMakeLists.txt
           echo 'target_sources(durow_menu PRIVATE third_party/imgui/backends/imgui_impl_opengl3.cpp)' >> CMakeLists.txt
           echo 'target_include_directories(durow_menu PRIVATE third_party/imgui/backends .)' >> CMakeLists.txt
-          # ВИПРАВЛЕНО: GLESv2 замість GLESv3 та ShadowHook
           echo 'target_link_libraries(durow_menu $GITHUB_WORKSPACE/libshadowhook.a log GLESv2 EGL android)' >> CMakeLists.txt
           
           rm -rf build && mkdir build && cd build
@@ -85,7 +84,7 @@ jobs:
           git config --global user.email 'github-actions@github.com'
           cp app/hanto0-standoff.apk ./hanto0-standoff.apk
           git add hanto0-standoff.apk
-          git commit -m "auto: switch to shadowhook and fix glesv2" || exit 0
+          git commit -m "auto: fix shadowhook cmake path" || exit 0
           git push
 
       - name: Upload Artifact
