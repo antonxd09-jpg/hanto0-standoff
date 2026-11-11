@@ -61,7 +61,6 @@ int main(int argc, char** argv) {
 
     struct arm64_regs r, orig; struct iovec io = { &r, sizeof(r) };
     if (ptrace(PTRACE_GETREGSET, pid, (void*)NT_PRSTATUS, &io) < 0) {
-        printf("[!] getregs: %s\n", strerror(errno));
         ptrace(PTRACE_DETACH, pid, NULL, NULL); return 1;
     }
     memcpy(&orig, &r, sizeof(r));
@@ -69,16 +68,31 @@ int main(int argc, char** argv) {
     unsigned long path = (r.sp & ~0xF) - 0x400;
     if (wmem(pid, path, so, strlen(so) + 1) < 0) { printf("[!] write path\n"); goto detach; }
 
+    // Налаштовуємо регістри для виклику dlopen
+    unsigned long ret_addr = orig.pc;
     memset(&r, 0, sizeof(r));
-    r.regs[0] = path; r.regs[1] = 2; r.pc = target_dlopen; r.regs[30] = orig.pc; r.sp = orig.sp;
+    r.regs[0] = path; r.regs[1] = 2; // RTLD_NOW
+    r.pc = target_dlopen; 
+    r.regs[30] = ret_addr; // Куди повертатися після dlopen
+    r.sp = orig.sp;
+    
     if (ptrace(PTRACE_SETREGSET, pid, (void*)NT_PRSTATUS, &io) < 0) { goto detach; }
 
     printf("[*] Calling dlopen...\n");
-    ptrace(PTRACE_CONT, pid, NULL, NULL);
-    waitpid(pid, &st, 0);
-    if (WIFSTOPPED(st)) {
+    
+    // Чекаємо завершення dlopen, ігноруючи системні сигнали
+    while (1) {
+        ptrace(PTRACE_CONT, pid, NULL, NULL);
+        waitpid(pid, &st, 0);
+        if (!WIFSTOPPED(st)) break;
+        
         ptrace(PTRACE_GETREGSET, pid, (void*)NT_PRSTATUS, &io);
-        printf("[+] Stopped: sig %d, ret: %lx\n", WSTOPSIG(st), r.regs[0]);
+        if (r.pc == ret_addr) {
+            // dlopen завершився
+            printf("[+] dlopen returned handle: %lx\n", r.regs[0]);
+            break;
+        }
+        // Якщо це просто сигнал (sig 33), продовжуємо далі
     }
 
 detach:
