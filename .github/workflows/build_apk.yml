@@ -25,7 +25,8 @@ jobs:
 
       - name: Build Injector
         run: |
-          $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang -O2 injector.c -o injector -static
+          # ВИПРАВЛЕНО: додано -Wl,-z,max-page-size=16384 для Android 14+
+          $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang -O2 injector.c -o injector -static -Wl,-z,max-page-size=16384
 
       - name: Compile APK
         run: |
@@ -62,7 +63,7 @@ jobs:
           git config --global user.email 'github-actions@github.com'
           cp app/hanto0-standoff.apk ./hanto0-standoff.apk
           git add hanto0-standoff.apk
-          git commit -m "auto: compiled APK with real injector and logs" || exit 0
+          git commit -m "auto: fix injector tls alignment for android 14" || exit 0
           git push
 
       - name: Upload Artifact
