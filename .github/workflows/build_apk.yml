@@ -21,14 +21,15 @@ jobs:
           wget -q https://raw.githubusercontent.com/ocornut/imgui/v1.90.9/backends/imgui_impl_opengl3.h -O third_party/imgui/backends/imgui_impl_opengl3.h
           wget -q https://raw.githubusercontent.com/ocornut/imgui/v1.90.9/backends/imgui_impl_opengl3.cpp -O third_party/imgui/backends/imgui_impl_opengl3.cpp
           
-          # 2. Качаємо та компілюємо Dobby
+          # 2. Качаємо та компілюємо Dobby (виправлено для Android)
           wget -q https://github.com/jmpews/Dobby/archive/refs/heads/master.zip
           unzip -q master.zip
           mv Dobby-master dobby_src
           cd dobby_src
-          cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-24 -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=ON .
+          mkdir build && cd build
+          cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-24 -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_SYSTEM_NAME=Android -DCMAKE_SYSTEM_VERSION=24 ..
           make -j$(nproc)
-          cd ..
+          cd ../..
           find dobby_src -name "libdobby.a" -exec cp {} $GITHUB_WORKSPACE/libdobby.a \;
           cp -r dobby_src/include .
           
@@ -85,7 +86,7 @@ jobs:
           git config --global user.email 'github-actions@github.com'
           cp app/hanto0-standoff.apk ./hanto0-standoff.apk
           git add hanto0-standoff.apk
-          git commit -m "auto: use dobby and auto GL version" || exit 0
+          git commit -m "auto: use dobby with fixed android asm" || exit 0
           git push
 
       - name: Upload Artifact

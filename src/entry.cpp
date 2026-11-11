@@ -19,19 +19,20 @@ nl::Menu* g_menu = nullptr;
 bool g_initialized = false;
 
 EGLBoolean hook_eglSwapBuffers(EGLDisplay dpy, EGLSurface surf) {
+    LOGI("Hook triggered: eglSwapBuffers called");
     if (!g_initialized) {
-        LOGI("First eglSwapBuffers call. Initializing ImGui...");
+        LOGI("Initializing ImGui...");
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         nl::load_fonts();
-        ImGui_ImplOpenGL3_Init(nullptr); // Авто-визначення версії OpenGL
+        ImGui_ImplOpenGL3_Init(nullptr);
         
         g_menu = new nl::Menu();
         g_menu->init(ImVec2(100, 100), 1.0f);
         g_menu->set_visible(true);
         
         g_initialized = true;
-        LOGI("ImGui initialized");
+        LOGI("ImGui initialized successfully");
     }
 
     if (g_initialized) {
@@ -47,11 +48,12 @@ EGLBoolean hook_eglSwapBuffers(EGLDisplay dpy, EGLSurface surf) {
 
 __attribute__((constructor))
 void on_load() {
-    LOGI("Menu loaded!");
+    LOGI("Menu loaded via constructor!");
     void* target = dlsym(RTLD_DEFAULT, "eglSwapBuffers");
     if (target) {
-        DobbyHook(target, (void*)hook_eglSwapBuffers, (void**)&orig_eglSwapBuffers);
-        LOGI("Hooked eglSwapBuffers");
+        LOGI("Found eglSwapBuffers at %p, hooking...", target);
+        int res = DobbyHook(target, (void*)hook_eglSwapBuffers, (void**)&orig_eglSwapBuffers);
+        LOGI("DobbyHook result: %d", res);
     } else {
         LOGI("Failed to find eglSwapBuffers");
     }
