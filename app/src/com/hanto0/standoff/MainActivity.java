@@ -52,7 +52,7 @@ public class MainActivity extends Activity {
             log("[*] Disabling security...");
             cmd("setenforce 0 2>/dev/null; echo 0 > /proc/sys/kernel/yama/ptrace_scope 2>/dev/null");
             
-            log("[*] Extracting files...");
+            log("[*] Copying files...");
             File so = new File(getFilesDir(), "libnl_menu.so");
             File inj = new File(getFilesDir(), "injector");
             if (so.exists()) so.delete();
@@ -60,23 +60,15 @@ public class MainActivity extends Activity {
             copyAsset("libnl_menu.so", so);
             copyAsset("injector", inj);
             
-            // Витягуємо папку assets локально, щоб скопіювати її в гру
-            File localAssets = new File(getFilesDir(), "assets");
-            localAssets.mkdirs();
-            copyAsset("avatar.rgba", new File(localAssets, "avatar.rgba"));
-            copyAsset("inventory.pak", new File(localAssets, "inventory.pak"));
-            
             String gameCache = "/data/data/com.axlebolt.standoff2/cache";
             cmd("cp " + so.getAbsolutePath() + " " + gameCache + "/libnl_menu.so");
-            cmd("mkdir -p " + gameCache + "/assets");
-            cmd("cp " + localAssets.getAbsolutePath() + "/* " + gameCache + "/assets/");
             cmd("cp " + inj.getAbsolutePath() + " /data/local/tmp/");
             
-            cmd("chown -R $(stat -c %u /data/data/com.axlebolt.standoff2) $(stat -c %g /data/data/com.axlebolt.standoff2) " + gameCache);
-            cmd("chmod -R 755 " + gameCache);
-            cmd("chcon -R u:object_r:app_data_file:s0 " + gameCache + " 2>/dev/null");
+            cmd("chown $(stat -c %u /data/data/com.axlebolt.standoff2) $(stat -c %g /data/data/com.axlebolt.standoff2) " + gameCache + "/libnl_menu.so");
+            cmd("chmod 755 " + gameCache + "/libnl_menu.so /data/local/tmp/injector");
+            cmd("chcon u:object_r:app_data_file:s0 " + gameCache + "/libnl_menu.so 2>/dev/null");
             
-            log("[+] Files copied and permissions fixed");
+            log("[+] Files copied");
             
             log("[*] Launching game...");
             cmd("monkey -p com.axlebolt.standoff2 -c android.intent.category.LAUNCHER 1");
@@ -112,8 +104,7 @@ public class MainActivity extends Activity {
     }
     
     private void copyAsset(String n, File f) throws Exception {
-        InputStream is;
-        try { is = getAssets().open(n); } catch (Exception e) { is = getAssets().open("assets/" + n); }
+        InputStream is = getAssets().open(n);
         FileOutputStream os = new FileOutputStream(f);
         byte[] b = new byte[8192]; int r;
         while ((r = is.read(b)) > 0) os.write(b, 0, r);
