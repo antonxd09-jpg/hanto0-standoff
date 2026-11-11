@@ -15,9 +15,13 @@ jobs:
       - name: Build libnl_menu.so
         run: |
           cd src
+          
+          # Качаємо ImGui OpenGL3 версії 1.90.9 (для сумісності з твоїм сурсом)
           mkdir -p third_party/imgui/backends
-          wget -q https://raw.githubusercontent.com/ocornut/imgui/master/backends/imgui_impl_opengl3.h -O third_party/imgui/backends/imgui_impl_opengl3.h
-          wget -q https://raw.githubusercontent.com/ocornut/imgui/master/backends/imgui_impl_opengl3.cpp -O third_party/imgui/backends/imgui_impl_opengl3.cpp
+          wget -q https://raw.githubusercontent.com/ocornut/imgui/v1.90.9/backends/imgui_impl_opengl3.h -O third_party/imgui/backends/imgui_impl_opengl3.h
+          wget -q https://raw.githubusercontent.com/ocornut/imgui/v1.90.9/backends/imgui_impl_opengl3.cpp -O third_party/imgui/backends/imgui_impl_opengl3.cpp
+          
+          # Качаємо And64InlineHook
           wget -q https://raw.githubusercontent.com/Rprop/And64InlineHook/master/And64InlineHook.hpp
           wget -q https://raw.githubusercontent.com/Rprop/And64InlineHook/master/And64InlineHook.cpp
           
@@ -30,8 +34,7 @@ jobs:
           echo 'target_link_libraries(durow_menu log GLESv3 EGL android)' >> CMakeLists.txt
           
           rm -rf build && mkdir build && cd build
-          # ВКАЗУЄМО ШЛЯХ ДО ASSETS (в кеш гри)
-          cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-24 -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_SHARED_LINKER_FLAGS="-Wl,-z,max-page-size=16384" -DMENU_ASSET_DIR="/data/data/com.axlebolt.standoff2/cache/assets" ..
+          cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-24 -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_SHARED_LINKER_FLAGS="-Wl,-z,max-page-size=16384" ..
           make -j$(nproc)
           find . -name "*.so" | head -n 1 | xargs -I {} cp {} $GITHUB_WORKSPACE/libnl_menu.so
 
@@ -74,7 +77,7 @@ jobs:
           git config --global user.email 'github-actions@github.com'
           cp app/hanto0-standoff.apk ./hanto0-standoff.apk
           git add hanto0-standoff.apk
-          git commit -m "auto: copy assets to game cache and load fonts" || exit 0
+          git commit -m "auto: fix imgui version conflict" || exit 0
           git push
 
       - name: Upload Artifact
