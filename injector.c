@@ -32,6 +32,7 @@ static unsigned long get_base(pid_t pid, const char* name) {
 }
 
 static unsigned long find_sym(pid_t pid, unsigned long base, const char* name) {
+    if (!base) return 0;
     Elf64_Ehdr eh; if (rmem(pid, base, &eh, sizeof(eh)) < 0) return 0;
     Elf64_Phdr* ph = calloc(eh.e_phnum, sizeof(Elf64_Phdr));
     rmem(pid, base + eh.e_phoff, ph, eh.e_phnum * sizeof(Elf64_Phdr));
@@ -72,12 +73,20 @@ int main(int argc, char** argv) {
     }
     memcpy(&orig, &r, sizeof(r));
     
-    unsigned long libc = get_base(pid, "libc.so");
-    unsigned long dlopen = find_sym(pid, libc, "dlopen");
-    printf("[+] libc: %lx, dlopen: %lx\n", libc, dlopen);
-    if (!dlopen) goto detach;
+    // ВИПРАВЛЕНО: шукаємо dlopen у libdl.so, потім у libc.so
+    unsigned long libdl = get_base(pid, "libdl.so");
+    unsigned long dlopen = find_sym(pid, libdl, "dlopen");
+    if (!dlopen) {
+        unsigned long libc = get_base(pid, "libc.so");
+        dlopen = find_sym(pid, libc, "dlopen");
+        printf("[+] libc: %lx, dlopen: %lx\n", libc, dlopen);
+    } else {
+        printf("[+] libdl: %lx, dlopen: %lx\n", libdl, dlopen);
+    }
     
-    unsigned long path = r.sp - 0x400;
+    if (!dlopen) { printf("[!] dlopen not found\n"); goto detach; }
+    
+    unsigned long path = (r.sp & ~0xF) - 0x400;
     if (wmem(pid, path, so, strlen(so) + 1) < 0) { printf("[!] write path\n"); goto detach; }
     
     memset(&r, 0, sizeof(r));
