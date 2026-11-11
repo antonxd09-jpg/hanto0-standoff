@@ -7,7 +7,7 @@
 #include "imgui_impl_opengl3.h"
 #include "menu/menu.h"
 #include "menu/fonts.h"
-#include "dobby.h"
+#include "xhook.h"
 
 #define LOG_TAG "Hanto0"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
@@ -49,12 +49,7 @@ EGLBoolean hook_eglSwapBuffers(EGLDisplay dpy, EGLSurface surf) {
 __attribute__((constructor))
 void on_load() {
     LOGI("Menu loaded via constructor!");
-    void* target = dlsym(RTLD_DEFAULT, "eglSwapBuffers");
-    if (target) {
-        LOGI("Found eglSwapBuffers at %p, hooking...", target);
-        int res = DobbyHook(target, (void*)hook_eglSwapBuffers, (void**)&orig_eglSwapBuffers);
-        LOGI("DobbyHook result: %d", res);
-    } else {
-        LOGI("Failed to find eglSwapBuffers");
-    }
+    xhook_register("libEGL.so", "eglSwapBuffers", (void*)hook_eglSwapBuffers, (void**)&orig_eglSwapBuffers);
+    int res = xhook_refresh(0);
+    LOGI("xhook_refresh result: %d", res);
 }
