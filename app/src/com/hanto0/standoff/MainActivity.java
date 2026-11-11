@@ -58,6 +58,11 @@ public class MainActivity extends Activity {
             log("[*] Copying files...");
             File so = new File(getFilesDir(), "libnl_menu.so");
             File inj = new File(getFilesDir(), "injector");
+            
+            // ВИПРАВЛЕНО: Видаляємо старі файли, щоб оновити на нові
+            if (so.exists()) so.delete();
+            if (inj.exists()) inj.delete();
+            
             copyAsset("libnl_menu.so", so);
             copyAsset("injector", inj);
             
@@ -100,7 +105,6 @@ public class MainActivity extends Activity {
     }
     
     private void copyAsset(String n, File f) throws Exception {
-        if (f.exists() && f.length() > 0) return;
         InputStream is = getAssets().open(n);
         FileOutputStream os = new FileOutputStream(f);
         byte[] b = new byte[8192]; int r;
