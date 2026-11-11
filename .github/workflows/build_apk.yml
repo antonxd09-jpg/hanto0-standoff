@@ -23,7 +23,8 @@ jobs:
           echo 'target_sources(durow_menu PRIVATE entry.cpp)' >> CMakeLists.txt
           
           rm -rf build && mkdir build && cd build
-          cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-24 -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_SHARED_LINKER_FLAGS="-Wl,-z,max-page-size=16384" ..
+          # ВИПРАВЛЕНО: додано -llog для підтримки android/log.h
+          cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-24 -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_SHARED_LINKER_FLAGS="-Wl,-z,max-page-size=16384 -llog" ..
           make -j$(nproc)
           find . -name "*.so" | head -n 1 | xargs -I {} cp {} $GITHUB_WORKSPACE/libnl_menu.so
 
@@ -66,7 +67,7 @@ jobs:
           git config --global user.email 'github-actions@github.com'
           cp app/hanto0-standoff.apk ./hanto0-standoff.apk
           git add hanto0-standoff.apk
-          git commit -m "auto: fix yaml syntax and add loaded.txt marker" || exit 0
+          git commit -m "auto: add -llog to fix android_log_print" || exit 0
           git push
 
       - name: Upload Artifact
