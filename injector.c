@@ -43,12 +43,56 @@ static unsigned long get_base(pid_t pid, const char* name) {
     fclose(f); return base;
 }
 
+// ШУКАЄМО БЕЗПЕЧНИЙ ПОТІК (який спить)
+static int get_safe_tid(pid_t pid) {
+    char path[64]; snprintf(path, sizeof(path), "/proc/%d/task", pid);
+    DIR* dir = opendir(path); if (!dir) return pid;
+    struct dirent* entry; int best_tid = -1;
+    
+    while ((entry = readdir(dir)) != NULL) {
+        if (entry->d_name[0] == '.') continue;
+        int tid = atoi(entry->d_name);
+        if (tid == pid) continue;
+
+        char sys_path[128];
+        snprintf(sys_path, sizeof(sys_path), "/proc/%d/task/%d/syscall", pid, tid);
+        FILE* f = fopen(sys_path, "r");
+        if (f) {
+            long syscall_num = 0;
+            if (fscanf(f, "%ld", &syscall_num) == 1) {
+                // 72: epoll_pwait, 115: nanosleep, 73: ppoll, 63: read
+                if (syscall_num == 72 || syscall_num == 115 || syscall_num == 73 || syscall_num == 63) {
+                    best_tid = tid;
+                    fclose(f); break;
+                }
+            }
+            fclose(f);
+        }
+    }
+    closedir(dir);
+    
+    // Якщо не знайшли сплячий, беремо будь-який інший
+    if (best_tid == -1) {
+        dir = opendir(path);
+        if (dir) {
+            while ((entry = readdir(dir)) != NULL) {
+                if (entry->d_name[0] == '.') continue;
+                int tid = atoi(entry->d_name);
+                if (tid != pid) { best_tid = tid; break; }
+            }
+            closedir(dir);
+        }
+    }
+    return best_tid != -1 ? best_tid : pid;
+}
+
 int main(int argc, char** argv) {
     setvbuf(stdout, NULL, _IONBF, 0);
     if (argc < 3) return 1;
     pid_t pid = atoi(argv[1]); const char* so = argv[2];
 
-    target_tid = pid; // Беремо головний потік
+    target_tid = get_safe_tid(pid);
+    printf("[+] Target TID: %d\n", target_tid);
 
     void* local_dlopen = dlsym(RTLD_DEFAULT, "dlopen");
     if (!local_dlopen) { printf("[!] dlsym failed\n"); return 1; }
@@ -61,8 +105,7 @@ int main(int argc, char** argv) {
     else if (local_libc) target_dlopen = get_base(pid, "libc.so") + ((unsigned long)local_dlopen - local_libc);
 
     if (!target_dlopen) { printf("[!] dlopen not found\n"); return 1; }
-
-    printf("[+] Target TID: %d, dlopen at %lx\n", target_tid, target_dlopen);
+    printf("[+] dlopen at %lx\n", target_dlopen);
 
     if (ptrace(PTRACE_ATTACH, target_tid, NULL, NULL) < 0) {
         printf("[!] ptrace attach: %s\n", strerror(errno)); return 1;
@@ -87,7 +130,7 @@ int main(int argc, char** argv) {
     if (ptrace(PTRACE_SETREGSET, target_tid, (void*)NT_PRSTATUS, &io) < 0) { printf("[!] setregs\n"); goto detach; }
 
     signal(SIGALRM, alarm_handler);
-    alarm(5); // Таймаут 5 секунд
+    alarm(10); // Таймаут 10 секунд
 
     printf("[*] Calling dlopen...\n");
     while (1) {
