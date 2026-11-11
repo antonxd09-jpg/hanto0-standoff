@@ -10,6 +10,8 @@
 #include <sys/uio.h>
 #include <dlfcn.h>
 
+#define NT_PRSTATUS 1
+
 struct arm64_regs { unsigned long regs[31]; unsigned long sp, pc, pstate; };
 
 static int wmem(pid_t pid, unsigned long addr, const void* buf, size_t len) {
@@ -32,7 +34,6 @@ int main(int argc, char** argv) {
     pid_t pid = atoi(argv[1]); const char* so = argv[2];
     printf("[*] PID: %d, SO: %s\n", pid, so);
 
-    // Знаходимо dlopen у нашому власному процесі
     void* local_dlopen = dlsym(RTLD_DEFAULT, "dlopen");
     if (!local_dlopen) { printf("[!] dlsym failed\n"); return 1; }
 
@@ -40,7 +41,6 @@ int main(int argc, char** argv) {
     unsigned long local_libc  = get_base(getpid(), "libc.so");
     unsigned long target_dlopen = 0;
 
-    // Обчислюємо адресу для цільового процесу
     if (local_libdl) {
         unsigned long offset = (unsigned long)local_dlopen - local_libdl;
         unsigned long target_libdl = get_base(pid, "libdl.so");
@@ -61,6 +61,7 @@ int main(int argc, char** argv) {
 
     struct arm64_regs r, orig; struct iovec io = { &r, sizeof(r) };
     if (ptrace(PTRACE_GETREGSET, pid, (void*)NT_PRSTATUS, &io) < 0) {
+        printf("[!] getregs: %s\n", strerror(errno));
         ptrace(PTRACE_DETACH, pid, NULL, NULL); return 1;
     }
     memcpy(&orig, &r, sizeof(r));
